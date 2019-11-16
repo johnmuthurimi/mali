@@ -5,14 +5,14 @@ spring:
         locator:
           enabled: true
       routes:
-        - id: caller-service
-          uri: lb://caller-service
+        - id: auth-service
+          uri: lb://auth-service
           predicates:
             - Path=/caller/**
           filters:
             - RewritePath=/caller/(?<path>.*), /$\{path}
-        - id: callme-service
-          uri: lb://callme-service
+        - id: email-service
+          uri: lb://email-service
           predicates:
             - Path=/callme/**
           filters:
