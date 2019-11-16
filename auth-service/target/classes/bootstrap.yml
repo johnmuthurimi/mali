@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: auth-service
+  cloud:
+    consul:
+      host: 192.168.100.29
+      discovery:
+        hostname: localhost
+        register-health-check: true
+
+server.port: 5001
