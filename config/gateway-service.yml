@@ -8,12 +8,12 @@ spring:
         - id: auth-service
           uri: lb://auth-service
           predicates:
-            - Path=/caller/**
+            - Path=/auth/**
           filters:
-            - RewritePath=/caller/(?<path>.*), /$\{path}
+            - RewritePath=/auth/(?<path>.*), /$\{path}
         - id: email-service
           uri: lb://email-service
           predicates:
-            - Path=/callme/**
+            - Path=/email/**
           filters:
-            - RewritePath=/callme/(?<path>.*), /$\{path}
+            - RewritePath=/email/(?<path>.*), /$\{path}

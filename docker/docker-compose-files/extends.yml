@@ -29,9 +29,9 @@ services:
         image: rabbitmq:3-management
         restart: always
         ports:
-          - 8501:15672
+          - 15672:15672
         expose:
-          - "8501"
+          - "15672"
         networks:
           - prodnetwork
         volumes:
