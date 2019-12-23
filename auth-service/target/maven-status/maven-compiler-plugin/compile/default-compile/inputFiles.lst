@@ -1,2 +1,4 @@
+/home/toor/workspace/mali/auth-service/src/main/java/slick/mali/auth/rabbitmq/RabbitMQConfig.java
 /home/toor/workspace/mali/auth-service/src/main/java/slick/mali/auth/controller/AuthController.java
 /home/toor/workspace/mali/auth-service/src/main/java/slick/mali/auth/AuthApplication.java
+/home/toor/workspace/mali/auth-service/src/main/java/slick/mali/auth/rabbitmq/LoginQueueMessageListener.java

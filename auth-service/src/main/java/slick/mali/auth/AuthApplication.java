@@ -27,7 +27,7 @@ public class AuthApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		rabbitTemplate.convertAndSend("Hello from out first message");
+		rabbitTemplate.convertAndSend("TestExchange", "testRouting", "Hello from code");
 	}
 
 }

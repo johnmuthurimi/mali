@@ -1,9 +1,16 @@
+server.port: 5001
 spring:
   application:
     name: auth-service
+
+  rabbitmq:
+    port: 5672
+    host: 10.0.2.15
+    username: guest
+    password: guest
+    
   cloud:
     consul:
-      consul:
       enabled: true
       port: 8500
       host: 10.0.2.15
@@ -19,4 +26,3 @@ spring:
       ribbon:
         enabled: false
 
-server.port: 5001
