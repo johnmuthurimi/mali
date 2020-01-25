@@ -1,0 +1,15 @@
+### Intellij IDEA ###
+.idea
+.vscode/*
+.settings/*
+
+
+### Maven template
+*/.settings/**
+*/target/**
+
+
+# Package Files #
+*.jar
+*.war
+*.ear
