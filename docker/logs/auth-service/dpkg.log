@@ -1,0 +1,11 @@
+2019-12-23 11:02:06 startup archives unpack
+2019-12-23 11:02:06 install telnet:amd64 <none> 0.17-36
+2019-12-23 11:02:06 status half-installed telnet:amd64 0.17-36
+2019-12-23 11:02:06 status unpacked telnet:amd64 0.17-36
+2019-12-23 11:02:06 status unpacked telnet:amd64 0.17-36
+2019-12-23 11:02:07 startup packages configure
+2019-12-23 11:02:07 configure telnet:amd64 0.17-36 <none>
+2019-12-23 11:02:07 status unpacked telnet:amd64 0.17-36
+2019-12-23 11:02:07 status half-configured telnet:amd64 0.17-36
+2019-12-23 11:02:07 status installed telnet:amd64 0.17-36
+2019-12-23 11:02:08 startup packages configure

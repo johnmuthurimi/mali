@@ -1,2 +1,2 @@
-slick/mali/service/caller/CallerController.class
-slick/mali/service/caller/CallerApplication.class
+slick/mali/auth/controller/AuthController.class
+slick/mali/auth/AuthApplication.class

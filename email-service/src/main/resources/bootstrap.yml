@@ -3,9 +3,19 @@ spring:
     name: email-service
   cloud:
     consul:
-      host: 192.168.100.29
+      enabled: true
+      port: 8500
+      host: 10.0.2.15
+      config:
+        format: YAML
       discovery:
-        hostname: localhost
+        instance-id: ${spring.application.name}:${random.value}
+        health-check-critical-timeout: 1m
         register-health-check: true
+        prefer-ip-address: true
+
+    loadbalancer:
+      ribbon:
+        enabled: false
 
 server.port: 5002
