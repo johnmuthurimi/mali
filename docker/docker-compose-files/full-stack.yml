@@ -1,6 +1,6 @@
 version: '2'
 networks:
-  prodnetwork:
+  prod:
     driver: bridge
 
 volumes:
@@ -8,68 +8,66 @@ volumes:
     driver: local
     
 services:
-  consul-service-node1:
-    container_name: consul-service-node1
+  consul-service:
+    container_name: consul-service
     image: consul
+    hostname: "{{.Node.Hostname}}"
     environment:
       - CONSUL_BOOTSTRAP_EXPECT=3
       - CONSUL_CLIENT_LAN_ADDRESS=0.0.0.0
       - CONSUL_DISABLE_KEYRING_FILE=true
-      - CONSUL_JOIN=consul-service-node1
-    restart: unless-stopped
+      - CONSUL_JOIN=consul-service
+    networks:
+      - prod    
     ports:
-      - '8300:8300'
-      - '8301:8301'
-      - '8301:8301/udp'
       - '8500:8500'
-      - '8600:8600'
-      - '8600:8600/udp'
+    expose:
+      - "8500"
     volumes:
-      - ./../logs/consul-service-node1/:/var/log
-      - ./../data/consul-service-node1/:/var/data
-    networks:
-      - prodnetwork
-  consul-service-node2:
-    container_name: consul-service-node2
-    image: consul
-    environment:
-      - CONSUL_BOOTSTRAP_EXPECT=3
-      - CONSUL_CLIENT_LAN_ADDRESS=0.0.0.0
-      - CONSUL_DISABLE_KEYRING_FILE=true
-      - CONSUL_JOIN=consul-service-node1
-    volumes:
-      - ./../logs/consul-service-node2/:/var/log
-      - ./../data/consul-service-node2/:/var/data
-    networks:
-      - prodnetwork
-
-  consul-service-node3:
-    container_name: consul-service-node3
-    image: consul
-    environment:
-      - CONSUL_BOOTSTRAP_EXPECT=3
-      - CONSUL_CLIENT_LAN_ADDRESS=0.0.0.0
-      - CONSUL_DISABLE_KEYRING_FILE=true
-      - CONSUL_JOIN=consul-service-node1
-    volumes:
-      - ./../logs/consul-service-node3/:/var/log
-      - ./../data/consul-service-node3/:/var/data
-    networks:
-      - prodnetwork
+      - ./../logs/consul-service/:/consul/data
+    restart: unless-stopped
 
   rabbitmq-service:
-    extends:
-      file: extends.yml
-      service: rabbitmq-service
+    container_name: rabbitmq-service
+    image: rabbitmq:3-management
+    restart: unless-stopped
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    expose:
+      - "5672"
+      - "15672"
+    networks:
+      - prod
+    volumes:
+      - ./../logs/rabbitmq-service/:/var/log
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
     depends_on:
-      - consul-service-node1
-      - consul-service-node2
-      - consul-service-node3
+      - consul-service
 
   gateway-service:
-    extends:
-      file: extends.yml
-      service: gateway-service
+    container_name: gateway-service
+    image: mucunga90/gateway-service:latest
+    restart: unless-stopped
+    ports:
+      - '5000:5000'
+    expose:
+      - "5000"
+      - "8500"
+      - "5672"
+    networks:
+      - prod
+    volumes:
+      - ./../logs/gateway-service/:/var/log
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
     depends_on:
       - rabbitmq-service
+  
+
   

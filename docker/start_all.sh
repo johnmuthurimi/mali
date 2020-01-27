@@ -5,7 +5,7 @@ SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P) && SELF_PATH="$SELF_PATH"/$
 
 echo "Stopping all services"
 docker ps | \
-grep "consul-service-node1\|consul-service-node2\|consul-service-node3\|rabbitmq-service\|gateway-service" | \
+grep "consul-service\|rabbitmq-service\|gateway-service" | \
 awk '{print $1}' | xargs docker stop
 
 # remove all images, containers, volumes and networks
