@@ -8,32 +8,68 @@ volumes:
     driver: local
     
 services:
-  consul-service:
-    extends:
-      file: extends.yml
-      service: consul-service
+  consul-service-node1:
+    container_name: consul-service-node1
+    image: consul
+    environment:
+      - CONSUL_BOOTSTRAP_EXPECT=3
+      - CONSUL_CLIENT_LAN_ADDRESS=0.0.0.0
+      - CONSUL_DISABLE_KEYRING_FILE=true
+      - CONSUL_JOIN=consul-service-node1
+    restart: unless-stopped
+    ports:
+      - '8300:8300'
+      - '8301:8301'
+      - '8301:8301/udp'
+      - '8500:8500'
+      - '8600:8600'
+      - '8600:8600/udp'
+    volumes:
+      - ./../logs/consul-service-node1/:/var/log
+      - ./../data/consul-service-node1/:/var/data
+    networks:
+      - prodnetwork
+  consul-service-node2:
+    container_name: consul-service-node2
+    image: consul
+    environment:
+      - CONSUL_BOOTSTRAP_EXPECT=3
+      - CONSUL_CLIENT_LAN_ADDRESS=0.0.0.0
+      - CONSUL_DISABLE_KEYRING_FILE=true
+      - CONSUL_JOIN=consul-service-node1
+    volumes:
+      - ./../logs/consul-service-node2/:/var/log
+      - ./../data/consul-service-node2/:/var/data
+    networks:
+      - prodnetwork
+
+  consul-service-node3:
+    container_name: consul-service-node3
+    image: consul
+    environment:
+      - CONSUL_BOOTSTRAP_EXPECT=3
+      - CONSUL_CLIENT_LAN_ADDRESS=0.0.0.0
+      - CONSUL_DISABLE_KEYRING_FILE=true
+      - CONSUL_JOIN=consul-service-node1
+    volumes:
+      - ./../logs/consul-service-node3/:/var/log
+      - ./../data/consul-service-node3/:/var/data
+    networks:
+      - prodnetwork
+
   rabbitmq-service:
     extends:
       file: extends.yml
       service: rabbitmq-service
     depends_on:
-      - consul-service
+      - consul-service-node1
+      - consul-service-node2
+      - consul-service-node3
+
   gateway-service:
     extends:
       file: extends.yml
       service: gateway-service
-    depends_on:
-      - rabbitmq-service
-  auth-service:
-    extends:
-      file: extends.yml
-      service: auth-service
-    depends_on:
-      - rabbitmq-service
-  email-service:
-    extends:
-      file: extends.yml
-      service: email-service
     depends_on:
       - rabbitmq-service
   

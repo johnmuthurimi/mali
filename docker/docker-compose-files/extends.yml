@@ -8,26 +8,10 @@ volumes:
     driver: local
     
 services:
-    consul-service:
-        container_name: consul-service
-        image: consul
-        restart: always
-        ports:
-          - 8500:8500
-        expose:
-          - "8500"
-        networks:
-          - prodnetwork
-        volumes:
-          - ./../logs/consul-service/:/var/log
-        logging:
-          options:
-            max-size: "10m"
-            max-file: "10"
     rabbitmq-service:
         container_name: rabbitmq-service
         image: rabbitmq:3-management
-        restart: always
+        restart: unless-stopped
         ports:
           - 5672:5672
           - 15672:15672
@@ -41,10 +25,11 @@ services:
           options:
             max-size: "10m"
             max-file: "10"
+
     gateway-service:
         container_name: gateway-service
         image: mucunga90/gateway-service:latest
-        restart: always
+        restart: unless-stopped
         ports:
           - 5000:5000
         expose:
@@ -55,42 +40,6 @@ services:
           - prodnetwork
         volumes:
           - ./../logs/gateway-service/:/var/log
-        logging:
-          options:
-            max-size: "10m"
-            max-file: "10"
-    auth-service:
-        container_name: auth-service
-        image: mucunga90/auth-service:latest
-        restart: always
-        ports:
-          - "5001:5001"
-        expose:
-          - "5001"          
-          - "8500"
-          - "5672"
-        networks:
-          - prodnetwork
-        volumes:
-          - ./../logs/auth-service/:/var/log
-        logging:
-          options:
-            max-size: "10m"
-            max-file: "10"
-    email-service:
-        container_name: email-service
-        image: mucunga90/email-service:latest
-        restart: always
-        ports:
-          - "5002:5002"
-        expose:
-          - "5002"
-          - "8500"
-          - "5672"
-        networks:
-          - prodnetwork
-        volumes:
-          - ./../logs/email-service/:/var/log
         logging:
           options:
             max-size: "10m"
