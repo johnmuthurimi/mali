@@ -1,4 +1,4 @@
-version: '2'
+version: '3.6'
 networks:
   prod:
     driver: bridge
@@ -11,7 +11,6 @@ services:
   consul-service:
     container_name: consul-service
     image: consul
-    hostname: "{{.Node.Hostname}}"
     environment:
       - CONSUL_BOOTSTRAP_EXPECT=3
       - CONSUL_CLIENT_LAN_ADDRESS=0.0.0.0
@@ -24,29 +23,33 @@ services:
     expose:
       - "8500"
     volumes:
-      - ./../logs/consul-service/:/consul/data
+      - ./../data/consul-service/:/consul/data
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
     restart: unless-stopped
 
   rabbitmq-service:
     container_name: rabbitmq-service
-    image: rabbitmq:3-management
-    restart: unless-stopped
+    image: rabbitmq:3.6-management-alpine  
+    networks:
+      - prod 
     ports:
       - '5672:5672'
       - '15672:15672'
     expose:
       - "5672"
       - "15672"
-    networks:
-      - prod
     volumes:
-      - ./../logs/rabbitmq-service/:/var/log
+      - ./../data/rabbitmq-service/:/var/lib/rabbitmq
     logging:
       options:
         max-size: "10m"
         max-file: "10"
     depends_on:
       - consul-service
+    restart: unless-stopped
 
   gateway-service:
     container_name: gateway-service

@@ -5,15 +5,15 @@ spring:
         locator:
           enabled: true
       routes:
-        - id: auth-service
-          uri: lb://auth-service
+        - id: user-service
+          uri: lb://user-service
           predicates:
-            - Path=/auth/**
+            - Path=/user/**
           filters:
-            - RewritePath=/auth/(?<path>.*), /$\{path}
-        - id: email-service
-          uri: lb://email-service
+            - RewritePath=/user/(?<path>.*), /$\{path}
+        - id: alert-service
+          uri: lb://alert-service
           predicates:
-            - Path=/email/**
+            - Path=/alert/**
           filters:
-            - RewritePath=/email/(?<path>.*), /$\{path}
+            - RewritePath=/alert/(?<path>.*), /$\{path}

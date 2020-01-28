@@ -12,6 +12,12 @@ awk '{print $1}' | xargs docker stop
 echo "Pruning all the services"
 docker system prune
 
+#Allow comment in PROD
+#docker image prune -a
+#docker volume prune
+#docker container prune
+
+
 echo -n "Build new images? y/n  "
 read build_images
 if [ "$build_images" == "y" ]; then
@@ -21,12 +27,13 @@ if [ "$build_images" == "y" ]; then
 
 fi
 
+#Allow comment in PROD
 if [ "$build_images" == "y" ]; then
-	echo -n "Docker credentials for publishing images"
+	echo -n "Docker credentials for publishing images"	
 	#docker login
 	#docker push mucunga90/gateway-service:latest
 fi
 
-#echo "Starting your local dockerized full stack with mounted volumes"
+echo "Starting your local dockerized full stack with mounted volumes"
 cd ./../docker/
 docker-compose -f docker-compose-files/full-stack.yml up -d

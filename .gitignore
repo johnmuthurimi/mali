@@ -7,6 +7,8 @@
 ### Maven template
 */.settings/**
 */target/**
+*/logs/**
+*/data/**
 
 
 # Package Files #

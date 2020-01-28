@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: alert-service
+  cloud:
+    consul:
+      enabled: true
+      port: 8500
+      host: 10.0.2.15
+      config:
+        format: YAML
+      discovery:
+        instance-id: ${spring.application.name}:${random.value}
+        health-check-critical-timeout: 1m
+        register-health-check: true
+        prefer-ip-address: true
+
+    loadbalancer:
+      ribbon:
+        enabled: false
+
+server.port: 5002
