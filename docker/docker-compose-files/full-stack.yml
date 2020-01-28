@@ -59,8 +59,6 @@ services:
       - '5000:5000'
     expose:
       - "5000"
-      - "8500"
-      - "5672"
     networks:
       - prod
     volumes:
@@ -71,6 +69,25 @@ services:
         max-file: "10"
     depends_on:
       - rabbitmq-service
+  
+  user-service:
+    container_name: user-service
+    image: mucunga90/user-service:latest
+    restart: unless-stopped
+    ports:
+      - '5001:5001'
+    expose:
+      - "5001"
+    networks:
+      - prod
+    volumes:
+      - ./../logs/user-service/:/var/log
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+    depends_on:
+      - gateway-service
   
 
   

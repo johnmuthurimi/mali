@@ -7,33 +7,27 @@ spring:
         locator:
           enabled: true
       routes:
-        - id: account-service
-          uri: lb://account-service
+        - id: user-service
+          uri: lb://user-service
           predicates:
-            - Path=/account/**
+            - Path=/user/**
           filters:
-            - RewritePath=/account/(?<path>.*), /$\{path}
+            - RewritePath=/user/(?<path>.*), /$\{path}
         - id: customer-service
           uri: lb://customer-service
           predicates:
             - Path=/customer/**
           filters:
             - RewritePath=/customer/(?<path>.*), /$\{path}
-        - id: order-service
-          uri: lb://order-service
+        - id: payment-service
+          uri: lb://payment-service
           predicates:
-            - Path=/order/**
+            - Path=/payment/**
           filters:
-            - RewritePath=/order/(?<path>.*), /$\{path}
-        - id: product-service
-          uri: lb://product-service
+            - RewritePath=/payment/(?<path>.*), /$\{path}
+        - id: ads-service
+          uri: lb://ads-service
           predicates:
-            - Path=/product/**
+            - Path=/ads/**
           filters:
-            - RewritePath=/product/(?<path>.*), /$\{path}
-
-logging.level.com.netflix: DEBUG
-    
-management:
-  security:
-    enabled: false
+            - RewritePath=/ads/(?<path>.*), /$\{path}
