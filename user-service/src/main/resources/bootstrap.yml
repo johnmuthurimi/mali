@@ -10,16 +10,17 @@ spring:
       config:
         format: YAML
       discovery:
-        instance-id: "${spring.cloud.client.hostname}:${spring.application.name}:${random.int[1,999999]}"
+        instance-id: "${spring.application.name}-${random.int[1,999999]}"
         health-check-critical-timeout: 1m
         register-health-check: true
         prefer-ip-address: true
   output.ansi.enabled: ALWAYS
+  rabbitmq:
+    port: 5672
+    host: 10.0.2.15
+    username: guest
+    password: guest
 logging:
   level:
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
-rabbitmq:
-  port: 5672
-  host: 10.0.2.15
-  username: guest
-  password: guest
+

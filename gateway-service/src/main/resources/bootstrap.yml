@@ -10,7 +10,7 @@ spring:
       config:
         format: YAML
       discovery:
-        instance-id: "${spring.cloud.client.hostname}:${spring.application.name}:${random.int[1,999999]}"
+        instance-id: "${spring.application.name}-${random.int[1,999999]}"
         health-check-critical-timeout: 1m
         register-health-check: true
         prefer-ip-address: true
