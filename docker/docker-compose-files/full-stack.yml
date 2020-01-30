@@ -49,12 +49,11 @@ services:
         max-file: "10"
     restart: unless-stopped
 
-  database-service:
-    container_name: database-service
-    image: mysql:8.0.17
-    environment:
-      MYSQL_ROOT_PASSWORD: mali
-      MYSQL_DATABASE: mali
+  # https://dev.mysql.com/doc/mysql-installation-excerpt/5.5/en/docker-mysql-getting-started.html
+  # GENERATED ROOT PASSWORD: 5Ej%0gOmr3GJybaG8@t10fIh,YD
+  mysql-service:
+    container_name: mysql-service
+    image: mysql/mysql-server:8.0.13
     networks:
       - prod 
     ports:
@@ -62,7 +61,7 @@ services:
     expose:
       - "3308"
     volumes:
-      - ./../data/database-service/:/var/lib/mysql
+      - ./../data/mysql-service/:/var/lib/mysql-server
     logging:
       options:
         max-size: "10m"
@@ -105,7 +104,7 @@ services:
     depends_on:
       - consul-service
       - rabbitmq-service
-      - database-service
+      - mysql-service
       - gateway-service
   
 
