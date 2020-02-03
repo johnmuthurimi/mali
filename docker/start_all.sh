@@ -15,7 +15,7 @@ docker system prune
 #Allow comment in PROD
 #docker image prune -a
 #docker volume prune
-#docker container prune
+docker container prune
 
 
 echo -n "Build new images? y/n  "

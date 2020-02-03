@@ -20,17 +20,13 @@ spring:
     host: 10.0.2.15
     username: guest
     password: guest
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3308/user_service?useSSL=false
-    username: root
-    password: "5Ej%0gOmr3GJybaG8@t10fIh,YD"
   jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/user_service
+    username: appuser
+    password: appuser
 logging:
   level:
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG

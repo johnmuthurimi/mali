@@ -49,19 +49,24 @@ services:
         max-file: "10"
     restart: unless-stopped
 
-  # https://dev.mysql.com/doc/mysql-installation-excerpt/5.5/en/docker-mysql-getting-started.html
-  # GENERATED ROOT PASSWORD: 5Ej%0gOmr3GJybaG8@t10fIh,YD
+  # https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/docker-mysql-getting-started.html
+  # https://dev.mysql.com/doc/refman/8.0/en/creating-accounts.html
+  # GENERATED ROOT PASSWORD: &@muRaLoB&0RkufjycAP^@Dq@Dq
   mysql-service:
     container_name: mysql-service
-    image: mysql/mysql-server:8.0.13
+    image: mysql:5.7
+    environment:
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: appuser
+      MYSQL_ROOT_PASSWORD: root
     networks:
-      - prod 
+      - prod
     ports:
       - "3308:3306"
     expose:
       - "3308"
     volumes:
-      - ./../data/mysql-service/:/var/lib/mysql-server
+      - ./../data/mysql-service:/var/lib/mysql
     logging:
       options:
         max-size: "10m"
@@ -79,11 +84,15 @@ services:
     networks:
       - prod
     volumes:
-      - ./../data/gateway-service/:/var/log
+      - ./../data/gateway-service/:/var/lib/mucunga90/gateway-service
     logging:
       options:
         max-size: "10m"
         max-file: "10"
+    depends_on:
+      - consul-service
+      - rabbitmq-service
+      - mysql-service
   
   user-service:
     container_name: user-service
@@ -96,7 +105,7 @@ services:
     networks:
       - prod
     volumes:
-      - ./../data/user-service/:/var/log
+      - ./../data/user-service/:/log
     logging:
       options:
         max-size: "10m"
