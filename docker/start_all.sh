@@ -8,13 +8,10 @@ docker ps | \
 grep "consul-service\|rabbitmq-service\|mysql-service\|gateway-service\|user-service\|alert-service" | \
 awk '{print $1}' | xargs docker stop
 
-# remove all images, containers, volumes and networks
-echo "Pruning all the services"
-
 #Allow comment in PROD
+#echo "Pruning all the services"
+# remove all images, containers, volumes and networks
 #docker system prune -a
-
-
 
 echo -n "Build new images? y/n  "
 read build_images
