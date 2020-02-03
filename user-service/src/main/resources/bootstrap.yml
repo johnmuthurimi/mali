@@ -24,9 +24,9 @@ spring:
     hibernate:
       ddl-auto: none
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/user_service
-    username: appuser
-    password: appuser
+    url: jdbc:mysql://localhost:3308/user_service
+    username: root
+    password: root
 logging:
   level:
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG

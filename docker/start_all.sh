@@ -10,12 +10,10 @@ awk '{print $1}' | xargs docker stop
 
 # remove all images, containers, volumes and networks
 echo "Pruning all the services"
-docker system prune
 
 #Allow comment in PROD
-#docker image prune -a
-#docker volume prune
-docker container prune
+#docker system prune -a
+
 
 
 echo -n "Build new images? y/n  "
