@@ -1,10 +1,10 @@
 package slick.mali.user.service;
 
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import slick.mali.user.model.User;
 import slick.mali.user.repository.UserRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation for all user operations

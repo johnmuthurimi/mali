@@ -1,7 +1,9 @@
-package slick.mali.user.service;
+package slick.mali.user.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * The BaseController class implements common functionality for all Controller
@@ -10,6 +12,8 @@ import org.slf4j.LoggerFactory;
  * annotated Controller methods.
  * 
  */
+@RestController
+@RequestMapping("/")
 public class BaseController {
 
     /**

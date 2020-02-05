@@ -13,7 +13,6 @@ spring:
         instance-id: "${spring.application.name}-${random.int[1,999999]}"
         health-check-critical-timeout: 1m
         register-health-check: true
-        prefer-ip-address: true
   output.ansi.enabled: ALWAYS
 logging:
   level:

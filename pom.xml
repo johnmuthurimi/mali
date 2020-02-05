@@ -30,7 +30,6 @@
       <modules>
           <module>gateway-service</module>
           <module>user-service</module>
-          <module>alert-service</module>
       </modules>
   
       <repositories>

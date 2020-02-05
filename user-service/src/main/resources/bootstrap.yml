@@ -14,6 +14,7 @@ spring:
         health-check-critical-timeout: 1m
         register-health-check: true
         prefer-ip-address: true
+    loadbalancer.ribbon.enabled: false
   output.ansi.enabled: ALWAYS
   rabbitmq:
     port: 5672
@@ -21,24 +22,14 @@ spring:
     username: guest
     password: guest
   jpa:
+    open-in-view: true
     hibernate:
       ddl-auto: none
-      generate-ddl: false
-      show-sql: true
   datasource:
     url: jdbc:mysql://10.0.2.15:3308/user_service?useSSL=false&serverTimezone=UTC&autoReconnect=true
     username: root
     password: root
-    driver-class-name: com.mysql.jdbc.Driver
-    testWhileIdle: true
-    timeBetweenEvictionRunsMillis: 60000
-    validationQuery: SELECT 1
-  tomcat:
-      test-while-idle: true
-      time-between-eviction-runs-millis: 60000
-      validation-query: SELECT 1
-  hikari:
-      connection-timeout: 10000000
+    driver-class-name: com.mysql.cj.jdbc.Driver
 logging:
   level:
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
