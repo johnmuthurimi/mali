@@ -1,5 +1,6 @@
 package slick.mali.user.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,10 +20,18 @@ public class UserService implements IUserService {
     private UserRepository repository;
 
     /**
-     * This function returns data from the databases
+     * This functions gets all users You must however the page and number of items
+     * in the page By default the system gives 100 users per page
      */
     @Override
     public List<User> getUsers(Long page, Long row) {
-        return (List<User>) repository.getUsers(page, row);
+        // Atempt fetching users
+        List<User> userResponse = null;
+        try {
+            userResponse = (List<User>) repository.getUsers(page, row);
+        } catch (Exception e) {
+            throw e;
+        }
+        return userResponse;
     }
 }

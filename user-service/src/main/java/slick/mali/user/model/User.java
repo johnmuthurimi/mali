@@ -2,45 +2,33 @@ package slick.mali.user.model;
 
 import java.util.UUID;
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 /**
  * Domain class for user
  */
-@Entity
-@Table(name = "user")
+@MappedSuperclass
+@SqlResultSetMapping(name = "User", classes = @ConstructorResult(targetClass = User.class, columns = {
+        @ColumnResult(name = "id", type = String.class), @ColumnResult(name = "username", type = String.class) }))
 public class User {
 
     /**
      * Auto generated uuid identifier for user
      */
-    @Id
-    @GeneratedValue(generator = "UUID")
-    @Column(name = "id", length = 16, unique = true, nullable = false)
     private UUID id;
 
     /**
      * Username should be unique
      */
-    @NotBlank
-    @Column(unique = true, nullable = false)
-    @Size(min = 1, max = 100)
     private String username;
 
     /**
      * Firstname of the user and allow nulls
      */
-    @NotBlank
-    @Column(name = "firstName", nullable = false)
-    @Size(max = 50)
     private String firstName;
 
     /**
      * LastName of the user and allow nulls
      */
-    @Column(name = "lastName", nullable = false)
-    @Size(max = 50)
     private String lastName;
 
     /**

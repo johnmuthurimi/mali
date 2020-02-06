@@ -9,9 +9,12 @@ import slick.mali.user.model.User;
 public interface IUserService extends IBaseService {
 
     /**
-     * This functions gets all users
-     * You must however pass a filter
-     * By default the system gives 100 users per page
+     * This functions gets all users You must however the page and number of items
+     * in the page By default the system gives 100 users per page
+     * 
+     * @param page
+     * @param row
+     * @return List of users
      */
     List<User> getUsers(Long page, Long row);
 }
