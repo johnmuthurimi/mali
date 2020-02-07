@@ -37,4 +37,13 @@ public class UserController extends BaseController {
         List<User> users = userService.userFetch(pageNumber);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
+
+    /*
+    @PostMapping(path = "/add", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<List<User>> userAdd(@RequestBody User user) {
+        User result = userService.userAdd(user);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }*/
+
+
 }

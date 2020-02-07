@@ -9,33 +9,31 @@ import javax.persistence.*;
 @Entity
 @Table(name = "user")
 @NamedStoredProcedureQueries({
-  @NamedStoredProcedureQuery(
-    name = "sp_user_fetch", 
-    procedureName = "USER_FETCH", 
-    resultClasses = { User.class }, 
-    parameters = { 
-        @StoredProcedureParameter(
-          name = "pageNumber", 
-          type = Integer.class) }) 
-})
+    @NamedStoredProcedureQuery(
+      name = "sp_user_fetch", 
+      procedureName = "sp_user_fetch", 
+      resultClasses = { User.class }, 
+      parameters = { 
+          @StoredProcedureParameter(
+            name = "pageNumber", 
+            type = Integer.class, 
+            mode = ParameterMode.IN) }) 
+  })
 public class User {
 
     /**
      * Auto generated uuid identifier for user
-     */
-    @Id
+     */    
     private UUID id;
 
     /**
      * Username should be unique
      */
-    @Column(name = "username")
     private String username;
 
     /**
      * Firstname of the user and allow nulls
      */
-    @Column(name = "firstName")
     private String firstName;
 
     /**
@@ -47,6 +45,7 @@ public class User {
     /**
      * Get user id
      */
+    @Id
     public UUID getId() {
         return id;
     }
@@ -75,6 +74,7 @@ public class User {
     /**
      * Get the firstname
      */
+    @Column(name = "firstName")
     public String getFirstName() {
         return firstName;
     }
@@ -96,6 +96,7 @@ public class User {
     /**
      * Set the user lastname
      */
+    @Column(name = "username")
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }

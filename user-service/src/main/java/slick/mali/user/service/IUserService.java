@@ -16,4 +16,12 @@ public interface IUserService extends IBaseService {
      * @return List of users
      */
     List<User> userFetch(int pageNumber);
+
+    /**
+     * This functions to save user
+     * 
+     * @param User
+     * @return Users
+     */
+    User userAdd(User user);
 }

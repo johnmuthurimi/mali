@@ -34,4 +34,18 @@ public class UserService implements IUserService {
         }
         return userResponse;
     }
+
+    /**
+     * Save customer to the database
+     */
+    @Override
+    public User userAdd(User user) {
+        User userResponse = null;
+        try {
+            userResponse = (User) repository.userAdd(user);
+        } catch (Exception e) {
+            throw e;
+        }
+        return userResponse;
+    }
 }
