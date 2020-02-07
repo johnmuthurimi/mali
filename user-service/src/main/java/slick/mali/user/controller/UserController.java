@@ -28,14 +28,13 @@ public class UserController extends BaseController {
      * This function returns users from the databases It is envisioned for admin
      * module management
      * 
-     * @param page
-     * @param row
+     * @param pageNumber
      * @return List of users
      */
     @RequestMapping(value = "/fetch")
     @ResponseBody
-    public ResponseEntity<List<User>> getUsers(@RequestParam long page, @RequestParam long row) {
-        List<User> users = userService.getUsers(page, row);
+    public ResponseEntity<List<User>> userFetch(@RequestParam int pageNumber) {
+        List<User> users = userService.userFetch(pageNumber);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 }

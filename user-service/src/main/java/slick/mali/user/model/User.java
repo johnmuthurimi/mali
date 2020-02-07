@@ -6,29 +6,42 @@ import javax.persistence.*;
 /**
  * Domain class for user
  */
-@MappedSuperclass
-@SqlResultSetMapping(name = "User", classes = @ConstructorResult(targetClass = User.class, columns = {
-        @ColumnResult(name = "id", type = String.class), @ColumnResult(name = "username", type = String.class) }))
+@Entity
+@Table(name = "user")
+@NamedStoredProcedureQueries({
+  @NamedStoredProcedureQuery(
+    name = "sp_user_fetch", 
+    procedureName = "USER_FETCH", 
+    resultClasses = { User.class }, 
+    parameters = { 
+        @StoredProcedureParameter(
+          name = "pageNumber", 
+          type = Integer.class) }) 
+})
 public class User {
 
     /**
      * Auto generated uuid identifier for user
      */
+    @Id
     private UUID id;
 
     /**
      * Username should be unique
      */
+    @Column(name = "username")
     private String username;
 
     /**
      * Firstname of the user and allow nulls
      */
+    @Column(name = "firstName")
     private String firstName;
 
     /**
      * LastName of the user and allow nulls
      */
+    @Column(name = "lastName")
     private String lastName;
 
     /**
@@ -47,7 +60,7 @@ public class User {
 
     /**
      * Get the username
-     */
+     */    
     public String getUsername() {
         return username;
     }

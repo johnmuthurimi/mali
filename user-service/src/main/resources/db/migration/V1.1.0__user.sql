@@ -1,6 +1,6 @@
 USE user_service;
 
-CREATE TABLE userlogin (
+CREATE TABLE user (
   id binary(16) PRIMARY KEY,
   username varchar(100) NOT NULL,
   firstname varchar(50) DEFAULT NULL,

@@ -30,18 +30,16 @@ public class UserRepository {
      * with arguments
      * 
      * @param page
-     * @param row
      * @return List of users
      */
-    public List<User> getUsers(long page, long row) {
+    public List<User> userFetch(int pageNumber) {
         List<User> list = new ArrayList<>();
-        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_getUsers", "User");
+        SqlParameterSource inParams = new MapSqlParameterSource()
+				.addValue("pageNumber", pageNumber);
+        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("USER_FETCH");
         try {
             // Execute query
-            // set input parameter
-            query.setParameter("page", page);
-            query.setParameter("row", row);
-            query.execute();
+            query.execute(inParams);
             list = query.getResultList();
         } catch (Exception e) {
             throw e;

@@ -6,7 +6,7 @@ spring:
     consul:
       enabled: true
       port: 8500
-      host: 10.0.2.15
+      host: 192.168.100.29
       config:
         format: YAML
       discovery:

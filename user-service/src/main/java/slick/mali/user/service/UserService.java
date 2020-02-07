@@ -24,11 +24,11 @@ public class UserService implements IUserService {
      * in the page By default the system gives 100 users per page
      */
     @Override
-    public List<User> getUsers(Long page, Long row) {
+    public List<User> userFetch(int pageNumber) {
         // Atempt fetching users
         List<User> userResponse = null;
         try {
-            userResponse = (List<User>) repository.getUsers(page, row);
+            userResponse = (List<User>) repository.userFetch(pageNumber);
         } catch (Exception e) {
             throw e;
         }
