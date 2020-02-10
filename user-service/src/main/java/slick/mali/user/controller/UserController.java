@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import slick.mali.user.model.Response;
 import slick.mali.user.model.User;
 import slick.mali.user.service.IUserService;
 
@@ -33,17 +35,20 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/fetch")
     @ResponseBody
-    public ResponseEntity<List<User>> userFetch(@RequestParam int pageNumber) {
+    public ResponseEntity<Response<List<User>>> userFetch(@RequestParam int pageNumber) {
         List<User> users = userService.userFetch(pageNumber);
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        Response<List<User>> res = new Response<List<User>>();
+        res.setCode(100);
+        res.setMessage("success");
+        res.setResult(users);
+        return new ResponseEntity<Response<List<User>>>(res, HttpStatus.OK);
     }
 
     /*
-    @PostMapping(path = "/add", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<List<User>> userAdd(@RequestBody User user) {
-        User result = userService.userAdd(user);
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }*/
-
+     * @PostMapping(path = "/add", consumes = "application/json", produces =
+     * "application/json") public ResponseEntity<List<User>> userAdd(@RequestBody
+     * User user) { User result = userService.userAdd(user); return new
+     * ResponseEntity<>(result, HttpStatus.OK); }
+     */
 
 }
