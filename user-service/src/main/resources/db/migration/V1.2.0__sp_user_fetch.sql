@@ -12,7 +12,7 @@ BEGIN
 
   SET @offset = (pageNumber*records);
 
-  SELECT * FROM user LIMIT offset, records;
+  SELECT id, email, identifier, value, enabled, deleted FROM user_hash LIMIT offset, records;
 
 END //
 DELIMITER ;

@@ -1,104 +1,113 @@
 package slick.mali.user.model;
 
-import java.util.UUID;
+import java.math.BigInteger;
 import javax.persistence.*;
 
 /**
  * Domain class for user
  */
 @Entity
-@Table(name = "user")
+@Table(name = "user_hash")
 @NamedStoredProcedureQueries({
-    @NamedStoredProcedureQuery(
-      name = "sp_user_fetch", 
-      procedureName = "sp_user_fetch", 
-      resultClasses = { User.class }, 
-      parameters = { 
-          @StoredProcedureParameter(
-            name = "pageNumber", 
-            type = Integer.class, 
-            mode = ParameterMode.IN) }) 
-  })
+                @NamedStoredProcedureQuery(name = "sp_user_fetch", procedureName = "sp_user_fetch", resultClasses = {
+                                User.class }, parameters = {
+                                                @StoredProcedureParameter(name = "pageNumber", type = Integer.class, mode = ParameterMode.IN) }) })
 public class User {
 
-    /**
-     * Auto generated uuid identifier for user
-     */    
-    private UUID id;
+        /**
+         * User unique id
+         */
+        @Id
+        @Column(name = "id")
+        private BigInteger id;
 
-    /**
-     * Username should be unique
-     */
-    private String username;
+        /**
+         * identifier should be unique
+         */
+        @Column(name = "identifier")
+        private String identifier;
 
-    /**
-     * Firstname of the user and allow nulls
-     */
-    private String firstName;
+        /**
+         * email of the user
+         */
+        @Column(name = "email")
+        private String email;
 
-    /**
-     * LastName of the user and allow nulls
-     */
-    @Column(name = "lastName")
-    private String lastName;
+        /**
+         * User password
+         */
+        @Column(name = "value")
+        private String value;
 
-    /**
-     * Get user id
-     */
-    @Id
-    public UUID getId() {
-        return id;
-    }
+        /**
+         * user enabled boolean
+         */
+        @Column(name = "enabled")
+        private boolean enabled;
 
-    /**
-     * Set the user id
-     */
-    public void setId(UUID id) {
-        this.id = id;
-    }
+        /**
+         * user deleted boolean
+         */
+        @Column(name = "deleted")
+        private boolean deleted;
 
-    /**
-     * Get the username
-     */    
-    public String getUsername() {
-        return username;
-    }
+        /**
+         * Get user id
+         */
+        @Id
+        public BigInteger getId() {
+                return id;
+        }
 
-    /**
-     * Set the username
-     */
-    public void setUsername(String username) {
-        this.username = username;
-    }
+        /**
+         * Set the user id
+         */
+        public void setId(BigInteger id) {
+                this.id = id;
+        }
 
-    /**
-     * Get the firstname
-     */
-    @Column(name = "firstName")
-    public String getFirstName() {
-        return firstName;
-    }
+        /**
+         * Get the identifier
+         */
+        public String getIdentifier() {
+                return identifier;
+        }
 
-    /**
-     * Set the firstname
-     */
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+        /**
+         * Set the identifier
+         */
+        public void setIdentifier(String identifier) {
+                this.identifier = identifier;
+        }
 
-    /**
-     * Get the user lastname
-     */
-    public String getLastName() {
-        return lastName;
-    }
+        /**
+         * Get the value
+         */
+        @Column(name = "value")
+        public String getValue() {
+                return value;
+        }
 
-    /**
-     * Set the user lastname
-     */
-    @Column(name = "username")
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+        /**
+         * Set the value
+         */
+        public void setValue(String value) {
+                this.value = value;
+        }
+
+        /**
+         * Get the user email
+         */
+        public String getEmail() {
+                return email;
+        }
+
+        /**
+         * Set the user email
+         */
+        @Column(name = "email")
+        public void setEmail(String email) {
+                this.email = email;
+        }
 
 }
