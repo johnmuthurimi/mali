@@ -8,10 +8,21 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "user_hash")
-@NamedStoredProcedureQueries({
-                @NamedStoredProcedureQuery(name = "sp_user_fetch", procedureName = "sp_user_fetch", resultClasses = {
-                                User.class }, parameters = {
-                                                @StoredProcedureParameter(name = "pageNumber", type = Integer.class, mode = ParameterMode.IN) }) })
+@NamedStoredProcedureQueries(
+{
+        @NamedStoredProcedureQuery(name = "sp_user_fetch", procedureName = "sp_user_fetch", resultClasses = { User.class }, 
+        parameters = {
+                @StoredProcedureParameter(name = "pageNumber", type = Integer.class, mode = ParameterMode.IN) 
+        }),
+        @NamedStoredProcedureQuery(name = "sp_user_add", procedureName = "sp_user_add", resultClasses = { User.class }, 
+        parameters = {
+                @StoredProcedureParameter(name = "type", type = String.class, mode = ParameterMode.IN),
+                @StoredProcedureParameter(name = "email", type = String.class, mode = ParameterMode.IN),
+                @StoredProcedureParameter(name = "identifier", type = String.class, mode = ParameterMode.IN),
+                @StoredProcedureParameter(name = "value", type = String.class, mode = ParameterMode.IN),
+                @StoredProcedureParameter(name = "status", type = Integer.class, mode = ParameterMode.IN) 
+        }) 
+})
 public class User {
 
         /**
@@ -20,6 +31,12 @@ public class User {
         @Id
         @Column(name = "id")
         private BigInteger id;
+
+        /**
+         * type of the user authentication
+         */
+        @Column(name = "type")
+        private String type;
 
         /**
          * identifier should be unique
@@ -40,6 +57,11 @@ public class User {
         private String value;
 
         /**
+         * User password
+         */
+        private String password;
+
+        /**
          * user enabled boolean
          */
         @Column(name = "enabled")
@@ -50,6 +72,12 @@ public class User {
          */
         @Column(name = "deleted")
         private boolean deleted;
+
+        /**
+         * user status
+         */
+        @Column(name = "status")
+        private Integer status;
 
         /**
          * Get user id
@@ -81,6 +109,20 @@ public class User {
         }
 
         /**
+         * Get the type
+         */
+        public String getType() {
+                return type;
+        }
+
+        /**
+         * Set the type
+         */
+        public void setType(String type) {
+                this.type = type;
+        }
+
+        /**
          * Get the value
          */
         @Column(name = "value")
@@ -96,6 +138,20 @@ public class User {
         }
 
         /**
+         * Get the password
+         */
+        public String getPassword() {
+                return password;
+        }
+
+        /**
+         * Set the password
+         */
+        public void setPassword(String password) {
+                this.password = password;
+        }
+
+        /**
          * Get the user email
          */
         public String getEmail() {
@@ -108,6 +164,21 @@ public class User {
         @Column(name = "email")
         public void setEmail(String email) {
                 this.email = email;
+        }
+
+        /**
+         * Get the user status
+         */
+        public Integer getStatus() {
+                return status;
+        }
+
+        /**
+         * Set the user status
+         */
+        @Column(name = "status")
+        public void setStatus(Integer status) {
+                this.status = status;
         }
 
 }

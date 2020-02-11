@@ -18,10 +18,10 @@ public interface IUserService extends IBaseService {
     List<User> userFetch(int pageNumber);
 
     /**
-     * This functions to save user
+     * This feature is responsible for registering a customer
      * 
      * @param User
      * @return Users
      */
-    User userAdd(User user);
+    User signUp(User user);
 }

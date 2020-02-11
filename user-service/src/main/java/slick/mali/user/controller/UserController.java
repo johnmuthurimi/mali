@@ -4,6 +4,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -36,19 +38,27 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/fetch")
     @ResponseBody
     public ResponseEntity<Response<List<User>>> userFetch(@RequestParam int pageNumber) {
-        List<User> users = userService.userFetch(pageNumber);
-        Response<List<User>> res = new Response<List<User>>();
-        res.setCode(100);
-        res.setMessage("success");
-        res.setResult(users);
-        return new ResponseEntity<Response<List<User>>>(res, HttpStatus.OK);
+        try {
+            List<User> result = userService.userFetch(pageNumber);
+            return this.successfulResponse(result);  
+        } catch (Exception e) {
+            return this.failedResponse(e.getMessage());            
+        }        
     }
-
-    /*
-     * @PostMapping(path = "/add", consumes = "application/json", produces =
-     * "application/json") public ResponseEntity<List<User>> userAdd(@RequestBody
-     * User user) { User result = userService.userAdd(user); return new
-     * ResponseEntity<>(result, HttpStatus.OK); }
+    
+    /**
+     * sign up user using email address and passworda
+     * @param user user object
+     * @return user 
      */
-
+    @PostMapping(path = "/signUp", consumes = "application/json", produces ="application/json") 
+    public ResponseEntity<Response<User>> signUp(@RequestBody User user) { 
+        
+        try {
+            User result = userService.signUp(user);
+            return this.successfulResponse(result);
+        } catch (Exception e) {
+            return this.failedResponse(e.getMessage());
+        }
+    }
 }

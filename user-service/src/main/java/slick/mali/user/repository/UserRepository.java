@@ -1,20 +1,17 @@
 package slick.mali.user.repository;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.StoredProcedureQuery;
-import javax.transaction.Transactional;
 
-import org.hibernate.procedure.ProcedureOutputs;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
 import slick.mali.user.model.User;
 
 /**
- * User Repository
+ * User Repository for all user actions
  */
 @Repository
 public class UserRepository {
@@ -33,26 +30,26 @@ public class UserRepository {
      * @return List of users
      */
     public List<User> userFetch(int pageNumber) {
-        List<User> list = new ArrayList<>();
-        try {
-            // Execute query
-            StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("sp_user_fetch");
-            query.setParameter("pageNumber", pageNumber);
-            list = query.getResultList();
-        } catch (Exception e) {
-            throw e;
-        } finally {
-        }
-        return list;
+        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("sp_user_fetch");
+        query.setParameter("pageNumber", pageNumber);
+        query.execute();
+        return query.getResultList();
     }
 
     /**
-     * Adding user in the database
+     * Create user in the database
      * 
-     * @param page
+     * @param user user request
      * @return User
      */
     public User userAdd(User user) {
-        return null;
+        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("sp_user_add");
+        query.setParameter("type", user.getType());
+        query.setParameter("email", user.getEmail());
+        query.setParameter("identifier", user.getIdentifier());
+        query.setParameter("value", user.getValue());
+        query.setParameter("status", user.getStatus());
+        query.execute();
+        return (User) query.getSingleResult();
     }
 }
