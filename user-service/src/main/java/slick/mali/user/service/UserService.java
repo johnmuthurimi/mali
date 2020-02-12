@@ -1,17 +1,14 @@
 package slick.mali.user.service;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import slick.mali.user.constants.UserStatus;
 import slick.mali.user.model.AuthParam;
 import slick.mali.user.model.User;
 import slick.mali.user.repository.UserRepository;
-import slick.mali.user.util.PasswordEncoder;
+import slick.mali.user.util.PasswordUtils;
+
 
 /**
  * Implementation for all user operations
@@ -50,23 +47,21 @@ public class UserService implements IUserService {
         
         try {
             // generate password
-            AuthParam params = new PasswordEncoder().generateStrongPasswordHash(user.getPassword());
+            String salt = PasswordUtils.getSalt(30);        
+            // Protect user's password. The generated value can be stored in DB.
+            AuthParam params = PasswordUtils.generateSecurePassword(user.getPassword(), salt);
             user.setType(params.getType());
             user.setValue(params.getPassword());
+            user.setSalt(salt);
             user.setStatus(UserStatus.PENDING);
 
             // save user
-            res = repository.userAdd(user);
-            
+            res = repository.userAdd(user);            
             // send notification to rabbitmqve not saved
-
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
-            // This failure is not bad because we ha
-            new Error(ex.getMessage());
+            return res;
         } catch (Exception e) {
             // Here we need to consider roll back
             throw e;
         }          
-        return res;
     }
 }

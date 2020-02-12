@@ -10,9 +10,9 @@ BEGIN
   DECLARE records INT DEFAULT 30;
   DECLARE offset INT DEFAULT 1;
 
-  SET @offset = (pageNumber*records);
+  SET @offset = fn_pagination_offset(pageNumber);
 
-  SELECT id, email, identifier, value, enabled, deleted, status FROM user_hash LIMIT offset, records;
+  SELECT id, email, identifier, enabled, deleted, status FROM user_hash LIMIT offset, records;
 
 END //
 DELIMITER ;

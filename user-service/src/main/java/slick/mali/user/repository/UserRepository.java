@@ -1,14 +1,14 @@
 package slick.mali.user.repository;
 
 import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.StoredProcedureQuery;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import slick.mali.user.model.User;
+
+
+
 
 /**
  * User Repository for all user actions
@@ -49,6 +49,7 @@ public class UserRepository {
         query.setParameter("identifier", user.getIdentifier());
         query.setParameter("value", user.getValue());
         query.setParameter("status", user.getStatus());
+        query.setParameter("salt", user.getSalt());
         query.execute();
         return (User) query.getSingleResult();
     }

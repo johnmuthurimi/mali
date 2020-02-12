@@ -16,6 +16,11 @@ public class AuthParam {
     private String password;
 
     /**
+     * salt
+     */
+    private String salt;
+
+    /**
      * Get type
      */
     public String getType() {
@@ -41,5 +46,19 @@ public class AuthParam {
      */
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    /**
+     * Get salt
+     */
+    public String getSalt() {
+        return salt;
+    }
+
+    /**
+     * Set the salt
+     */
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 }

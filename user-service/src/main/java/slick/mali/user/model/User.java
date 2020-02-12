@@ -19,6 +19,7 @@ import javax.persistence.*;
                 @StoredProcedureParameter(name = "type", type = String.class, mode = ParameterMode.IN),
                 @StoredProcedureParameter(name = "email", type = String.class, mode = ParameterMode.IN),
                 @StoredProcedureParameter(name = "identifier", type = String.class, mode = ParameterMode.IN),
+                @StoredProcedureParameter(name = "salt", type = String.class, mode = ParameterMode.IN),
                 @StoredProcedureParameter(name = "value", type = String.class, mode = ParameterMode.IN),
                 @StoredProcedureParameter(name = "status", type = Integer.class, mode = ParameterMode.IN) 
         }) 
@@ -57,21 +58,15 @@ public class User {
         private String value;
 
         /**
+         * User salt
+         */
+        @Column(name = "salt")
+        private String salt;
+
+        /**
          * User password
          */
         private String password;
-
-        /**
-         * user enabled boolean
-         */
-        @Column(name = "enabled")
-        private boolean enabled;
-
-        /**
-         * user deleted boolean
-         */
-        @Column(name = "deleted")
-        private boolean deleted;
 
         /**
          * user status
@@ -135,6 +130,21 @@ public class User {
          */
         public void setValue(String value) {
                 this.value = value;
+        }
+
+        /**
+         * Get the salt
+         */
+        @Column(name = "salt")
+        public String getSalt() {
+                return salt;
+        }
+
+        /**
+         * Set the salt
+         */
+        public void setSalt(String salt) {
+                this.salt = salt;
         }
 
         /**

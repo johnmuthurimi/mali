@@ -3,10 +3,11 @@ USE user_service;
 CREATE TABLE user_hash (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   type NVARCHAR(50) NOT NULL,
-  params NVARCHAR(200) NOT NULL,
+  salt NVARCHAR(200) NOT NULL,
   email NVARCHAR(200) NOT NULL,
   identifier NVARCHAR(200) NOT NULL,
   value VARCHAR(1024) NOT NULL,
+  status INT(10) NOT NULL,
   failed_attempts INT DEFAULT 0 NOT NULL,
   last_attempt DATE NOT NULL,
   expire_date DATE NOT NULL,
