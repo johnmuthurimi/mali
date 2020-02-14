@@ -51,6 +51,15 @@ public class UserRepository {
         query.setParameter("status", user.getStatus());
         query.setParameter("salt", user.getSalt());
         query.execute();
-        return (User) query.getSingleResult();
+
+        //Get output parameters
+        Integer outRecordId = (Integer) query.getOutputParameterValue(7);
+        String outMessage = (String) query.getOutputParameterValue(8);
+
+        if(outRecordId != null && outMessage == "success") {
+            user.setId(outRecordId);
+            return user;
+        }
+        return null;
     }
 }

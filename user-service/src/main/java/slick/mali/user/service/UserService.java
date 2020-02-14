@@ -46,11 +46,11 @@ public class UserService implements IUserService {
         User res = new User();
         
         try {
-            // generate password
+            // generate salts
             String salt = PasswordUtils.getSalt(30);        
             // Protect user's password. The generated value can be stored in DB.
             AuthParam params = PasswordUtils.generateSecurePassword(user.getPassword(), salt);
-            user.setType(params.getType());
+            user.setType(user.getType());
             user.setValue(params.getPassword());
             user.setSalt(salt);
             user.setStatus(UserStatus.PENDING);

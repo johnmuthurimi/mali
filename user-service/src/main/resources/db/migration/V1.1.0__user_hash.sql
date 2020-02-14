@@ -1,14 +1,14 @@
 USE user_service;
 
 CREATE TABLE user_hash (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  type NVARCHAR(50) NOT NULL,
-  salt NVARCHAR(200) NOT NULL,
-  email NVARCHAR(200) NOT NULL,
-  identifier NVARCHAR(200) NOT NULL,
-  value VARCHAR(1024) NOT NULL,
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  type VARCHAR(10) NOT NULL,
+  salt VARCHAR(50) NOT NULL,
+  email NVARCHAR(50) NOT NULL,
+  identifier NVARCHAR(20) NOT NULL,
+  value VARCHAR(512) NOT NULL,
   status INT(10) NOT NULL,
-  failed_attempts INT DEFAULT 0 NOT NULL,
+  failed_attempts INT(10) DEFAULT 0 NOT NULL,
   last_attempt DATE NOT NULL,
   expire_date DATE NOT NULL,
   enabled TINYINT(1) DEFAULT 1 NOT NULL,

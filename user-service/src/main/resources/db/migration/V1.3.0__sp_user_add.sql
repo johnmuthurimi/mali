@@ -5,7 +5,15 @@ DROP PROCEDURE IF EXISTS sp_user_add;
 //
 
 DELIMITER //
-CREATE PROCEDURE sp_user_add(IN type NVARCHAR(50), IN email NVARCHAR(200), IN identifier NVARCHAR(200), IN value VARCHAR(1024), IN status INT(10), IN salt NVARCHAR(200))
+CREATE PROCEDURE sp_user_add(
+      IN type NVARCHAR(50),
+      IN email NVARCHAR(200),
+      IN identifier NVARCHAR(200),
+      IN value VARCHAR(1024),
+      IN status INT(10),
+      IN salt NVARCHAR(200),
+      IN outRecordId INT,
+      IN outMessage VARCHAR(20))
 BEGIN
 
   
@@ -19,9 +27,10 @@ BEGIN
   -- get user id
   SET id = LAST_INSERT_ID();
   
-  -- insert phone for the account
+  -- validate inserted record
   IF id > 0 THEN
-      SELECT id, email, identifier, value, enabled, deleted, status FROM user_hash WHERE id = id;
+      SELECT id INTO outRecordId;
+      SELECT 'success' INTO outMessage;
       -- commit
       COMMIT;
   ELSE

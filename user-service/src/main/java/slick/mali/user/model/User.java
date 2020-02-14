@@ -1,6 +1,5 @@
 package slick.mali.user.model;
 
-import java.math.BigInteger;
 import javax.persistence.*;
 
 /**
@@ -21,7 +20,9 @@ import javax.persistence.*;
                 @StoredProcedureParameter(name = "identifier", type = String.class, mode = ParameterMode.IN),
                 @StoredProcedureParameter(name = "salt", type = String.class, mode = ParameterMode.IN),
                 @StoredProcedureParameter(name = "value", type = String.class, mode = ParameterMode.IN),
-                @StoredProcedureParameter(name = "status", type = Integer.class, mode = ParameterMode.IN) 
+                @StoredProcedureParameter(name = "status", type = Integer.class, mode = ParameterMode.IN),
+                @StoredProcedureParameter(name = "outRecordId", type = Integer.class, mode = ParameterMode.OUT),
+                @StoredProcedureParameter(name = "outMessage", type = String.class, mode = ParameterMode.OUT)  
         }) 
 })
 public class User {
@@ -31,7 +32,7 @@ public class User {
          */
         @Id
         @Column(name = "id")
-        private BigInteger id;
+        private Integer id;
 
         /**
          * type of the user authentication
@@ -78,14 +79,14 @@ public class User {
          * Get user id
          */
         @Id
-        public BigInteger getId() {
+        public Integer getId() {
                 return id;
         }
 
         /**
          * Set the user id
          */
-        public void setId(BigInteger id) {
+        public void setId(Integer id) {
                 this.id = id;
         }
 
