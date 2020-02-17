@@ -1,16 +1,13 @@
-package slick.mali.user;
+package slick.mali.gatewayservice;
+
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Application {
-
-	/**
-	 * Main function with arguments
-	 */
+public class GatewayServiceApplication {
+	
 	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+		SpringApplication.run(GatewayServiceApplication.class, args);
 	}
 }
-

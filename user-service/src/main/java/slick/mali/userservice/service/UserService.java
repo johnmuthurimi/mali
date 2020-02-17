@@ -1,13 +1,13 @@
-package slick.mali.user.service;
+package slick.mali.userservice.service;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import slick.mali.user.constants.UserStatus;
-import slick.mali.user.model.AuthParam;
-import slick.mali.user.model.User;
-import slick.mali.user.repository.UserRepository;
-import slick.mali.user.util.PasswordUtils;
+import slick.mali.userservice.constants.UserStatus;
+import slick.mali.userservice.model.AuthParam;
+import slick.mali.userservice.model.User;
+import slick.mali.userservice.repository.UserRepository;
+import slick.mali.userservice.util.PasswordUtils;
 
 
 /**

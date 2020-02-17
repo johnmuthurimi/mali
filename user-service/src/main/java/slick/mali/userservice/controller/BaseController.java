@@ -1,4 +1,4 @@
-package slick.mali.user.controller;
+package slick.mali.userservice.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,8 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import slick.mali.user.model.Response;
-import slick.mali.user.constants.ResultCode;
+import slick.mali.userservice.model.Response;
+import slick.mali.userservice.constants.ResultCode;
 
 /**
  * The BaseController class implements common functionality for all Controller

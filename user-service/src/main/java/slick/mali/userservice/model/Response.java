@@ -1,4 +1,4 @@
-package slick.mali.user.model;
+package slick.mali.userservice.model;
 
 public class Response<T> {
 

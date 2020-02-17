@@ -1,4 +1,4 @@
-package slick.mali.user.service;
+package slick.mali.userservice.service;
 
 /**
  * Base interface for all the interfaces

@@ -1,4 +1,4 @@
-package slick.mali.user.controller;
+package slick.mali.userservice.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

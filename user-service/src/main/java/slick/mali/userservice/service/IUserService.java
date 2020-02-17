@@ -1,7 +1,7 @@
-package slick.mali.user.service;
+package slick.mali.userservice.service;
 
 import java.util.List;
-import slick.mali.user.model.User;
+import slick.mali.userservice.model.User;
 
 /**
  * Interface for all user operations

@@ -1,4 +1,4 @@
-package slick.mali.user.util;
+package slick.mali.userservice.util;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -8,7 +8,7 @@ import java.util.Base64;
 import java.util.Random;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import slick.mali.user.model.AuthParam;
+import slick.mali.userservice.model.AuthParam;
 
 
 

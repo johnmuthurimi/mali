@@ -1,4 +1,4 @@
-package slick.mali.user.constants;
+package slick.mali.userservice.constants;
 
 /**
  * This class holds the result code return in the API requests

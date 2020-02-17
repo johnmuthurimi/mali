@@ -1,11 +1,11 @@
-package slick.mali.user.repository;
+package slick.mali.userservice.repository;
 
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.StoredProcedureQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import slick.mali.user.model.User;
+import slick.mali.userservice.model.User;
 
 
 
