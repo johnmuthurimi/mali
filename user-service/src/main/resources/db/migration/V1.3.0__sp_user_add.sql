@@ -6,12 +6,12 @@ DROP PROCEDURE IF EXISTS sp_user_add;
 
 DELIMITER //
 CREATE PROCEDURE sp_user_add(
-      IN type NVARCHAR(50),
-      IN email NVARCHAR(200),
-      IN identifier NVARCHAR(200),
-      IN value VARCHAR(1024),
+      IN type VARCHAR(10),
+      IN email VARCHAR(50),
+      IN identifier VARCHAR(20),
+      IN value VARCHAR(512),
       IN status INT(10),
-      IN salt NVARCHAR(200),
+      IN salt VARCHAR(50),
       IN outRecordId INT,
       IN outMessage VARCHAR(20))
 BEGIN

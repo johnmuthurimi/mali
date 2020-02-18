@@ -32,7 +32,10 @@ services:
 
   rabbitmq-service:
     container_name: rabbitmq-service
-    image: rabbitmq:3.6-management-alpine  
+    image: rabbitmq:3.6-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: appuser
+      RABBITMQ_DEFAULT_PASS: appuser
     networks:
       - prod 
     ports:

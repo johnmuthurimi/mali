@@ -7,9 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import slick.mali.userservice.model.User;
 
-
-
-
 /**
  * User Repository for all user actions
  */
@@ -33,7 +30,8 @@ public class UserRepository {
         StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("sp_user_fetch");
         query.setParameter("pageNumber", pageNumber);
         query.execute();
-        return query.getResultList();
+        List<User> users = query.getResultList();
+        return users;
     }
 
     /**
@@ -52,11 +50,11 @@ public class UserRepository {
         query.setParameter("salt", user.getSalt());
         query.execute();
 
-        //Get output parameters
+        // Get output parameters
         Integer outRecordId = (Integer) query.getOutputParameterValue(7);
         String outMessage = (String) query.getOutputParameterValue(8);
 
-        if(outRecordId != null && outMessage == "success") {
+        if (outRecordId != null && outMessage == "success") {
             user.setId(outRecordId);
             return user;
         }
