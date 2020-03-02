@@ -1,6 +1,8 @@
 package slick.mali.userservice.service;
 
 import java.util.List;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import slick.mali.userservice.constants.UserStatus;
@@ -28,7 +30,7 @@ public class UserService implements IUserService {
      */
     @Override
     public List<User> userFetch(int pageNumber) {
-        return (List<User>) repository.userFetch(pageNumber);
+        return (List<User>) repository.findAll(new PageRequest(pageNumber, 50, new Sort(Sort.Direction.ASC, "Id")));
     }
 
     
@@ -55,8 +57,8 @@ public class UserService implements IUserService {
             user.setSalt(salt);
             user.setStatus(UserStatus.PENDING);
 
-            // save user
-            res = repository.userAdd(user);            
+            // save user  
+            return userRepository.save(user);         
             // send notification to rabbitmqve not saved
             return res;
         } catch (Exception e) {

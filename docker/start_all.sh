@@ -30,8 +30,8 @@ if [ "$build_images" == "y" ]; then
 	echo -n "Docker credentials for publishing images"	
 	docker login
 	# Included service here if you want to publish this to docker hub
-	docker push mucunga90/gateway-service:latest
-	docker push mucunga90/user-service:latest
+	#docker push mucunga90/gateway-service:latest
+	#docker push mucunga90/user-service:latest
 fi
 
 echo "Starting your local dockerized full stack with mounted volumes"

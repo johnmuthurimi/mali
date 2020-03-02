@@ -6,7 +6,7 @@ spring:
     consul:
       enabled: true
       port: 8500
-      host: 127.0.0.1
+      host: 10.0.2.15
       config:
         format: YAML
       discovery:
@@ -18,19 +18,22 @@ spring:
   output.ansi.enabled: ALWAYS
   rabbitmq:
     port: 5672
-    host: 127.0.0.1
+    host: 10.0.2.15
     username: appuser
     password: appuser
   jpa:
     open-in-view: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
+    properties:
+      hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
   datasource:
-    url: jdbc:mysql://127.0.0.1:3308/user_service?useSSL=false&serverTimezone=UTC&autoReconnect=true
+    url: jdbc:mysql://10.0.2.15:3308/user_service?useSSL=false&serverTimezone=UTC&autoReconnect=true
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 logging:
   level:
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+    org.hibernate.SQL: DEBUG
 

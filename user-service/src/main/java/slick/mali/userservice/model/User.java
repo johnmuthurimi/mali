@@ -7,62 +7,55 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "user_hash")
-@NamedStoredProcedureQueries(
-{
-        @NamedStoredProcedureQuery(name = "sp_user_fetch", procedureName = "sp_user_fetch", resultClasses = { User.class }, 
-        parameters = {
-                @StoredProcedureParameter(name = "pageNumber", type = Integer.class, mode = ParameterMode.IN) 
-        }),
-        @NamedStoredProcedureQuery(name = "sp_user_add", procedureName = "sp_user_add", resultClasses = { User.class }, 
-        parameters = {
-                @StoredProcedureParameter(name = "type", type = String.class, mode = ParameterMode.IN),
-                @StoredProcedureParameter(name = "email", type = String.class, mode = ParameterMode.IN),
-                @StoredProcedureParameter(name = "identifier", type = String.class, mode = ParameterMode.IN),
-                @StoredProcedureParameter(name = "salt", type = String.class, mode = ParameterMode.IN),
-                @StoredProcedureParameter(name = "value", type = String.class, mode = ParameterMode.IN),
-                @StoredProcedureParameter(name = "status", type = Integer.class, mode = ParameterMode.IN),
-                @StoredProcedureParameter(name = "outRecordId", type = Integer.class, mode = ParameterMode.OUT),
-                @StoredProcedureParameter(name = "outMessage", type = String.class, mode = ParameterMode.OUT)  
-        }) 
-})
 public class User {
 
         /**
          * User unique id
          */
         @Id
-        @Column(name = "id")
-        private Integer id;
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
         /**
-         * type of the user authentication
+         * type of the user authentication e.g Password, PIN
          */
-        @Column(name = "type")
+        @NotNull
+        @Size(max = 10)
+        @Column(columnDefinition = "VARCHAR(10) NOT NULL")
         private String type;
-
-        /**
-         * identifier should be unique
-         */
-        @Column(name = "identifier")
-        private String identifier;
-
-        /**
-         * email of the user
-         */
-        @Column(name = "email")
-        private String email;
-
-        /**
-         * User password
-         */
-        @Column(name = "value")
-        private String value;
 
         /**
          * User salt
          */
-        @Column(name = "salt")
+        @NotNull
+        @Size(max = 50)
+        @Column(columnDefinition = "VARCHAR(50) NOT NULL")
         private String salt;
+
+        /**
+         * email of the user
+         */
+        @NotNull
+        @Email
+        @Size(max = 50)
+        @Column(columnDefinition = "VARCHAR(50) NOT NULL")
+        private String email;
+
+        /**
+         * identifier should be unique
+         */
+        @NotNull
+        @Size(max = 20)
+        @Column(columnDefinition = "VARCHAR(20) NOT NULL")
+        private String identifier;
+
+        /**
+         * User value
+         */
+        @NotNull
+        @Size(max = 512)
+        @Column(columnDefinition = "VARCHAR(512) NOT NULL")
+        private String value;
 
         /**
          * User password
@@ -70,38 +63,70 @@ public class User {
         private String password;
 
         /**
-         * user status
+         * User status
          */
-        @Column(name = "status")
+        @NotNull
+        @Size(max = 10)
+        @Column(columnDefinition = "INT(10) NOT NULL")
         private Integer status;
+
+        /**
+         * User failedAttempts
+         */
+        @NotNull
+        @Size(max = 10)
+        @Column(columnDefinition = "INT(10) DEFAULT 0 NOT NULL")
+        private Integer failedAttempts;
+
+        /**
+         * User lastAttempt
+         */
+        @NotNull
+        @Column(columnDefinition = "DATE NOT NULL")
+        private Date lastAttempt;
+
+        /**
+         * User expireDate
+         */
+        @NotNull
+        @Column(columnDefinition = "DATE NOT NULL")
+        private Date expireDate;
+
+        /**
+         * User enabled
+         */
+        @NotNull
+        @Column(columnDefinition = "BOOLEAN DEFAULT false")
+        private Boolean enabled;
+
+        /**
+         * User deleted
+         */
+        @NotNull
+        @Column(columnDefinition = "BOOLEAN DEFAULT false")
+        private Boolean deleted;
+
+        /*
+        https://www.callicoder.com/hibernate-spring-boot-jpa-one-to-one-mapping-example/
+        @OneToOne(fetch = FetchType.LAZY,
+            cascade =  CascadeType.ALL,
+            mappedBy = "user")
+        private UserProfile userProfile;
+        */
 
         /**
          * Get user id
          */
         @Id
-        public Integer getId() {
+        public Long getId() {
                 return id;
         }
 
         /**
          * Set the user id
          */
-        public void setId(Integer id) {
+        public void setId(Long id) {
                 this.id = id;
-        }
-
-        /**
-         * Get the identifier
-         */
-        public String getIdentifier() {
-                return identifier;
-        }
-
-        /**
-         * Set the identifier
-         */
-        public void setIdentifier(String identifier) {
-                this.identifier = identifier;
         }
 
         /**
@@ -119,24 +144,8 @@ public class User {
         }
 
         /**
-         * Get the value
-         */
-        @Column(name = "value")
-        public String getValue() {
-                return value;
-        }
-
-        /**
-         * Set the value
-         */
-        public void setValue(String value) {
-                this.value = value;
-        }
-
-        /**
          * Get the salt
          */
-        @Column(name = "salt")
         public String getSalt() {
                 return salt;
         }
@@ -146,6 +155,48 @@ public class User {
          */
         public void setSalt(String salt) {
                 this.salt = salt;
+        }
+
+        /**
+         * Get the user email
+         */
+        public String getEmail() {
+                return email;
+        }
+
+        /**
+         * Set the user email
+         */
+        public void setEmail(String email) {
+                this.email = email;
+        }
+
+        /**
+         * Get the identifier
+         */
+        public String getIdentifier() {
+                return identifier;
+        }
+
+        /**
+         * Set the identifier
+         */
+        public void setIdentifier(String identifier) {
+                this.identifier = identifier;
+        }
+
+        /**
+         * Get the value
+         */
+        public String getValue() {
+                return value;
+        }
+
+        /**
+         * Set the value
+         */
+        public void setValue(String value) {
+                this.value = value;
         }
 
         /**
@@ -163,21 +214,6 @@ public class User {
         }
 
         /**
-         * Get the user email
-         */
-        public String getEmail() {
-                return email;
-        }
-
-        /**
-         * Set the user email
-         */
-        @Column(name = "email")
-        public void setEmail(String email) {
-                this.email = email;
-        }
-
-        /**
          * Get the user status
          */
         public Integer getStatus() {
@@ -187,9 +223,78 @@ public class User {
         /**
          * Set the user status
          */
-        @Column(name = "status")
         public void setStatus(Integer status) {
                 this.status = status;
+        }
+
+        /**
+         * Get the user failedAttempts
+         */
+        public Integer getFailedAttempts() {
+                return failedAttempts;
+        }
+
+        /**
+         * Set the user failedAttempts
+         */
+        public void setFailedAttempts(Integer failedAttempts) {
+                this.failedAttempts = failedAttempts;
+        }
+
+        /**
+         * Get the user LastAttempt
+         */
+        public Date getLastAttempt() {
+                return lastAttempt;
+        }
+
+        /**
+         * Set the user LastAttempt
+         */
+        public void setLastAttempt(Integer lastAttempt) {
+                this.lastAttempt = lastAttempt;
+        }
+
+        /**
+         * Get the user expireDate
+         */
+        public Date getExpireDate() {
+                return expireDate;
+        }
+
+        /**
+         * Set the user expireDate
+         */
+        public void setExpireDate(Date expireDate) {
+                this.expireDate = expireDate;
+        }
+
+        /**
+         * Get the user enabled
+         */
+        public Boolean isEnabled() {
+                return enabled;
+        }
+
+        /**
+         * Set the user enabled
+         */
+        public void setEnabled(Boolean enabled) {
+                this.enabled = enabled;
+        }
+
+        /**
+         * Get the user deleted
+         */
+        public Boolean isDeleted() {
+                return deleted;
+        }
+
+        /**
+         * Set the user deleted
+         */
+        public void setDeleted(Boolean deleted) {
+                this.deleted = deleted;
         }
 
 }
