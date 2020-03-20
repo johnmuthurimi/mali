@@ -1,6 +1,9 @@
 package slick.mali.userservice.model;
 
+import java.util.Date;
+
 import javax.persistence.*;
+import javax.validation.constraints.*;
 
 /**
  * Domain class for user
@@ -251,7 +254,7 @@ public class User {
         /**
          * Set the user LastAttempt
          */
-        public void setLastAttempt(Integer lastAttempt) {
+        public void setLastAttempt(Date lastAttempt) {
                 this.lastAttempt = lastAttempt;
         }
 

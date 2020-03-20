@@ -22,7 +22,7 @@ public class UserService implements IUserService {
      * Inject the user repository
      */
     @Autowired
-    private UserRepository repository;
+    private UserRepository userRepository;
 
     /**
      * This functions gets all users You must however the page and number of items
@@ -30,7 +30,7 @@ public class UserService implements IUserService {
      */
     @Override
     public List<User> userFetch(int pageNumber) {
-        return (List<User>) repository.findAll(new PageRequest(pageNumber, 50, new Sort(Sort.Direction.ASC, "Id")));
+        return (List<User>) userRepository.findAll();
     }
 
     
@@ -58,7 +58,7 @@ public class UserService implements IUserService {
             user.setStatus(UserStatus.PENDING);
 
             // save user  
-            return userRepository.save(user);         
+            // return userRepository.save(user);         
             // send notification to rabbitmqve not saved
             return res;
         } catch (Exception e) {
