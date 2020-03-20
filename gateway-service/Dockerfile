@@ -1,11 +1,8 @@
-FROM java:8
-
-EXPOSE 5000
-
-MAINTAINER John Peter <mucunga90@gmail.com>
-
-ADD target/gateway-service*.jar app.jar
-
-RUN bash -c 'touch /app.jar'
-
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+FROM openjdk:8-jre-alpine
+ENV APP_FILE gateway-service-1.0.jar
+ENV APP_HOME /app
+EXPOSE 8088
+COPY target/$APP_FILE $APP_HOME/
+WORKDIR $APP_HOME
+ENTRYPOINT ["sh", "-c"]
+CMD ["exec java -jar $APP_FILE"]

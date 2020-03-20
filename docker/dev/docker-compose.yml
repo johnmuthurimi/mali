@@ -28,7 +28,7 @@ services:
       options:
         max-size: "10m"
         max-file: "10"
-    restart: always
+    restart: unless-stopped
 
   rabbitmq-service:
     container_name: rabbitmq-service
@@ -50,7 +50,7 @@ services:
       options:
         max-size: "10m"
         max-file: "10"
-    restart: always
+    restart: unless-stopped
 
   # https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/docker-mysql-getting-started.html
   # https://dev.mysql.com/doc/refman/8.0/en/creating-accounts.html
@@ -74,7 +74,24 @@ services:
       options:
         max-size: "10m"
         max-file: "10"
-    restart: always
+    restart: unless-stopped
+
+  config-service:
+    container_name: config-service
+    image: mucunga90/config-service:latest
+    networks:
+      - prod  
+    ports:
+      - '5000:5000'
+    expose:
+      - "5000"    
+    volumes:
+      - ./../data/config-service/:/var/lib/mucunga90/config-service
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+    restart: unless-stopped
 
   gateway-service:
     container_name: gateway-service
@@ -95,7 +112,7 @@ services:
       - consul-service
       - rabbitmq-service
       - mysql-service
-    restart: always
+    restart: unless-stopped
   
   user-service:
     container_name: user-service
@@ -114,7 +131,7 @@ services:
         max-file: "10"
     depends_on:
       - gateway-service
-    restart: always
+    restart: unless-stopped
   
 
   

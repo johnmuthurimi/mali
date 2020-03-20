@@ -1,19 +1,6 @@
-server.port: ${PORT:5000}
-spring:  
+spring:
   application:
     name: gateway-service
   cloud:
-    consul:
-      enabled: true
-      port: 8500
-      host: 10.0.2.15
-      config:
-        format: YAML
-      discovery:
-        instance-id: "${spring.application.name}-${random.int[1,999999]}"
-        health-check-critical-timeout: 1m
-        register-health-check: true
-  output.ansi.enabled: ALWAYS
-logging:
-  level:
-    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+    config:
+      uri: http://localhost:8088
