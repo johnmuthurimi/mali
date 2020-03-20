@@ -24,7 +24,7 @@ services:
       options:
         max-size: "10m"
         max-file: "10"
-    restart: no
+    restart: "no"
 
   # https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/docker-mysql-getting-started.html
   # https://dev.mysql.com/doc/refman/8.0/en/creating-accounts.html
@@ -48,7 +48,7 @@ services:
       options:
         max-size: "10m"
         max-file: "10"
-    restart: no
+    restart: "no"
 
   config-service:
     container_name: config-service
@@ -68,7 +68,7 @@ services:
     depends_on:
       - rabbitmq-service
       - mysql-service
-    restart: no
+    restart: "no"
 
   discovery-service:
     container_name: discovery-service
@@ -87,7 +87,7 @@ services:
         max-file: "10"
     depends_on:
       - config-service
-    restart: no
+    restart: "no"
 
   gateway-service:
     container_name: gateway-service
@@ -107,7 +107,7 @@ services:
     depends_on:
       - config-service
       - discovery-service
-    restart: no
+    restart: "no"
 
   proxy-service:
     container_name: proxy-service
@@ -128,7 +128,7 @@ services:
       - config-service
       - discovery-service
       - gateway-service
-    restart: no
+    restart: "no"
   
   user-service:
     container_name: user-service
@@ -150,7 +150,7 @@ services:
       - discovery-service
       - gateway-service
       - proxy-service
-    restart: no
+    restart: "no"
   
 
   

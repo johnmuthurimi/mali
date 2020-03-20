@@ -1,4 +1,4 @@
-package slick.mali.discoveryservices;
+package slick.mali.discoveryservice;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
