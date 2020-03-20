@@ -1,5 +1,8 @@
+debug: true
+
 server:
-  port: 8088
+  port: 5001
+  
 spring:
   profiles:
     active: native

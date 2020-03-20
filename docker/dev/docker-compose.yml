@@ -1,35 +1,9 @@
 version: '3.6'
 networks:
-  prod:
+  prod-network:
     driver: bridge
 
-volumes:
-  registry-stuff:
-    driver: local
-    
 services:
-  consul-service:
-    container_name: consul-service
-    image: consul
-    environment:
-      - CONSUL_BOOTSTRAP_EXPECT=3
-      - CONSUL_CLIENT_LAN_ADDRESS=0.0.0.0
-      - CONSUL_DISABLE_KEYRING_FILE=true
-      - CONSUL_JOIN=consul-service
-    networks:
-      - prod    
-    ports:
-      - '8500:8500'
-    expose:
-      - "8500"
-    volumes:
-      - ./../data/consul-service/:/consul/data
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "10"
-    restart: unless-stopped
-
   rabbitmq-service:
     container_name: rabbitmq-service
     image: rabbitmq:3.6-management-alpine
@@ -37,7 +11,7 @@ services:
       RABBITMQ_DEFAULT_USER: appuser
       RABBITMQ_DEFAULT_PASS: appuser
     networks:
-      - prod 
+      - prod-network 
     ports:
       - '5672:5672'
       - '15672:15672'
@@ -50,7 +24,7 @@ services:
       options:
         max-size: "10m"
         max-file: "10"
-    restart: unless-stopped
+    restart: no
 
   # https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/docker-mysql-getting-started.html
   # https://dev.mysql.com/doc/refman/8.0/en/creating-accounts.html
@@ -63,7 +37,7 @@ services:
       MYSQL_PASSWORD: appuser
       MYSQL_ROOT_PASSWORD: root
     networks:
-      - prod
+      - prod-network 
     ports:
       - "3308:3306"
     expose:
@@ -74,64 +48,109 @@ services:
       options:
         max-size: "10m"
         max-file: "10"
-    restart: unless-stopped
+    restart: no
 
   config-service:
     container_name: config-service
     image: mucunga90/config-service:latest
     networks:
-      - prod  
-    ports:
-      - '5000:5000'
-    expose:
-      - "5000"    
-    volumes:
-      - ./../data/config-service/:/var/lib/mucunga90/config-service
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "10"
-    restart: unless-stopped
-
-  gateway-service:
-    container_name: gateway-service
-    image: mucunga90/gateway-service:latest
-    networks:
-      - prod  
-    ports:
-      - '5000:5000'
-    expose:
-      - "5000"    
-    volumes:
-      - ./../data/gateway-service/:/var/lib/mucunga90/gateway-service
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "10"
-    depends_on:
-      - consul-service
-      - rabbitmq-service
-      - mysql-service
-    restart: unless-stopped
-  
-  user-service:
-    container_name: user-service
-    image: mucunga90/user-service:latest
-    networks:
-      - prod    
+      - prod-network   
     ports:
       - '5001:5001'
     expose:
       - "5001"    
     volumes:
-      - ./../data/user-service/:/log
+      - ./../data/config-service/:/var/lib/app
     logging:
       options:
         max-size: "10m"
         max-file: "10"
     depends_on:
+      - rabbitmq-service
+      - mysql-service
+    restart: no
+
+  discovery-service:
+    container_name: discovery-service
+    image: mucunga90/discovery-service:latest
+    networks:
+      - prod-network   
+    ports:
+      - '5002:5002'
+    expose:
+      - "5002"    
+    volumes:
+      - ./../data/discovery-service/:/var/lib/app
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+    depends_on:
+      - config-service
+    restart: no
+
+  gateway-service:
+    container_name: gateway-service
+    image: mucunga90/gateway-service:latest
+    networks:
+      - prod-network    
+    ports:
+      - '5003:5003'
+    expose:
+      - "5003"    
+    volumes:
+      - ./../data/gateway-service/:/var/lib/app
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+    depends_on:
+      - config-service
+      - discovery-service
+    restart: no
+
+  proxy-service:
+    container_name: proxy-service
+    image: mucunga90/proxy-service:latest
+    networks:
+      - prod-network    
+    ports:
+      - '5004:5004'
+    expose:
+      - "5004"    
+    volumes:
+      - ./../data/proxy-service/:/var/lib/app
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+    depends_on:
+      - config-service
+      - discovery-service
       - gateway-service
-    restart: unless-stopped
+    restart: no
+  
+  user-service:
+    container_name: user-service
+    image: mucunga90/user-service:latest
+    networks:
+      - prod-network    
+    ports:
+      - '5005:5005'
+    expose:
+      - "5005"    
+    volumes:
+      - ./../data/user-service/:/var/lib/app
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+    depends_on:
+      - config-service
+      - discovery-service
+      - gateway-service
+      - proxy-service
+    restart: no
   
 
   

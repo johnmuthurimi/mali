@@ -1,5 +1,7 @@
+debug: true
+
 server:
-  port: 8061
+  port: 5002
 
 eureka:
   instance:
