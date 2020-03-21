@@ -3,5 +3,5 @@ spring:
     name: user-service
   cloud:
     config:
-      uri: http://localhost:5001
+      uri: http://192.168.100.29:5001
 

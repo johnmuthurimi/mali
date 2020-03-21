@@ -27,12 +27,7 @@ services:
       options:
         max-size: "10m"
         max-file: "10"
-    healthcheck:
-        test: curl -f https://localhost:5001 || exit 1
-        interval: 30s
-        timeout: 10s
-        retries: 5
-    restart: "no"
+    restart: "on-failure"
 
   rabbitmq-service:
     container_name: rabbitmq-service
@@ -64,12 +59,7 @@ services:
         max-file: "10"
     depends_on:
       - config-service
-    healthcheck:
-        test: curl -f https://localhost:5672 || exit 1
-        interval: 30s
-        timeout: 10s
-        retries: 5
-    restart: "no"
+    restart: "on-failure"
 
   # https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/docker-mysql-getting-started.html
   # https://dev.mysql.com/doc/refman/8.0/en/creating-accounts.html
@@ -104,12 +94,7 @@ services:
     depends_on:
       - config-service
       - rabbitmq-service
-    healthcheck:
-        test: curl -f https://localhost:3308 || exit 1
-        interval: 30s
-        timeout: 10s
-        retries: 5
-    restart: "no"
+    restart: "on-failure"
 
   discovery-service:
     container_name: discovery-service
@@ -138,13 +123,7 @@ services:
       - config-service
       - rabbitmq-service
       - mysql-service
-    healthcheck:
-        test: curl -f https://localhost:5002 || exit 1
-        interval: 30s
-        timeout: 10s
-        retries: 5
-    command: ["wait-for-it.sh", "config-service:5001"]
-    restart: "no"
+    restart: "on-failure"
 
   proxy-service:
     container_name: proxy-service
@@ -152,9 +131,9 @@ services:
     networks:
       - prod-network    
     ports:
-      - '5004:5004'
+      - '5003:5003'
     expose:
-      - "5004"    
+      - "5003"    
     volumes:
       - ./../data/proxy-service/:/var/lib/app
     deploy:
@@ -170,37 +149,97 @@ services:
         max-size: "10m"
         max-file: "10"
     depends_on:
-      - config-service
-      - rabbitmq-service
-      - mysql-service
       - discovery-service
-    healthcheck:
-        test: curl -f https://localhost:5004 || exit 1
-        interval: 30s
-        timeout: 10s
-        retries: 5
-    restart: "no"
-  
-  user-service:
-    container_name: user-service
-    image: mucunga90/user-service:latest
+    restart: "on-failure"
+
+  gateway-service:
+    container_name: gateway-service
+    image: mucunga90/gateway-service:latest
     networks:
       - prod-network    
     ports:
-      - '5005:5005'
+      - '5004:5004'
     expose:
-      - "5005"    
+      - "5004"    
     volumes:
-      - ./../data/user-service/:/var/lib/app
+      - ./../data/gateway-service/:/var/lib/app
     logging:
       options:
         max-size: "10m"
         max-file: "10"
     depends_on:
-      - config-service
       - discovery-service
-      - gateway-service
       - proxy-service
-    restart: "no"
+    restart: "on-failure"
 
-  
+    discovery-service:
+    container_name: discovery-service
+    image: mucunga90/discovery-service:latest
+    networks:
+      - prod-network   
+    ports:
+      - '5002:5002'
+    expose:
+      - "5002"    
+    volumes:
+      - ./../data/discovery-service/:/var/lib/app
+    deploy:
+      resources:
+        limits:
+          cpus: '0.001'
+          memory: 50M
+        reservations:
+          cpus: '0.001'
+          memory: 50M
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+    restart: "on-failure"
+
+  proxy-service:
+    container_name: proxy-service
+    image: mucunga90/proxy-service:latest
+    networks:
+      - prod-network    
+    ports:
+      - '5003:5003'
+    expose:
+      - "5003"    
+    volumes:
+      - ./../data/proxy-service/:/var/lib/app
+    deploy:
+      resources:
+        limits:
+          cpus: '0.001'
+          memory: 50M
+        reservations:
+          cpus: '0.001'
+          memory: 50M
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+    depends_on:
+      - discovery-service
+    restart: "on-failure"
+
+  gateway-service:
+    container_name: gateway-service
+    image: mucunga90/gateway-service:latest
+    networks:
+      - prod-network    
+    ports:
+      - '5004:5004'
+    expose:
+      - "5004"    
+    volumes:
+      - ./../data/gateway-service/:/var/lib/app
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+    depends_on:
+      - discovery-service
+      - proxy-service
+    restart: "on-failure"

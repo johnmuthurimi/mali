@@ -1,12 +1,12 @@
 debug: true
 
 server:
-  port: 5003
+  port: 5004
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:5002/eureka/
+      defaultZone: http://192.168.100.29:5002/eureka/
 
 logging:
   pattern: 
@@ -62,7 +62,7 @@ spring:
         filters:
         - RewritePath=/report/(?<path>.*), /$\{path}
       - id: openapi
-        uri: http://localhost:${server.port}
+        uri: http://192.168.100.29:${server.port}
         predicates:
         - Path=/v3/api-docs/**
         filters:
