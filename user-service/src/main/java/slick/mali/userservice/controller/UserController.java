@@ -18,7 +18,6 @@ import slick.mali.userservice.service.IUserService;
  * This class handles all the users request for api v1
  */
 @RestController
-@RequestMapping(value = "/user")
 public class UserController extends BaseController {
 
     /**

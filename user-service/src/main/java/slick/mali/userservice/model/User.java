@@ -8,15 +8,11 @@ import javax.validation.constraints.*;
 /**
  * Domain class for user
  */
-@Entity
-@Table(name = "user_hash")
 public class User {
 
         /**
          * User unique id
          */
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
 
         /**

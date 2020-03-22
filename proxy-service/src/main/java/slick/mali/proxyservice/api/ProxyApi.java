@@ -32,7 +32,7 @@ public class ProxyApi {
 	private SwaggerResource createResource(String name, String location, String version) {
 		SwaggerResource swaggerResource = new SwaggerResource();
 		swaggerResource.setName(name);
-		swaggerResource.setLocation("/" + location + "/v2/api-docs");
+		swaggerResource.setLocation("/" + location + "/v3/api-docs");
 		swaggerResource.setSwaggerVersion(version);
 		return swaggerResource;
 	}

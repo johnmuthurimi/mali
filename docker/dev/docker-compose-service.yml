@@ -75,3 +75,24 @@ services:
       - discovery-service
       - proxy-service
     restart: "on-failure"
+
+  user-service:
+    container_name: user-service
+    image: mucunga90/user-service:latest
+    networks:
+      - prod-network    
+    ports:
+      - '5005:5005'
+    expose:
+      - "5005"    
+    volumes:
+      - ./../data/user-service/:/var/lib/app
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+    depends_on:
+      - discovery-service
+      - proxy-service
+      - gateway-service
+    restart: "on-failure"

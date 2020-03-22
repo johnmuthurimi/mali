@@ -18,7 +18,6 @@ import slick.mali.userservice.constants.ResultCode;
  * 
  */
 @RestController
-@RequestMapping("/")
 public class BaseController {
 
     /**
