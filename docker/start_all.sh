@@ -46,10 +46,10 @@ if [ "$build_images" == "y" ]; then
 	echo -n "Docker credentials for publishing images"	
 	docker login
 	# Included service here if you want to publish this to docker hub
-	docker push mucunga90/config-service:latest
-	docker push mucunga90/discovery-service:latest
-	docker push mucunga90/proxy-service:latest
-	docker push mucunga90/gateway-service:latest	
+	#docker push mucunga90/config-service:latest
+	#docker push mucunga90/discovery-service:latest
+	#docker push mucunga90/proxy-service:latest
+	#docker push mucunga90/gateway-service:latest	
 	#docker push mucunga90/user-service:latest
 fi
 
@@ -57,10 +57,21 @@ echo "Starting your local dockerized full stack with mounted volumes"
 cd ./../docker/
 
 # update which environment
-echo -n "Build which environment: dev/test/live: "
+echo -n "Build which environment: [dev/prod]  "
 read build_env
-if [ "$build_env" == "dev" ]; then
-	docker-compose -f ${build_env}/docker-compose.yml up -d
+
+echo -n "Compose configuration services: [y/n]  "
+read build_config
+if [ "$build_config" == "y" ]; then
+	docker-compose -f $build_env/docker-compose-config.yml up -d
 fi
+
+echo -n "Compose application services: [y/n]  "
+read build_service
+if [ "$build_service" == "y" ]; then
+	docker-compose -f $build_env/docker-compose-service.yml up -d
+fi
+
+
 
 
