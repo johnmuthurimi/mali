@@ -1,7 +1,8 @@
 package slick.mali.userservice.service;
 
-import java.util.List;
-import slick.mali.userservice.model.User;
+import java.sql.SQLException;
+
+import slick.mali.userservice.model.Auth;
 
 /**
  * Interface for all user operations
@@ -9,19 +10,20 @@ import slick.mali.userservice.model.User;
 public interface IUserService extends IBaseService {
 
     /**
-     * This functions gets all users You must however the page and number of items
-     * in the page By default the system gives 100 users per page
+     * This functions user credentials
      * 
      * @param pageNumber
-     * @return List of users
+     * @return User
+     * @throws SQLException
      */
-    List<User> userFetch(int pageNumber);
+    Auth getAuth(String id) throws SQLException;
 
     /**
      * This feature is responsible for registering a customer
      * 
      * @param User
      * @return Users
+     * @throws Exception
      */
-    User signUp(User user);
+    Auth register(Auth user) throws SQLException;
 }

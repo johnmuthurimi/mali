@@ -26,10 +26,25 @@ spring:
     properties:
       hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
   datasource:
-    url: jdbc:mysql://192.168.100.29:3308/user_service?useSSL=false&serverTimezone=UTC&autoReconnect=true
+    url: jdbc:mysql://192.168.100.29:3308/userservice?useSSL=false&serverTimezone=UTC&autoReconnect=true
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
+    testOnBorrow: true
+    testWhileIdle: true
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 30000
+    validationQuery: SELECT 1
+    max-active: 15
+    max-idle: 10
+    max-wait: 8000
+
+flyway:
+  enabled: true 
+  url: jdbc:mysql://192.168.100.29:3308/mysql
+  schemas: userservice
+  user: root
+  password: root
 
 springdoc:
   packagesToScan: slick.mali.userservice

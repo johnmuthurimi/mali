@@ -8,7 +8,6 @@ import java.util.Base64;
 import java.util.Random;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import slick.mali.userservice.model.AuthParam;
 
 
 
@@ -28,17 +27,11 @@ public class PasswordUtils {
      * @param salt
      * @return
      */
-    public static AuthParam generateSecurePassword(String password, String salt) {
+    public static String generateSecurePassword(String password, String salt) {
         String returnValue = null;
         byte[] securePassword = hash(password.toCharArray(), salt.getBytes()); 
         returnValue = Base64.getEncoder().encodeToString(securePassword); 
-
-        // Prepare return model
-        AuthParam params = new AuthParam();
-        params.setType("password");
-        params.setPassword(returnValue);
-        params.setSalt(salt);
-        return params;
+        return returnValue;
     }
 
     /**
@@ -54,9 +47,9 @@ public class PasswordUtils {
     {
         boolean returnValue = false;        
         // Generate New secure password with the same salt
-        AuthParam auth = generateSecurePassword(providedPassword, salt);        
+        String password = generateSecurePassword(providedPassword, salt);        
         // Check if two passwords are equal
-        returnValue = auth.getPassword().equalsIgnoreCase(securedPassword);        
+        returnValue = password.equalsIgnoreCase(securedPassword);        
         return returnValue;
     }
 

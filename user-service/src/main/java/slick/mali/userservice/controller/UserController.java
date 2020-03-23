@@ -1,6 +1,5 @@
 package slick.mali.userservice.controller;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import slick.mali.userservice.model.Response;
-import slick.mali.userservice.model.User;
+import slick.mali.userservice.model.Auth;
 import slick.mali.userservice.service.IUserService;
 
 /**
@@ -33,11 +32,11 @@ public class UserController extends BaseController {
      * @param pageNumber
      * @return List of users
      */
-    @RequestMapping(value = "/fetch")
+    @RequestMapping(value = "/auth/get")
     @ResponseBody
-    public ResponseEntity<Response<List<User>>> userFetch(@RequestParam int pageNumber) {
+    public ResponseEntity<Response<Auth>> getAuth(@RequestParam String id) {
         try {
-            List<User> result = userService.userFetch(pageNumber);
+            Auth result = userService.getAuth(id);
             return this.successfulResponse(result);
         } catch (Exception e) {
             return this.failedResponse(e.getMessage());
@@ -50,11 +49,11 @@ public class UserController extends BaseController {
      * @param user user object
      * @return user
      */
-    @PostMapping(path = "/signUp", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Response<User>> signUp(@RequestBody User user) {
+    @PostMapping(path = "/auth", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Response<Auth>> signUp(@RequestBody Auth user) {
 
         try {
-            User result = userService.signUp(user);
+            Auth result = userService.register(user);
             return this.successfulResponse(result);
         } catch (Exception e) {
             return this.failedResponse(e.getMessage());
