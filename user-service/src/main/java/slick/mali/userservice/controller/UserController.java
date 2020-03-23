@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import slick.mali.userservice.model.Response;
 import slick.mali.userservice.model.Auth;
+import slick.mali.userservice.model.Request;
 import slick.mali.userservice.service.IUserService;
 
 /**
@@ -32,7 +33,7 @@ public class UserController extends BaseController {
      * @param pageNumber
      * @return List of users
      */
-    @RequestMapping(value = "/auth/get")
+    @RequestMapping(value = "/auth")
     @ResponseBody
     public ResponseEntity<Response<Auth>> getAuth(@RequestParam String id) {
         try {
@@ -50,10 +51,10 @@ public class UserController extends BaseController {
      * @return user
      */
     @PostMapping(path = "/auth", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Response<Auth>> signUp(@RequestBody Auth user) {
+    public ResponseEntity<Response<Auth>> signUp(@RequestBody Request<Auth> req) {
 
         try {
-            Auth result = userService.register(user);
+            Auth result = userService.register(req.getParam());
             return this.successfulResponse(result);
         } catch (Exception e) {
             return this.failedResponse(e.getMessage());

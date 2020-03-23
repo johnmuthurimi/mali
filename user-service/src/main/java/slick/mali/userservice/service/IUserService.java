@@ -16,7 +16,7 @@ public interface IUserService extends IBaseService {
      * @return User
      * @throws SQLException
      */
-    Auth getAuth(String id) throws SQLException;
+    Auth getAuth(String id);
 
     /**
      * This feature is responsible for registering a customer
@@ -25,5 +25,5 @@ public interface IUserService extends IBaseService {
      * @return Users
      * @throws Exception
      */
-    Auth register(Auth user) throws SQLException;
+    Auth register(Auth user);
 }

@@ -1,7 +1,5 @@
 package slick.mali.userservice.dao.auth;
 
-import java.sql.SQLException;
-
 import slick.mali.userservice.model.Auth;
 
 public interface AuthDao {
@@ -12,12 +10,12 @@ public interface AuthDao {
     * @return Auth object
     * @throws SQLException
     */
-   public Auth getAuth(String id) throws SQLException;  
+   public Auth getAuth(String id);  
 
    /**
     * This function registers new user
     * @param auth
  * @throws SQLException
     */
-   public void register(Auth auth) throws SQLException;
+   public String register(Auth auth);
 }

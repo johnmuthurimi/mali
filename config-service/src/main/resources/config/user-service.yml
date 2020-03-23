@@ -26,7 +26,7 @@ spring:
     properties:
       hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
   datasource:
-    url: jdbc:mysql://192.168.100.29:3308/userservice?useSSL=false&serverTimezone=UTC&autoReconnect=true
+    url: jdbc:mysql://192.168.100.29:3308/user_service?useSSL=false&serverTimezone=UTC&autoReconnect=true
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -42,7 +42,7 @@ spring:
 flyway:
   enabled: true 
   url: jdbc:mysql://192.168.100.29:3308/mysql
-  schemas: userservice
+  schemas: user_service
   user: root
   password: root
 

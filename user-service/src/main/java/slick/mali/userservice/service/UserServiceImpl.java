@@ -1,6 +1,5 @@
 package slick.mali.userservice.service;
 
-import java.sql.SQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import slick.mali.userservice.constants.UserStatus;
@@ -26,7 +25,7 @@ public class UserServiceImpl implements IUserService {
      * @throws SQLException
      */
     @Override
-    public Auth getAuth(String id) throws SQLException {
+    public Auth getAuth(String id) {
         return authDao.getAuth(id);
     }
 
@@ -41,26 +40,22 @@ public class UserServiceImpl implements IUserService {
      * @throws Exception
      */
     @Override
-    public Auth register(Auth user) throws SQLException {
-        try {
-            // generate salts
-            String salt = PasswordUtils.getSalt(30);        
-            String hashValue = PasswordUtils.generateSecurePassword(user.getPassword(), salt);
-            user.setType(user.getType());
-            user.setSalt(salt);
-            user.setPassword(hashValue);            
-            user.setStatus(UserStatus.NEW);
-            user.setEnabled(false);
-            user.setDeleted(false);
-            authDao.register(user);
+    public Auth register(Auth user) {
+        // generate salts
+        String salt = PasswordUtils.getSalt(30);        
+        String hashValue = PasswordUtils.generateSecurePassword(user.getPassword(), salt);
+        user.setType("password");
+        user.setSalt(salt);
+        user.setPassword(hashValue);            
+        user.setStatus(UserStatus.NEW);
+        user.setEnabled(false);
+        user.setDeleted(false);
+        String id = authDao.register(user);
+        user.setId(id);
 
-            // save user  
-            // return userRepository.save(user);         
-            // send notification to rabbitmqve not saved
-            return user;
-        } catch (SQLException e) {
-            // Here we need to consider roll back
-            throw e;
-        }          
+        // save user  
+        // return userRepository.save(user);         
+        // send notification to rabbitmqve not saved
+        return user;         
     }
 }
