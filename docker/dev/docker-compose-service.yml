@@ -96,3 +96,23 @@ services:
       - proxy-service
       - gateway-service
     restart: "on-failure"
+
+  web-service:
+    container_name: web-service
+    image: mucunga90/web-service:latest
+    networks:
+      - prod-network    
+    ports:
+      - '80:80'
+    expose:
+      - "80"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+    depends_on:
+      - discovery-service
+      - proxy-service
+      - gateway-service
+      - user-service
+    restart: "on-failure"

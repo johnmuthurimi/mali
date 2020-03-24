@@ -36,8 +36,14 @@ if [ "$build_images" == "y" ]; then
 	cd ./../gateway-service/
 	sh ./build_image.sh
 
+	# Included service here if you want to build the docker image
 	echo "Generating user-service image..."
 	cd ./../user-service/
+	sh ./build_image.sh
+
+	# Included service here if you want to build the docker image
+	echo "Generating web-service image..."
+	cd ./../web-service/
 	sh ./build_image.sh
 fi
 
