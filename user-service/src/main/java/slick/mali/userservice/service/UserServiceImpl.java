@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import slick.mali.userservice.constants.UserStatus;
 import slick.mali.userservice.dao.auth.AuthDao;
 import slick.mali.userservice.model.Auth;
+import slick.mali.userservice.model.EventRequest;
+import slick.mali.userservice.rabbitmq.OTPMessageSender;
 import slick.mali.userservice.util.PasswordUtils;
 
 /**
@@ -12,6 +14,9 @@ import slick.mali.userservice.util.PasswordUtils;
  */
 @Service
 public class UserServiceImpl implements IUserService {
+
+    @Autowired
+    private OTPMessageSender otpMessageSender;
 
     /**
      * Inject the user repository
@@ -25,11 +30,10 @@ public class UserServiceImpl implements IUserService {
      * @throws SQLException
      */
     @Override
-    public Auth getAuth(String id) {
+    public Auth getAuth(final String id) {
         return authDao.getAuth(id);
     }
 
-    
     /**
      * This feature is responsible for the following; 1. Add user succesfully to
      * database 2. Send email request to alert service via rabbitmq Send
@@ -40,22 +44,35 @@ public class UserServiceImpl implements IUserService {
      * @throws Exception
      */
     @Override
-    public Auth register(Auth user) {
+    public Auth register(final Auth user) {
         // generate salts
-        String salt = PasswordUtils.getSalt(30);        
-        String hashValue = PasswordUtils.generateSecurePassword(user.getPassword(), salt);
+        final String salt = PasswordUtils.getSalt(30);
+        final String hashValue = PasswordUtils.generateSecurePassword(user.getPassword(), salt);
         user.setType("password");
         user.setSalt(salt);
-        user.setPassword(hashValue);            
+        user.setPassword(hashValue);
         user.setStatus(UserStatus.NEW);
         user.setEnabled(false);
         user.setDeleted(false);
-        String id = authDao.register(user);
+
+        // Register users
+        final String id = authDao.register(user);
         user.setId(id);
 
-        // save user  
-        // return userRepository.save(user);         
-        // send notification to rabbitmqve not saved
-        return user;         
+        // send notification to rabbitmq
+        final EventRequest event = new EventRequest();
+        event.setEmail(user.getEmail());
+        event.setusername(user.getusername());
+        sendOTP(event);
+        
+        return user;
+    }
+
+    /**
+     * Send OTP request via Rabbit MQ
+     */
+    @Override
+    public void sendOTP(final EventRequest event) {
+        otpMessageSender.sendOTP(event);
     }
 }

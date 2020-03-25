@@ -1,6 +1,6 @@
 package slick.mali.userservice.model;
 
-public class Request<T> {
+public class Request<T> extends BaseModel{
 
     /**
      * This is the request id

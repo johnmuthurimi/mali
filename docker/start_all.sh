@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+echo "See Memory and CPU Usage for All Your Docker Containers"
+docker ps -q | xargs  docker stats --no-stream
+
 # get the absolute path of the executable
 SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P) && SELF_PATH="$SELF_PATH"/$(basename -- "$0")
 
@@ -9,7 +12,7 @@ docker system prune -a --volumes
 
 echo "Stopping all services"
 docker ps | \
-grep "rabbitmq-service\|mysql-service\|config-service\|discovery-service\|proxy-service\|gateway-service\|user-service" | \
+grep "rabbitmq-service\|mysql-service\|config-service\|discovery-service\|proxy-service\|gateway-service\|user-service\|alert-service\|web-service" | \
 awk '{print $1}' | xargs docker stop
 
 echo -n "Build new images? y/n  "
@@ -41,6 +44,7 @@ if [ "$build_images" == "y" ]; then
 	cd ./../user-service/
 	sh ./build_image.sh
 
+
 	# Included service here if you want to build the docker image
 	echo "Generating web-service image..."
 	cd ./../web-service/
@@ -57,6 +61,8 @@ if [ "$build_images" == "y" ]; then
 	#docker push mucunga90/proxy-service:latest
 	#docker push mucunga90/gateway-service:latest	
 	#docker push mucunga90/user-service:latest
+	#docker push mucunga90/alert-service:latest
+	#docker push mucunga90/web-service:latest
 fi
 
 echo "Starting your local dockerized full stack with mounted volumes"
@@ -77,6 +83,9 @@ read build_service
 if [ "$build_service" == "y" ]; then
 	docker-compose -f $build_env/docker-compose-service.yml up -d
 fi
+
+echo "See Memory and CPU Usage for All Your Docker Containers"
+docker ps -q | xargs  docker stats --no-stream
 
 
 

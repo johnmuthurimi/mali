@@ -1,6 +1,6 @@
 package slick.mali.userservice.model;
 
-public class Response<T> {
+public class Response<T> extends BaseModel{
 
     /**
      * This is the response code

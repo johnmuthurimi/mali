@@ -1,0 +1,50 @@
+debug: true
+
+server:
+  port: 5005
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://192.168.100.29:5002/eureka/
+
+logging:
+  pattern: 
+    console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
+
+spring:
+  output.ansi.enabled: ALWAYS
+  rabbitmq:
+    port: 5672
+    host: 192.168.100.29
+    username: appuser
+    password: appuser
+  jpa:
+    open-in-view: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+  datasource:
+    url: jdbc:mysql://192.168.100.29:3308/user_service?useSSL=false&serverTimezone=UTC&autoReconnect=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    testOnBorrow: true
+    testWhileIdle: true
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 30000
+    validationQuery: SELECT 1
+    max-active: 15
+    max-idle: 10
+    max-wait: 8000
+
+flyway:
+  enabled: true 
+  url: jdbc:mysql://192.168.100.29:3308/mysql
+  schemas: user_service
+  user: root
+  password: root
+
+springdoc:
+  packagesToScan: slick.mali.alertservice
