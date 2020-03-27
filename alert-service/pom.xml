@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>slick.mali</groupId>
+	<groupId>slick.mali.alertservice</groupId>
 	<artifactId>alert-service</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
@@ -13,7 +13,7 @@
 
 	<parent>
 		<groupId>slick.mali</groupId>
-		<artifactId>core-service</artifactId>
+		<artifactId>build-service</artifactId>
 		<version>1.0</version>
     </parent>
 
@@ -22,6 +22,11 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>slick.mali.coreservice</groupId>
+			<artifactId>core-service</artifactId>
+			<version>1.0</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
@@ -72,6 +77,10 @@
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 	</dependencies>
 

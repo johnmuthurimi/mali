@@ -4,11 +4,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>slick.mali.userservice</groupId>
-	<artifactId>user-service</artifactId>
+	<groupId>slick.mali.coreservice</groupId>
+	<artifactId>core-service</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
-	<name>user-service</name>
+	<name>core-service</name>
     <description>user microservice</description>
 
 	<parent>
@@ -22,11 +22,6 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>slick.mali.coreservice</groupId>
-			<artifactId>core-service</artifactId>
-			<version>1.0</version>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
@@ -83,8 +78,8 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

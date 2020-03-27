@@ -2,8 +2,10 @@ package slick.mali.userservice.service;
 
 import java.sql.SQLException;
 
-import slick.mali.userservice.model.Auth;
-import slick.mali.userservice.model.EventRequest;
+import slick.mali.coreservice.model.Auth;
+import slick.mali.coreservice.model.EventRequest;
+import slick.mali.coreservice.service.IBaseService;
+
 
 /**
  * Interface for all user operations
@@ -29,8 +31,8 @@ public interface IUserService extends IBaseService {
     Auth register(Auth user);
 
     /**
-     * Send OTP request
+     *  Request to Rabbit MQ
      * @param event
      */
-    void sendOTP(EventRequest event);
+    void sendMesage(final EventRequest event);
 }

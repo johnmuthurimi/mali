@@ -1,4 +1,4 @@
-package slick.mali.userservice.rabbitmq;
+package slick.mali.alertservice.rabbitmq;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;

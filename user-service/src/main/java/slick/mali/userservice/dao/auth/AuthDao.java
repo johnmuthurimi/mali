@@ -1,8 +1,11 @@
 package slick.mali.userservice.dao.auth;
 
-import slick.mali.userservice.model.Auth;
+import java.sql.SQLException;
 
-public interface AuthDao {
+import slick.mali.coreservice.dao.BaseDao;
+import slick.mali.coreservice.model.Auth;
+
+public interface AuthDao  extends BaseDao {
    
    /**
     * This function returns user authentication

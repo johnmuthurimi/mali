@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
-import slick.mali.userservice.model.Auth;
+import slick.mali.coreservice.model.Auth;
 
 public class AuthMapper implements RowMapper<Auth> {
 

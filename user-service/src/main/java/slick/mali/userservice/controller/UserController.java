@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import slick.mali.userservice.model.Response;
-import slick.mali.userservice.model.Auth;
-import slick.mali.userservice.model.Request;
+
+import slick.mali.coreservice.model.Response;
+import slick.mali.coreservice.model.Auth;
+import slick.mali.coreservice.model.Request;
 import slick.mali.userservice.service.IUserService;
+import slick.mali.coreservice.controller.BaseController;
 
 /**
  * This class handles all the users request for api v1

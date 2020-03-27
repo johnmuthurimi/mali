@@ -2,10 +2,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>slick.mali</groupId>
-    <artifactId>core-service</artifactId>
+    <artifactId>build-service</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
-    <name>core-service</name>
+    <name>build-service</name>
   
     <parent>    
         <groupId>org.springframework.boot</groupId>
@@ -17,7 +17,8 @@
         <module>config-service</module>
         <module>discovery-service</module>
         <module>proxy-service</module>
-        <module>gateway-service</module>        
+        <module>gateway-service</module>
+        <module>core-service</module> 
         <module>user-service</module>
         <module>alert-service</module>
     </modules>

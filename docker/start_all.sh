@@ -21,6 +21,12 @@ if [ "$build_images" == "y" ]; then
 
 	# Included service here if you want to build the docker image
 	echo "Generating config-service image..."
+	cd ./..
+	sh ./build_image.sh
+	cd ./docker
+
+	# Included service here if you want to build the docker image
+	echo "Generating config-service image..."
 	cd ./../config-service/
 	sh ./build_image.sh
 
@@ -40,8 +46,18 @@ if [ "$build_images" == "y" ]; then
 	sh ./build_image.sh
 
 	# Included service here if you want to build the docker image
+	echo "Generating core-service image..."
+	cd ./../core-service/
+	sh ./build_image.sh
+	
+	# Included service here if you want to build the docker image
 	echo "Generating user-service image..."
 	cd ./../user-service/
+	sh ./build_image.sh
+
+	# Included service here if you want to build the docker image
+	echo "Generating alert-service image..."
+	cd ./../alert-service/
 	sh ./build_image.sh
 
 

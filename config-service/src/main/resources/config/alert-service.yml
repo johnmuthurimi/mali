@@ -1,7 +1,7 @@
 debug: true
 
 server:
-  port: 5005
+  port: 5006
 
 eureka:
   client:
@@ -26,7 +26,7 @@ spring:
     properties:
       hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
   datasource:
-    url: jdbc:mysql://192.168.100.29:3308/user_service?useSSL=false&serverTimezone=UTC&autoReconnect=true
+    url: jdbc:mysql://192.168.100.29:3308/alert_service?useSSL=false&serverTimezone=UTC&autoReconnect=true
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -39,10 +39,20 @@ spring:
     max-idle: 10
     max-wait: 8000
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: mucunga90
+    password: Mucunga90()
+    properties.mail.smtp.auth: true
+    properties.mail.smtp.starttls.enable: true
+    smtp.debug: true
+    batchSize: 10
+
 flyway:
   enabled: true 
   url: jdbc:mysql://192.168.100.29:3308/mysql
-  schemas: user_service
+  schemas: alert_service
   user: root
   password: root
 

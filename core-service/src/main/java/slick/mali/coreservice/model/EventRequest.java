@@ -1,13 +1,13 @@
-package slick.mali.alertservice.model;
+package slick.mali.coreservice.model;
 
 import java.io.Serializable;
 
 /**
- * Domain class for EventResponse
+ * Domain class for EventRequest
  */
-public class EventResponse implements Serializable {
+public class EventRequest extends BaseModel implements Serializable {
 
-        /**
+        /**     
         *
         */
         private static final long serialVersionUID = 1L;

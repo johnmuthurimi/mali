@@ -11,7 +11,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import slick.mali.userservice.model.Auth;
+import slick.mali.coreservice.model.Auth;
 
 @Transactional
 @Repository

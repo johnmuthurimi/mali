@@ -2,11 +2,12 @@ package slick.mali.userservice.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import slick.mali.userservice.constants.UserStatus;
+import slick.mali.coreservice.constants.UserStatus;
 import slick.mali.userservice.dao.auth.AuthDao;
-import slick.mali.userservice.model.Auth;
-import slick.mali.userservice.model.EventRequest;
-import slick.mali.userservice.rabbitmq.OTPMessageSender;
+import slick.mali.coreservice.model.Auth;
+import slick.mali.coreservice.model.EventRequest;
+import slick.mali.userservice.rabbitmq.EventMessageSender;
+import slick.mali.userservice.rabbitmq.RabbitConfig;
 import slick.mali.userservice.util.PasswordUtils;
 
 /**
@@ -16,7 +17,7 @@ import slick.mali.userservice.util.PasswordUtils;
 public class UserServiceImpl implements IUserService {
 
     @Autowired
-    private OTPMessageSender otpMessageSender;
+    private EventMessageSender eventMessageSender;
 
     /**
      * Inject the user repository
@@ -63,16 +64,16 @@ public class UserServiceImpl implements IUserService {
         final EventRequest event = new EventRequest();
         event.setEmail(user.getEmail());
         event.setusername(user.getusername());
-        sendOTP(event);
+        sendMesage(event);
         
         return user;
     }
 
     /**
-     * Send OTP request via Rabbit MQ
+     * Send message request via Rabbit MQ
      */
     @Override
-    public void sendOTP(final EventRequest event) {
-        otpMessageSender.sendOTP(event);
+    public void sendMesage(final EventRequest event) {
+        eventMessageSender.sendMessage(event, RabbitConfig.QUEUE_DATA);
     }
 }

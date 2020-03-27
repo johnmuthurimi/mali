@@ -1,11 +1,6 @@
-package slick.mali.userservice.model;
+package slick.mali.coreservice.model;
 
-public class Request<T> extends BaseModel{
-
-    /**
-     * This is the request id
-     */
-    private int id;
+public class Request<T> extends BaseModel {
 
     /**
      * This is the object param returned
@@ -16,20 +11,6 @@ public class Request<T> extends BaseModel{
      * Message returned for every request
      */
     private String hash;
-
-    /**
-     * Get id
-     */
-    public int getId() {
-        return id;
-    }
-
-    /**
-     * Set the id
-     */
-    public void setId(int id) {
-        this.id = id;
-    }
 
     /**
      * Get param

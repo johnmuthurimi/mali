@@ -1,4 +1,4 @@
-package slick.mali.userservice.model;
+package slick.mali.coreservice.model;
 
 public class Response<T> extends BaseModel{
 

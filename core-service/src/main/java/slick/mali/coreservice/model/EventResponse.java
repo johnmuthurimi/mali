@@ -1,11 +1,11 @@
-package slick.mali.userservice.model;
+package slick.mali.coreservice.model;
 
 import java.io.Serializable;
 
 /**
- * Domain class for EventRequest
+ * Domain class for EventResponse
  */
-public class EventRequest implements Serializable {
+public class EventResponse extends BaseModel implements Serializable {
 
         /**
         *

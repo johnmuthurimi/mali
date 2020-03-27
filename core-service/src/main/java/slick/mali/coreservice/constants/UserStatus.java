@@ -1,4 +1,4 @@
-package slick.mali.userservice.constants;
+package slick.mali.coreservice.constants;
 
 /**
  * This class holds the all user statuses
