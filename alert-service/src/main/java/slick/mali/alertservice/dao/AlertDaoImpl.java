@@ -52,7 +52,7 @@ public class AlertDaoImpl implements AlertDao {
     public List<EmailRequest> getQueuedEmailBatch() {
         List<EmailRequest> list = getNewEmailBatch();
         if (list.isEmpty()) {
-            return null;
+            return new ArrayList<EmailRequest>();
         }
 
         queueNewBatch(list);
@@ -63,14 +63,14 @@ public class AlertDaoImpl implements AlertDao {
      * Get all emails newly inserted
      */
     public List<EmailRequest> getNewEmailBatch() {
-        String query = "SELECT id, sender, recepient, message, createdAt, sentAt, deliveredAt, status"
+        String query = "SELECT id, sender, recepient, message, createdAt, sentAt, deliveredAt, status "
                 + "FROM alert_email_out  "
                 + "WHERE status = ? "
                 + "LIMIT ? ";
         int limit = Integer.parseInt(env.getProperty("spring.mail.batchSize"));
         RowMapper<EmailRequest> rowMapper = new EmailRequestMapper();
         List<EmailRequest> list = new ArrayList<EmailRequest>();
-        return jdbcTemplate.query(query, rowMapper, AlertStatus.NEW, limit);
+        return jdbcTemplate.query(query, rowMapper, new Object[]{AlertStatus.NEW, limit});
     }
 
     /**
@@ -81,10 +81,9 @@ public class AlertDaoImpl implements AlertDao {
                 "UPDATE  alert_email_out SET status = ? WHERE id = ?",
                 new BatchPreparedStatementSetter() {
 
-                    public void setValues(PreparedStatement ps, int i) 
-						throws SQLException {
-                        ps.setString(1, list.get(i).getId());
-                        ps.setInt(2, AlertStatus.QUEUED);
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setInt(1, AlertStatus.QUEUED);
+                        ps.setString(2, list.get(i).getId());                        
                     }
 
                     public int getBatchSize() {
@@ -103,10 +102,10 @@ public class AlertDaoImpl implements AlertDao {
                 "UPDATE  alert_email_out SET status = ? WHERE id = ?",
                 new BatchPreparedStatementSetter() {
 
-                    public void setValues(PreparedStatement ps, int i) 
-						throws SQLException {
-                        ps.setString(1, list.get(i).getId());
-                        ps.setInt(2, list.get(i).getStatus());
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+
+                        ps.setInt(1, list.get(i).getStatus());
+                        ps.setString(2, list.get(i).getId());       
                     }
 
                     public int getBatchSize() {

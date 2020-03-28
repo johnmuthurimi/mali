@@ -4,7 +4,12 @@ server:
   port: 5005
 
 eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 1
+    lease-expiration-duration-in-seconds: 2
   client:
+    fetchRegistry: true
+    registryFetchIntervalSeconds: 5
     serviceUrl:
       defaultZone: http://192.168.100.29:5002/eureka/
 

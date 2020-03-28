@@ -8,7 +8,7 @@ import slick.mali.coreservice.model.Auth;
 import slick.mali.coreservice.model.EventRequest;
 import slick.mali.userservice.rabbitmq.EventMessageSender;
 import slick.mali.userservice.rabbitmq.RabbitConfig;
-import slick.mali.userservice.util.PasswordUtils;
+import slick.mali.coreservice.util.PasswordUtils;
 
 /**
  * Implementation for all user operations
@@ -74,6 +74,6 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public void sendMesage(final EventRequest event) {
-        eventMessageSender.sendMessage(event, RabbitConfig.QUEUE_DATA);
+        eventMessageSender.sendMessage(event, RabbitConfig.QUEUE_OTP);
     }
 }
