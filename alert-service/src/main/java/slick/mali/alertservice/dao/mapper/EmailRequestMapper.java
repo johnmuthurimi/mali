@@ -1,11 +1,10 @@
-package slick.mali.alertservice.dao;
-
-import java.math.BigInteger;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+package slick.mali.alertservice.dao.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
 import slick.mali.coreservice.model.alert.EmailRequest;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 
 /**

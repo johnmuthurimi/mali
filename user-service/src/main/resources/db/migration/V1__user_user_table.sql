@@ -1,8 +1,8 @@
 USE user_service;
 
-DROP TABLE IF EXISTS user_auth;
+DROP TABLE IF EXISTS user_user;
 
-CREATE TABLE user_auth (
+CREATE TABLE user_user (
     id 		        VARCHAR(36) NOT NULL,
     type 		    CHAR(8) NOT NULL DEFAULT 'password',
     salt 		    VARCHAR(50) NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE user_auth (
     deleted		    tinyint(1) DEFAULT 0,
 
     PRIMARY KEY (id),
-    CONSTRAINT unique_user_auth_id UNIQUE (id),
-    CONSTRAINT unique_user_auth_email UNIQUE (email),
-    CONSTRAINT unique_user_auth_username UNIQUE (username)
+    CONSTRAINT unique_user_user_id UNIQUE (id),
+    CONSTRAINT unique_user_user_email UNIQUE (email),
+    CONSTRAINT unique_user_user_username UNIQUE (username)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

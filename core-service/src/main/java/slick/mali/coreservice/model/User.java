@@ -3,7 +3,7 @@ package slick.mali.coreservice.model;
 /**
  * Domain class for user
  */
-public class Auth extends BaseModel {
+public class User extends BaseModel {
 
         /**
          * User String id

@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { routerTransition } from '../../router.animations';
 
 @Component({
     selector: 'app-charts',
     templateUrl: './charts.component.html',
-    styleUrls: ['./charts.component.scss'],
-    animations: [routerTransition()]
+    styleUrls: ['./charts.component.scss']
 })
 export class ChartsComponent implements OnInit {
     // bar chart
@@ -101,8 +99,8 @@ export class ChartsComponent implements OnInit {
             backgroundColor: 'rgba(148,159,177,0.2)',
             borderColor: 'rgba(148,159,177,1)',
             pointBackgroundColor: 'rgba(148,159,177,1)',
-            pointBorderColor: '#fff',
-            pointHoverBackgroundColor: '#fff',
+            pointBorderColor: '#F5F5F5',
+            pointHoverBackgroundColor: '#F5F5F5',
             pointHoverBorderColor: 'rgba(148,159,177,0.8)'
         },
         {
@@ -110,8 +108,8 @@ export class ChartsComponent implements OnInit {
             backgroundColor: 'rgba(77,83,96,0.2)',
             borderColor: 'rgba(77,83,96,1)',
             pointBackgroundColor: 'rgba(77,83,96,1)',
-            pointBorderColor: '#fff',
-            pointHoverBackgroundColor: '#fff',
+            pointBorderColor: '#F5F5F5',
+            pointHoverBackgroundColor: '#F5F5F5',
             pointHoverBorderColor: 'rgba(77,83,96,1)'
         },
         {
@@ -119,8 +117,8 @@ export class ChartsComponent implements OnInit {
             backgroundColor: 'rgba(148,159,177,0.2)',
             borderColor: 'rgba(148,159,177,1)',
             pointBackgroundColor: 'rgba(148,159,177,1)',
-            pointBorderColor: '#fff',
-            pointHoverBackgroundColor: '#fff',
+            pointBorderColor: '#F5F5F5',
+            pointHoverBackgroundColor: '#F5F5F5',
             pointHoverBorderColor: 'rgba(148,159,177,0.8)'
         }
     ];

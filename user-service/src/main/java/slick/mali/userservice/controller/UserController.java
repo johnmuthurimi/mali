@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import slick.mali.coreservice.model.Response;
-import slick.mali.coreservice.model.Auth;
+import slick.mali.coreservice.model.User;
 import slick.mali.coreservice.model.Request;
 import slick.mali.userservice.service.IUserService;
 import slick.mali.coreservice.controller.BaseController;
@@ -29,17 +29,15 @@ public class UserController extends BaseController {
     private IUserService userService;
 
     /**
-     * This function returns users from the databases It is envisioned for admin
-     * module management
-     * 
-     * @param pageNumber
-     * @return List of users
+     * This is end point is responsible getting registered user
+     * @param  id
+     * @return User
      */
-    @RequestMapping(value = "/auth")
+    @RequestMapping(value = "/user")
     @ResponseBody
-    public ResponseEntity<Response<Auth>> getAuth(@RequestParam String id) {
+    public ResponseEntity<Response<User>> getUser(@RequestParam String id) {
         try {
-            Auth result = userService.getAuth(id);
+            User result = userService.getUser(id);
             return this.successfulResponse(result);
         } catch (Exception e) {
             return this.failedResponse(e.getMessage());
@@ -47,16 +45,15 @@ public class UserController extends BaseController {
     }
 
     /**
-     * sign up user using email address and passworda
-     * 
-     * @param user user object
-     * @return user
+     * This is end point is responsible registered user
+     * @param req
+     * @return
      */
-    @PostMapping(path = "/auth", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Response<Auth>> signUp(@RequestBody Request<Auth> req) {
+    @PostMapping(path = "/user", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Response<User>> signUp(@RequestBody Request<User> req) {
 
         try {
-            Auth result = userService.register(req.getParam());
+            User result = userService.signUp(req.getParam());
             return this.successfulResponse(result);
         } catch (Exception e) {
             return this.failedResponse(e.getMessage());

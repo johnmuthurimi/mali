@@ -1,20 +1,19 @@
 package slick.mali.alertservice.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileCopyUtils;
 import slick.mali.alertservice.dao.AlertDao;
+import slick.mali.alertservice.service.emailTemplate.EmailVerification;
 import slick.mali.coreservice.model.EventResponse;
 import slick.mali.coreservice.model.alert.EmailRequest;
+import slick.mali.coreservice.util.LoggerUtil;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation for all alert operations
@@ -22,8 +21,7 @@ import java.util.List;
 @Service
 public class AlertServiceImpl implements IAlertService {
 
-    @Value("classpath:email-template/otp.txt")
-    Resource resourceFile;
+    public  static final Logger LOGGER = LoggerFactory.getLogger(AlertServiceImpl.class);
 
     /**
      * Environment variable
@@ -38,40 +36,33 @@ public class AlertServiceImpl implements IAlertService {
     private AlertDao alertDao;
 
     /**
-     * emailService injection
-     */
-    @Autowired
-    EmailService emailService;
-
-    /**
     * Insert newly created email notification
     * @param request
     */
     @Override
-    public String createNewEmailNotification(EventResponse request) {
-        String sender = env.getProperty("spring.mail.username");
-        EmailRequest req = new EmailRequest();
-        req.setSender(sender);
-        req.setRecepient(request.getEmail());
-
-        Resource resource = new ClassPathResource("emailTemplate/otp.html");
-        InputStream inputStream = null;
+    public String sendEmailVerificationNotification(EventResponse request) {
+        String id = null;
         try {
-            inputStream = resource.getInputStream();
-        } catch (IOException e) {
-            e.printStackTrace();
+            LoggerUtil.info(LOGGER, "AlertServiceImpl: creating email notification for recipient: " + request.getEmail());
+            String sender = env.getProperty("spring.mail.username");
+
+            String message = generateEmailVerificationMessage(request);
+            EmailRequest req = new EmailRequest();
+            req.setSender(sender);
+            req.setRecepient(request.getEmail());
+            req.setMessage(message);
+
+            id = alertDao.createNewEmailNotification(req);
+            LoggerUtil.info(LOGGER, "IAlertService: email notification for recipient: " + request.getEmail() + " successfully created");
+
+        } catch (Exception e) {
+            LoggerUtil.info(LOGGER, "IAlertService: email notification for recipient: " + request.getEmail() + " Failed");
+            LoggerUtil.error(LOGGER, e.getMessage());
         }
-        try {
-            byte[] bdata = FileCopyUtils.copyToByteArray(inputStream);
-            String data = new String(bdata, StandardCharsets.UTF_8);
 
-            req.setMessage(data);
-        } catch (IOException e) {
-        }
-
-
-        return alertDao.createNewEmailNotification(req);
+        return id;
     }
+
 
     /**
     * Returns a List of queue emails for sending
@@ -82,20 +73,29 @@ public class AlertServiceImpl implements IAlertService {
     }
 
     /**
-    * Update the new batch after email service
-    */
+     * Update the new batch after email service
+     * @param list email List
+     * @return list of int
+     */
     public int[] updateQueuedEmailBatch(List<EmailRequest> list) {
         return alertDao.updateQueuedEmailBatch(list);
     }
 
     /**
-     * Send emails 
+     * Update email message with template
+     * @return String
      */
-    public void sendEmail() {
-        List<EmailRequest> queue = getQueuedEmailBatch();
-        String subject = env.getProperty("spring.mail.subject");
-        for (int i = 0; i < queue.size(); i++) {
-            emailService.sendEmail(queue.get(i), subject);
-        }
+    private String generateEmailVerificationMessage(EventResponse request) {
+        EmailVerification template = new EmailVerification("verify.html");
+        String link = env.getProperty("spring.mail.verificationLink");
+        link = link + "/" + request.getId();
+
+        Map<String, String> replacements = new HashMap<String, String>();
+        replacements.put("user", request.getusername());
+        replacements.put("link", link);
+
+        String message = template.getTemplate(replacements);
+        return message;
     }
+
 }

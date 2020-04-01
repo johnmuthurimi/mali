@@ -14,21 +14,16 @@ public interface IAlertService extends IBaseService {
     * Insert newly created email notification
     * @param request
     */
-    String createNewEmailNotification(EventResponse request);
+    String sendEmailVerificationNotification(EventResponse request);
 
     /**
     * Returns a List of queue emails for sending
     * @return List<EmailRequest>
     */
-    public List<EmailRequest> getQueuedEmailBatch();
+    List<EmailRequest> getQueuedEmailBatch();
 
     /**
     * Update the new batch after email service
     */
-    public int[] updateQueuedEmailBatch(List<EmailRequest> list);
-
-    /**
-     * Send emails to customers
-     */
-    public void sendEmail();
+    int[] updateQueuedEmailBatch(List<EmailRequest> list);
 }

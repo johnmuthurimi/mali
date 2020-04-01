@@ -1,9 +1,7 @@
 package slick.mali.userservice.service;
 
-import java.sql.SQLException;
-
-import slick.mali.coreservice.model.Auth;
 import slick.mali.coreservice.model.EventRequest;
+import slick.mali.coreservice.model.User;
 import slick.mali.coreservice.service.IBaseService;
 
 
@@ -13,26 +11,25 @@ import slick.mali.coreservice.service.IBaseService;
 public interface IUserService extends IBaseService {
 
     /**
-     * This functions user credentials
+     * This functions getting registered user by id
      * 
-     * @param pageNumber
+     * @param id
      * @return User
-     * @throws SQLException
      */
-    Auth getAuth(String id);
+    User getUser(String id);
 
     /**
      * This feature is responsible for registering a customer
      * 
-     * @param User
+     * @param user
      * @return Users
      * @throws Exception
      */
-    Auth register(Auth user);
+    User signUp(User user);
 
     /**
      *  Request to Rabbit MQ
      * @param event
      */
-    void sendMesage(final EventRequest event);
+    void sendMessage(final EventRequest event);
 }

@@ -1,20 +1,21 @@
 package slick.mali.alertservice.dao;
 
-import java.sql.SQLException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import slick.mali.alertservice.dao.mapper.EmailRequestMapper;
+import slick.mali.coreservice.constants.AlertStatus;
+import slick.mali.coreservice.model.alert.EmailRequest;
+
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.core.env.Environment;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Repository;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.transaction.annotation.Transactional;
-import slick.mali.coreservice.constants.AlertStatus;
-import slick.mali.coreservice.model.alert.EmailRequest;
 
 /**
  * Implementing class for all the database operations
@@ -60,6 +61,28 @@ public class AlertDaoImpl implements AlertDao {
     }
 
     /**
+     * Update the new batch after email service
+     */
+    @Override
+    public int[] updateQueuedEmailBatch(List<EmailRequest> list) {
+        return jdbcTemplate.batchUpdate(
+                "UPDATE  alert_email_out SET status = ? WHERE id = ?",
+                new BatchPreparedStatementSetter() {
+
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+
+                        ps.setInt(1, list.get(i).getStatus());
+                        ps.setString(2, list.get(i).getId());       
+                    }
+
+                    public int getBatchSize() {
+                        return list.size();
+                    }
+
+                });
+    }
+
+    /**
      * Get all emails newly inserted
      */
     public List<EmailRequest> getNewEmailBatch() {
@@ -83,29 +106,7 @@ public class AlertDaoImpl implements AlertDao {
 
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
                         ps.setInt(1, AlertStatus.QUEUED);
-                        ps.setString(2, list.get(i).getId());                        
-                    }
-
-                    public int getBatchSize() {
-                        return list.size();
-                    }
-
-                });
-    }
-
-    /**
-     * Update the new batch after email service
-     */
-    @Override
-    public int[] updateQueuedEmailBatch(List<EmailRequest> list) {
-        return jdbcTemplate.batchUpdate(
-                "UPDATE  alert_email_out SET status = ? WHERE id = ?",
-                new BatchPreparedStatementSetter() {
-
-                    public void setValues(PreparedStatement ps, int i) throws SQLException {
-
-                        ps.setInt(1, list.get(i).getStatus());
-                        ps.setString(2, list.get(i).getId());       
+                        ps.setString(2, list.get(i).getId());
                     }
 
                     public int getBatchSize() {

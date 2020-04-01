@@ -1,9 +1,9 @@
 package slick.mali.alertservice.dao;
 
-import java.util.List;
-import java.sql.SQLException;
 import slick.mali.coreservice.dao.BaseDao;
 import slick.mali.coreservice.model.alert.EmailRequest;
+
+import java.util.List;
 
 /**
  * Class for all the alert service database operations

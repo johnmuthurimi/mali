@@ -20,9 +20,9 @@ public class EventMessageListener {
      * Receive the Message from Rabbit MQ
      * This function should be overidden in the implementation class
      */
-    @RabbitListener(queues = slick.mali.alertservice.rabbitmq.RabbitConfig.QUEUE_OTP)
+    @RabbitListener(queues = slick.mali.alertservice.rabbitmq.RabbitConfig.QUEUE_EMAIL_VERIFICATION)
     public void processMessage(EventResponse res) {
-        logger.info("Event Received: "+res);
-        alertService.createNewEmailNotification(res);
+        logger.info("RabbitMQ Event Received: "+res);
+        alertService.sendEmailVerificationNotification(res);
     }
 }
