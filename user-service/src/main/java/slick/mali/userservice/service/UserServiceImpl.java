@@ -137,7 +137,7 @@ public class UserServiceImpl implements IUserService {
 
         try {
             user = userDao.getToken(token);
-            if (user != null && user.getToken() != null) {
+            if (user != null) {
                 if (user.isVerified()) {
                     throw new Exception("Token has already been used");
                 } else {
@@ -148,6 +148,8 @@ public class UserServiceImpl implements IUserService {
                     // Update the user as verified, enable the user and change status
                     userDao.updateUserVerified(user.getId());
                 }
+            } else {
+                throw new Exception("Token has already been used");
             }
         } catch(Exception e) {
             throw new Exception("Token has already been used");
