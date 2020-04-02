@@ -7,9 +7,9 @@ import java.io.Serializable;
  */
 public class EventRequest extends BaseModel implements Serializable {
 
-        /**     
-        *
-        */
+        /**
+         * serialize version
+         */
         private static final long serialVersionUID = 1L;
 
         /**
@@ -18,9 +18,9 @@ public class EventRequest extends BaseModel implements Serializable {
         private String email;
 
         /**
-         * username should be unique
+         * token of the user
          */
-        private String username;
+        private String token;
 
         /**
          * Get the user email
@@ -37,16 +37,16 @@ public class EventRequest extends BaseModel implements Serializable {
         }
 
         /**
-         * Get the username
+         * Get the user token
          */
-        public String getusername() {
-                return username;
+        public String getToken() {
+                return token;
         }
 
         /**
-         * Set the username
+         * Set the user token
          */
-        public void setusername(String username) {
-                this.username = username;
+        public void setToken(String email) {
+                this.token = token;
         }
 }

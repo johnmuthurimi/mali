@@ -32,4 +32,12 @@ public interface IUserService extends IBaseService {
      * @param event
      */
     void sendMessage(final EventRequest event);
+
+    /**
+     * This functions verifies the user token sent via email link
+     *
+     * @param token
+     * @return User
+     */
+    User isTokenValid(String token);
 }

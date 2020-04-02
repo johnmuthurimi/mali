@@ -88,10 +88,9 @@ public class AlertServiceImpl implements IAlertService {
     private String generateEmailVerificationMessage(EventResponse request) {
         EmailVerification template = new EmailVerification("verify.html");
         String link = env.getProperty("spring.mail.verificationLink");
-        link = link + "/" + request.getId();
+        link = link + "/" + request.getToken();
 
         Map<String, String> replacements = new HashMap<String, String>();
-        replacements.put("user", request.getusername());
         replacements.put("link", link);
 
         String message = template.getTemplate(replacements);

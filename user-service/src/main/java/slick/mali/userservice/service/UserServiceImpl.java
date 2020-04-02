@@ -49,6 +49,7 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public User signUp(final User user) {
+        final EventRequest event = new EventRequest();
         try {
             LoggerUtil.info(LOGGER, "AlertServiceImpl: Initiate user sign up for: " + user.getEmail());
             // generate salts
@@ -67,17 +68,35 @@ public class UserServiceImpl implements IUserService {
             user.setId(id);
             LoggerUtil.info(LOGGER, "AlertServiceImpl: Insert the user in the database: " + user.getEmail());
 
-            // send notification to rabbitmq
-            final EventRequest event = new EventRequest();
+            LoggerUtil.info(LOGGER, "AlertServiceImpl: Generate user verification token for : " + user.getEmail());
+            final String token = userDao.generateUserVerificationToken(user);
+            user.setId(id);
+
             event.setId(user.getId());
             event.setEmail(user.getEmail());
-            event.setusername(user.getusername());
+            event.setToken(token);
+
+            // send notification to rabbitmq
             sendMessage(event);
             LoggerUtil.info(LOGGER, "AlertServiceImpl: Initiated RabbitMQ OTP request for: " + user.getEmail());
+
+            // Update user to pending
+            userDao.updateUserPending(user.getId());
+            LoggerUtil.info(LOGGER, "AlertServiceImpl: Pending user email confirmation for: " + user.getEmail());
         } catch (Exception e) {
+            // We need to delete user token from the database if exist
+            if (event.getToken() != null) {
+                userDao.deleteToken(event.getToken());
+            }
+
             // We need to delete user from the database if exist
+            if (user.getId() != null) {
+                userDao.deleteUser(user.getId());
+            }
+
             LoggerUtil.error(LOGGER, "AlertServiceImpl: There experienced error registering user : " + user.getEmail());
             LoggerUtil.error(LOGGER, e.getMessage());
+            throw e;
         }
 
         LoggerUtil.info(LOGGER, "AlertServiceImpl: Completed sign up requested for : " + user.getEmail());
@@ -90,5 +109,30 @@ public class UserServiceImpl implements IUserService {
     @Override
     public void sendMessage(final EventRequest event) {
         eventMessageSender.sendMessage(event, RabbitConfig.QUEUE_EMAIL_VERIFICATION);
+    }
+
+    /**
+     * Verify the user token whether it is valid
+     * @param token
+     * @return
+     */
+    @Override
+    public User isTokenValid(String token) {
+        User user = new User();
+
+        try {
+            user = userDao.getToken(token);
+            if (user != null && user.getToken() != null) {
+                // Update the token as verified
+                userDao.updateTokenVerified(user.getToken());
+
+                // Update the user as verified, enable the user and change status
+                userDao.updateUserVerified(user.getId());
+            }
+        } catch(Exception e) {
+            user = null;
+        }
+
+        return user;
     }
 }

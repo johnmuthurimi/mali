@@ -10,8 +10,9 @@ CREATE TABLE user_user (
     username 		VARCHAR(50) NOT NULL,
     password	    VARCHAR(512) NOT NULL,
     status 		    INT(1) NOT NULL DEFAULT 0,
-    enabled 		tinyint(1) DEFAULT 0,
-    deleted		    tinyint(1) DEFAULT 0,
+    verified        tinyint(1) NOT NULL DEFAULT '0',
+    enabled 		tinyint(1) NOT NULL DEFAULT 0,
+    deleted		    tinyint(1) NOT NULL DEFAULT 0,
 
     PRIMARY KEY (id),
     CONSTRAINT unique_user_user_id UNIQUE (id),

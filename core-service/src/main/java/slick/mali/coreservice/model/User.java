@@ -16,6 +16,11 @@ public class User extends BaseModel {
         private String type;
 
         /**
+         * user token
+         */
+        private String token;
+
+        /**
          * User salt
          */
         private String salt;
@@ -24,11 +29,6 @@ public class User extends BaseModel {
          * email of the user
          */
         private String email;
-
-        /**
-         * username should be unique
-         */
-        private String username;
 
         /**
          * User password
@@ -79,6 +79,20 @@ public class User extends BaseModel {
         }
 
         /**
+         * Get the token
+         */
+        public String getToken() {
+                return token;
+        }
+
+        /**
+         * Set the token
+         */
+        public void setToken(String token) {
+                this.token = token;
+        }
+
+        /**
          * Get the salt
          */
         public String getSalt() {
@@ -104,20 +118,6 @@ public class User extends BaseModel {
          */
         public void setEmail(String email) {
                 this.email = email;
-        }
-
-        /**
-         * Get the username
-         */
-        public String getusername() {
-                return username;
-        }
-
-        /**
-         * Set the username
-         */
-        public void setusername(String username) {
-                this.username = username;
         }
 
         /**

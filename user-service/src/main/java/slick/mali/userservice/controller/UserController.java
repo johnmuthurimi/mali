@@ -36,11 +36,12 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/user")
     @ResponseBody
     public ResponseEntity<Response<User>> getUser(@RequestParam String id) {
+        User result = new User();
         try {
-            User result = userService.getUser(id);
+            result = userService.getUser(id);
             return this.successfulResponse(result);
         } catch (Exception e) {
-            return this.failedResponse(e.getMessage());
+            return this.errorResponse(result, e.getMessage());
         }
     }
 
@@ -51,12 +52,37 @@ public class UserController extends BaseController {
      */
     @PostMapping(path = "/user", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Response<User>> signUp(@RequestBody Request<User> req) {
-
+        User result = new User();
         try {
-            User result = userService.signUp(req.getParam());
-            return this.successfulResponse(result);
+            result = userService.signUp(req.getParam());
+            if (result.getId() != null) {
+                return this.successfulResponse(null);
+            } else {
+                return this.errorResponse(result,"User sign up Failed");
+            }
         } catch (Exception e) {
-            return this.failedResponse(e.getMessage());
+            return this.errorResponse(result, e.getMessage());
+        }
+    }
+
+    /**
+     * This is end point for verification os user email
+     * @param  token
+     * @return User
+     */
+    @RequestMapping(value = "/verify")
+    @ResponseBody
+    public ResponseEntity<Response<User>> verifyUser(@RequestParam String token) {
+        User result = new User();
+        try {
+            result = userService.isTokenValid(token);
+            if (result.getId() != null) {
+                return this.successfulResponse(null);
+            } else {
+                return this.errorResponse(result, "User verification failed");
+            }
+        } catch (Exception e) {
+            return this.errorResponse(result, e.getMessage());
         }
     }
 }

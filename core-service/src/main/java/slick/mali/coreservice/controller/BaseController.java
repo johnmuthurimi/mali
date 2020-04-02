@@ -40,15 +40,16 @@ public abstract class BaseController {
     }
 
     /**
-     * Generic Reponse for all failed requests
+     * Generic Reponse for all error requests
      * @param <T>
      * @param message
      * @return
      */
-    public <T> ResponseEntity<Response<T>> failedResponse(String message) {
+    public <T> ResponseEntity<Response<T>> errorResponse(T result, String message) {
         Response<T> res = new Response<T>();
         res.setCode(ResultCode.ERROR);
         res.setMessage(message);
+        res.setResult(result);
         return new ResponseEntity<Response<T>>(res, HttpStatus.OK);
     }    
 }

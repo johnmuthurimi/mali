@@ -1,6 +1,7 @@
 package slick.mali.coreservice.model;
 
 public class BaseModel {
+
     /**
      * User String id
      */
