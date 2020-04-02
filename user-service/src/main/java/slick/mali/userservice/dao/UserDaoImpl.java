@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import slick.mali.coreservice.constants.UserStatus;
 import slick.mali.coreservice.model.User;
+import slick.mali.userservice.dao.mapper.TokenMapper;
 import slick.mali.userservice.dao.mapper.UserMapper;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class UserDaoImpl implements UserDao {
      */
     @Override
     public User getUser(String id) {
-        String query = "SELECT id, type, email, status, enabled"
+        String query = "SELECT id, type, email, status, enabled "
                 + "FROM user_user  "
                 + "WHERE id = ? AND deleted = 0";
         RowMapper<User> rowMapper = new UserMapper();
@@ -117,10 +118,10 @@ public class UserDaoImpl implements UserDao {
      */
     @Override
     public User getToken(String tokenId) {
-        String query = "SELECT token, user_id"
+        String query = "SELECT token, user_id "
                 + "FROM user_verify  "
-                + "WHERE id = ? AND deleted = 0";
-        return jdbcTemplate.queryForObject(query, new Object[]{tokenId}, new UserMapper());
+                + "WHERE token = ? AND deleted = 0";
+        return jdbcTemplate.queryForObject(query, new Object[]{tokenId}, new TokenMapper());
     }
 
     /**
@@ -130,7 +131,7 @@ public class UserDaoImpl implements UserDao {
     public void updateTokenVerified(String tokenId) {
         String query = "UPDATE user_verify "
                 + "SET verified = ? "
-                + "WHERE id = ? AND deleted = 0 ";
+                + "WHERE token = ? AND deleted = 0 ";
         jdbcTemplate.update(query, 1, tokenId);
     }
 

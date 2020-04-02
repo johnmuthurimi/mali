@@ -1,5 +1,7 @@
 package slick.mali.coreservice.model;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * Domain class for user
  */
@@ -28,11 +30,13 @@ public class User extends BaseModel {
         /**
          * email of the user
          */
+        @NotNull(message = "Please provide email")
         private String email;
 
         /**
          * User password
          */
+        @NotNull(message = "Please provide password")
         private String password;
 
         /**

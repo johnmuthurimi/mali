@@ -16,6 +16,8 @@ import slick.mali.coreservice.model.Request;
 import slick.mali.userservice.service.IUserService;
 import slick.mali.coreservice.controller.BaseController;
 
+import javax.validation.Valid;
+
 /**
  * This class handles all the users request for api v1
  */
@@ -35,7 +37,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/user")
     @ResponseBody
-    public ResponseEntity<Response<User>> getUser(@RequestParam String id) {
+    public ResponseEntity<Response<User>> getUser(@RequestParam(value = "id") String id) {
         User result = new User();
         try {
             result = userService.getUser(id);
@@ -51,7 +53,7 @@ public class UserController extends BaseController {
      * @return
      */
     @PostMapping(path = "/user", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Response<User>> signUp(@RequestBody Request<User> req) {
+    public ResponseEntity<Response<User>> signUp(@Valid @RequestBody Request<User> req) {
         User result = new User();
         try {
             result = userService.signUp(req.getParam());
@@ -72,11 +74,11 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/verify")
     @ResponseBody
-    public ResponseEntity<Response<User>> verifyUser(@RequestParam String token) {
+    public ResponseEntity<Response<User>> verifyUser(@RequestParam(value = "token") String token) {
         User result = new User();
         try {
             result = userService.isTokenValid(token);
-            if (result.getId() != null) {
+            if (result != null) {
                 return this.successfulResponse(null);
             } else {
                 return this.errorResponse(result, "User verification failed");
