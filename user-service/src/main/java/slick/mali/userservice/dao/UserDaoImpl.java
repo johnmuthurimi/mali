@@ -22,13 +22,37 @@ public class UserDaoImpl implements UserDao {
     private JdbcTemplate jdbcTemplate;
 
     /**
+     * get user by email
+     * @param email
+     * @return
+     */
+    @Override
+    public User getUserByEmail(String email) {
+        String query = "SELECT id, type, email, status, enabled "
+                + "FROM user_user  "
+                + "WHERE email = ? "
+                + "LIMIT 1 ";
+        RowMapper<User> rowMapper = new UserMapper();
+        List<User> aut = new ArrayList<User>();
+        aut = jdbcTemplate.query(query, rowMapper, email);
+        if(aut.isEmpty() ){
+            return null;
+        } else if (aut.size() == 1) {
+            // list contains exactly 1 element
+            return aut.get(0);
+        }
+        return null;
+    }
+
+    /**
      * Use this function to get user
      */
     @Override
     public User getUser(String id) {
         String query = "SELECT id, type, email, status, enabled "
                 + "FROM user_user  "
-                + "WHERE id = ? AND deleted = 0";
+                + "WHERE id = ? AND deleted = 0 "
+                + "LIMIT 1 ";
         RowMapper<User> rowMapper = new UserMapper();
         List<User> aut = new ArrayList<User>();
         aut = jdbcTemplate.query(query, rowMapper, id);
@@ -118,10 +142,20 @@ public class UserDaoImpl implements UserDao {
      */
     @Override
     public User getToken(String tokenId) {
-        String query = "SELECT token, user_id "
+        String query = "SELECT token, user_id, verified "
                 + "FROM user_verify  "
-                + "WHERE token = ? AND deleted = 0";
-        return jdbcTemplate.queryForObject(query, new Object[]{tokenId}, new TokenMapper());
+                + "WHERE token = ? AND deleted = 0 AND verified = 0 "
+                + "LIMIT 1 ";
+        RowMapper<User> rowMapper = new TokenMapper();
+        List<User> aut = new ArrayList<User>();
+        aut = jdbcTemplate.query(query, rowMapper, tokenId);
+        if(aut.isEmpty() ){
+            return null;
+        } else if (aut.size() == 1) {
+            // list contains exactly 1 element
+            return aut.get(0);
+        }
+        return null;
     }
 
     /**

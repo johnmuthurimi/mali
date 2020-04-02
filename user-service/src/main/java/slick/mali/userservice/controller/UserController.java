@@ -43,7 +43,7 @@ public class UserController extends BaseController {
             result = userService.getUser(id);
             return this.successfulResponse(result);
         } catch (Exception e) {
-            return this.errorResponse(result, e.getMessage());
+            return this.errorResponse(e.getMessage());
         }
     }
 
@@ -56,14 +56,19 @@ public class UserController extends BaseController {
     public ResponseEntity<Response<User>> signUp(@Valid @RequestBody Request<User> req) {
         User result = new User();
         try {
-            result = userService.signUp(req.getParam());
-            if (result.getId() != null) {
-                return this.successfulResponse(null);
+            boolean userExist = userService.checkUserExists(req.getParam());
+            if (userExist) {
+                return this.errorResponse("User already exists");
             } else {
-                return this.errorResponse(result,"User sign up Failed");
+                result = userService.signUp(req.getParam());
+                if (result.getId() != null) {
+                    return this.successfulResponse(null);
+                } else {
+                    return this.errorResponse( "User sign up Failed");
+                }
             }
         } catch (Exception e) {
-            return this.errorResponse(result, e.getMessage());
+            return this.errorResponse(e.getMessage());
         }
     }
 
@@ -81,10 +86,10 @@ public class UserController extends BaseController {
             if (result != null) {
                 return this.successfulResponse(null);
             } else {
-                return this.errorResponse(result, "User verification failed");
+                return this.errorResponse("User verification failed");
             }
         } catch (Exception e) {
-            return this.errorResponse(result, e.getMessage());
+            return this.errorResponse(e.getMessage());
         }
     }
 }

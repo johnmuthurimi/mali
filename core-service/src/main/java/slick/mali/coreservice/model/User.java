@@ -55,6 +55,11 @@ public class User extends BaseModel {
         private Boolean deleted;
 
         /**
+         * User verified
+         */
+        private Boolean verified;
+
+        /**
          * Get user id
          */
         public String getId() {
@@ -178,6 +183,20 @@ public class User extends BaseModel {
          */
         public void setDeleted(Boolean deleted) {
                 this.deleted = deleted;
+        }
+
+        /**
+         * Get the user deleted
+         */
+        public Boolean isVerified() {
+                return verified;
+        }
+
+        /**
+         * Set the user deleted
+         */
+        public void setVerified(Boolean verified) {
+                this.verified = verified;
         }
 
 }

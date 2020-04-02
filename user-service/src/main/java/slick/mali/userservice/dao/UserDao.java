@@ -4,7 +4,15 @@ import slick.mali.coreservice.dao.BaseDao;
 import slick.mali.coreservice.model.User;
 
 public interface UserDao extends BaseDao {
-   
+
+
+   /**
+    * Get user by email
+    * @param email
+    * @return
+    */
+   User getUserByEmail(String email);
+
    /**
     * This function returns user authentication
     * @param id user identifier

@@ -11,6 +11,12 @@ import slick.mali.coreservice.service.IBaseService;
 public interface IUserService extends IBaseService {
 
     /**
+     * Check if user exist
+     * @param user
+     * @return
+     */
+    boolean checkUserExists(User user);
+    /**
      * This functions getting registered user by id
      * 
      * @param id
@@ -39,5 +45,5 @@ public interface IUserService extends IBaseService {
      * @param token
      * @return User
      */
-    User isTokenValid(String token);
+    User isTokenValid(String token) throws Exception;
 }

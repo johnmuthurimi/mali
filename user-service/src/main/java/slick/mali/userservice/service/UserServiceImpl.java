@@ -31,6 +31,21 @@ public class UserServiceImpl implements IUserService {
     private UserDao userDao;
 
     /**
+     * Check if user exist
+     * @param user
+     * @return
+     */
+    public boolean checkUserExists(User user) {
+        boolean exist = false;
+        User checkUser = userDao.getUserByEmail(user.getEmail());
+        if (checkUser != null) {
+            exist = true;
+        }
+
+        return exist;
+    }
+
+    /**
      * This functions user credentials
      */
     @Override
@@ -117,20 +132,25 @@ public class UserServiceImpl implements IUserService {
      * @return
      */
     @Override
-    public User isTokenValid(String token) {
+    public User isTokenValid(String token) throws Exception {
         User user = new User();
 
         try {
             user = userDao.getToken(token);
             if (user != null && user.getToken() != null) {
-                // Update the token as verified
-                userDao.updateTokenVerified(user.getToken());
+                if (user.isVerified()) {
+                    throw new Exception("Token has already been used");
+                } else {
 
-                // Update the user as verified, enable the user and change status
-                userDao.updateUserVerified(user.getId());
+                    // Update the token as verified
+                    userDao.updateTokenVerified(user.getToken());
+
+                    // Update the user as verified, enable the user and change status
+                    userDao.updateUserVerified(user.getId());
+                }
             }
         } catch(Exception e) {
-            user = null;
+            throw new Exception("Token has already been used");
         }
 
         return user;

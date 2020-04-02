@@ -14,6 +14,7 @@ public class TokenMapper implements RowMapper<User> {
         if (rs != null) {
             user.setToken(rs.getString("token"));
             user.setId(rs.getString("user_id"));
+            user.setVerified(rs.getBoolean("verified"));
         }
         return user;
    }
