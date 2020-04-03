@@ -8,6 +8,7 @@ eureka:
     leaseRenewalIntervalInSeconds: 1
     lease-expiration-duration-in-seconds: 2
   client:
+    registerWithEureka: true
     fetchRegistry: true
     registryFetchIntervalSeconds: 5
     serviceUrl:

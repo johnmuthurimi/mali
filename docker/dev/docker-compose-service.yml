@@ -29,33 +29,6 @@ services:
         max-file: "10"
     restart: "on-failure"
 
-  proxy-service:
-    container_name: proxy-service
-    image: mucunga90/proxy-service:latest
-    networks:
-      - prod-network    
-    ports:
-      - '5003:5003'
-    expose:
-      - "5003"    
-    volumes:
-      - ./../data/proxy-service/:/var/lib/app
-    deploy:
-      resources:
-        limits:
-          cpus: '0.25'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 512M
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "10"
-    depends_on:
-      - discovery-service
-    restart: "on-failure"
-
   gateway-service:
     container_name: gateway-service
     image: mucunga90/gateway-service:latest
@@ -81,7 +54,6 @@ services:
         max-file: "10"
     depends_on:
       - discovery-service
-      - proxy-service
     restart: "on-failure"
 
   user-service:
@@ -109,7 +81,6 @@ services:
         max-file: "10"
     depends_on:
       - discovery-service
-      - proxy-service
       - gateway-service
     restart: "on-failure"
 
@@ -138,7 +109,6 @@ services:
         max-file: "10"
     depends_on:
       - discovery-service
-      - proxy-service
       - gateway-service
     restart: "on-failure"
 
@@ -165,7 +135,6 @@ services:
         max-file: "10"
     depends_on:
       - discovery-service
-      - proxy-service
       - gateway-service
       - user-service
       - alert-service

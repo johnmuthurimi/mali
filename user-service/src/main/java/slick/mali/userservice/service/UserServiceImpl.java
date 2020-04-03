@@ -157,4 +157,66 @@ public class UserServiceImpl implements IUserService {
 
         return user;
     }
+
+    /**
+     * Login User in the platform, it involves the following
+     * @param user
+     * @return user
+     */
+    @Override
+    public User login(User user) {
+        final EventRequest event = new EventRequest();
+        try {
+            LoggerUtil.info(LOGGER, "AlertServiceImpl: Initiate user sign up for: " + user.getEmail());
+            // generate salts
+            final String salt = PasswordUtils.getSalt(30);
+            final String hashValue = PasswordUtils.generateSecurePassword(user.getPassword(), salt);
+            user.setType("password");
+            user.setSalt(salt);
+            user.setPassword(hashValue);
+            user.setStatus(UserStatus.NEW);
+            user.setEnabled(false);
+            user.setDeleted(false);
+            LoggerUtil.info(LOGGER, "AlertServiceImpl: Generated password for: " + user.getEmail());
+
+            // Register users
+            final String id = userDao.signUp(user);
+            user.setId(id);
+            LoggerUtil.info(LOGGER, "AlertServiceImpl: Insert the user in the database: " + user.getEmail());
+
+            LoggerUtil.info(LOGGER, "AlertServiceImpl: Generate user verification token for : " + user.getEmail());
+            final String token = userDao.generateUserVerificationToken(user);
+            user.setId(id);
+
+            event.setId(user.getId());
+            event.setEmail(user.getEmail());
+            event.setToken(token);
+
+            // send notification to rabbitmq
+            sendMessage(event);
+            LoggerUtil.info(LOGGER, "AlertServiceImpl: Initiated RabbitMQ OTP request for: " + user.getEmail());
+
+            // Update user to pending
+            userDao.updateUserPending(user.getId());
+            LoggerUtil.info(LOGGER, "AlertServiceImpl: Pending user email confirmation for: " + user.getEmail());
+        } catch (Exception e) {
+            // We need to delete user token from the database if exist
+            if (event.getToken() != null) {
+                userDao.deleteToken(event.getToken());
+            }
+
+            // We need to delete user from the database if exist
+            if (user.getId() != null) {
+                userDao.deleteUser(user.getId());
+            }
+
+            LoggerUtil.error(LOGGER, "AlertServiceImpl: There experienced error registering user : " + user.getEmail());
+            LoggerUtil.error(LOGGER, e.getMessage());
+            throw e;
+        }
+
+        LoggerUtil.info(LOGGER, "AlertServiceImpl: Completed sign up requested for : " + user.getEmail());
+        return user;
+    }
+
 }

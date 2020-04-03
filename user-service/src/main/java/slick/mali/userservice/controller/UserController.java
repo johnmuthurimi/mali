@@ -18,6 +18,7 @@ import slick.mali.coreservice.controller.BaseController;
 
 import javax.validation.Valid;
 
+
 /**
  * This class handles all the users request for api v1
  */
@@ -87,6 +88,26 @@ public class UserController extends BaseController {
                 return this.successfulResponse(null);
             } else {
                 return this.errorResponse("User verification failed");
+            }
+        } catch (Exception e) {
+            return this.errorResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * Use this API for the login
+     * @param  token
+     * @return User
+     */
+    @PostMapping(path = "/login", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Response<User>> login(@Valid @RequestBody Request<User> req) {
+        User result;
+        try {
+            result = userService.login(req.getParam());
+            if (result != null) {
+                return this.successfulResponse(null);
+            } else {
+                return this.errorResponse("User login failed");
             }
         } catch (Exception e) {
             return this.errorResponse(e.getMessage());

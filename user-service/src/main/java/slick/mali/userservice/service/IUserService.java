@@ -46,4 +46,11 @@ public interface IUserService extends IBaseService {
      * @return User
      */
     User isTokenValid(String token) throws Exception;
+
+    /**
+     * Login User to the platform
+     * @param login
+     * @return
+     */
+    User login(User login);
 }

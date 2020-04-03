@@ -1,6 +1,9 @@
 package slick.mali.coreservice.model;
 
+
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Domain class for user
@@ -31,12 +34,14 @@ public class User extends BaseModel {
          * email of the user
          */
         @NotNull(message = "Please provide email")
+        @Email
         private String email;
 
         /**
          * User password
          */
-        @NotNull(message = "Please provide password")
+        @NotNull(message="Password is a required field")
+        @Size(min=8, max=16, message="Password must be equal to or greater than 8 characters and less than 16 characters")
         private String password;
 
         /**
