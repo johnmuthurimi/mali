@@ -13,18 +13,5 @@ logging:
     pattern:
         console: '%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n'
 
-server.port: ${PORT:5001}
-
----
-spring:
-    profiles: zone1
-    cloud:
-        consul:
-            discovery: {instanceZone: zone1}
-
----
-spring:
-    profiles: zone2
-    cloud:
-        consul:
-            discovery: {instanceZone: zone2}
+server:
+  port: ${PORT:5001}

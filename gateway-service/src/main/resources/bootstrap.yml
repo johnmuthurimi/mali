@@ -5,35 +5,11 @@ spring:
     consul:
       host: 192.168.100.29
       port: 8500
+      discovery: {instance-id: '${spring.application.name}:${server.port}:${random.int[1,999999]}'}
 
 logging:
   level:
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
 
----
-spring:
-  profiles: zone1
-  cloud:
-    consul:
-      discovery:
-        instance-id: "${spring.cloud.client.hostname}:${spring.application.name}:${random.int[1,999999]}"
-        instanceZone: zone1
-        register: false
-        registerHealthCheck: false
-        tags: zone=zone1
-server:  
-  port: ${PORT:8080}
-
----
-spring:
-  profiles: zone2
-  cloud:
-    consul:
-      discovery:
-        instance-id: "${spring.cloud.client.hostname}:${spring.application.name}:${random.int[1,999999]}"
-        instanceZone: zone2
-        register: false
-        registerHealthCheck: false
-        tags: zone=zone2
 server:
-  port: ${PORT:9080}
+  port: ${PORT:8080}
