@@ -1,141 +1,80 @@
 version: '3.7'
 networks:
-  prod-network:
-    driver: bridge
-
+    prod-network:
+        driver: bridge
 services:
-  discovery-service:
-    container_name: discovery-service
-    image: mucunga90/discovery-service:latest
-    networks:
-      - prod-network   
-    ports:
-      - '5002:5002'
-    expose:
-      - "5002"    
-    volumes:
-      - ./../data/discovery-service/:/var/lib/app
-    deploy:
-      resources:
-        limits:
-          cpus: '0.25'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 512M
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "10"
-    restart: "on-failure"
+    gateway-service:
+        container_name: gateway-service
+        image: 'mucunga90/gateway-service:latest'
+        networks:
+            - prod-network
+        ports:
+            - '8080:8080'
+            - '9080:9080'
+        expose:
+            - '8080'
+            - '9080'
+        volumes:
+            - './../data/gateway-service/:/var/lib/app'
+        deploy:
+            resources: {limits: {cpus: '0.25', memory: 512M}, reservations: {cpus: '0.25', memory: 512M}}
+        logging:
+            options: {max-size: 10m, max-file: '10'}
+        restart: on-failure
 
-  gateway-service:
-    container_name: gateway-service
-    image: mucunga90/gateway-service:latest
-    networks:
-      - prod-network    
-    ports:
-      - '5004:5004'
-    expose:
-      - "5004"    
-    volumes:
-      - ./../data/gateway-service/:/var/lib/app
-    deploy:
-      resources:
-        limits:
-          cpus: '0.25'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 512M
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "10"
-    depends_on:
-      - discovery-service
-    restart: "on-failure"
+    user-service:
+        container_name: user-service
+        image: 'mucunga90/user-service:latest'
+        networks:
+            - prod-network
+        ports:
+            - '5001:5001'
+        expose:
+            - '5001'
+        volumes:
+            - './../data/user-service/:/var/lib/app'
+        deploy:
+            resources: {limits: {cpus: '0.25', memory: 512M}, reservations: {cpus: '0.25', memory: 512M}}
+        logging:
+            options: {max-size: 10m, max-file: '10'}
+        depends_on:
+            - gateway-service
+        restart: on-failure
 
-  user-service:
-    container_name: user-service
-    image: mucunga90/user-service:latest
-    networks:
-      - prod-network    
-    ports:
-      - '5005:5005'
-    expose:
-      - "5005"    
-    volumes:
-      - ./../data/user-service/:/var/lib/app
-    deploy:
-      resources:
-        limits:
-          cpus: '0.25'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 512M
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "10"
-    depends_on:
-      - discovery-service
-      - gateway-service
-    restart: "on-failure"
+    alert-service:
+        container_name: alert-service
+        image: 'mucunga90/alert-service:latest'
+        networks:
+            - prod-network
+        ports:
+            - '5002:5002'
+        expose:
+            - '5002'
+        volumes:
+            - './../data/alert-service/:/var/lib/app'
+        deploy:
+            resources: {limits: {cpus: '0.25', memory: 512M}, reservations: {cpus: '0.25', memory: 512M}}
+        logging:
+            options: {max-size: 10m, max-file: '10'}
+        depends_on:
+            - gateway-service
+        restart: on-failure
 
-  alert-service:
-    container_name: alert-service
-    image: mucunga90/alert-service:latest
-    networks:
-      - prod-network    
-    ports:
-      - '5006:5006'
-    expose:
-      - "5006"    
-    volumes:
-      - ./../data/alert-service/:/var/lib/app
-    deploy:
-      resources:
-        limits:
-          cpus: '0.25'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 512M
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "10"
-    depends_on:
-      - discovery-service
-      - gateway-service
-    restart: "on-failure"
-
-  web-service:
-    container_name: web-service
-    image: mucunga90/web-service:latest
-    networks:
-      - prod-network    
-    ports:
-      - '80:80'
-    expose:
-      - "80"
-    deploy:
-      resources:
-        limits:
-          cpus: '0.25'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 512M
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "10"
-    depends_on:
-      - discovery-service
-      - gateway-service
-      - user-service
-      - alert-service
-    restart: "on-failure"
+    web-service:
+        container_name: web-service
+        image: 'mucunga90/web-service:latest'
+        networks:
+            - prod-network
+        ports:
+            - '80:80'
+        expose:
+            - '80'
+        deploy:
+            resources: {limits: {cpus: '0.25', memory: 512M}, reservations: {cpus: '0.25', memory: 512M}}
+        logging:
+            options: {max-size: 10m, max-file: '10'}
+        depends_on:
+            - gateway-service
+            - user-service
+            - alert-service
+        restart: on-failure

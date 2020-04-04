@@ -1,97 +1,75 @@
 version: '3.7'
 networks:
-  prod-network:
-    driver: bridge
-
+    prod-network:
+        driver: bridge
 services:
-  config-service:
-    container_name: config-service
-    image: mucunga90/config-service:latest
-    networks:
-      - prod-network   
-    ports:
-      - '5001:5001'
-    expose:
-      - "5001"    
-    volumes:
-      - ./../data/config-service/:/var/lib/app
-    deploy:
-      resources:
-        limits:
-          cpus: '0.25'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 512M
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "10"
-    restart: "on-failure"
+    consul-service:
+        container_name: consul-service
+        image: consul
+        environment:
+            - CONSUL_BIND_INTERFACE=eth0
+            - CONSUL_BOOTSTRAP_EXPECT=3
+            - CONSUL_CLIENT_LAN_ADDRESS=0.0.0.0
+            - CONSUL_DISABLE_KEYRING_FILE=true
+            - CONSUL_JOIN=consul-service
+        networks:
+            - prod-network
+        ports:
+            - '8500:8500'
+        expose:
+            - '8500'
+        volumes:
+            - './../data/consul-service/:/consul/data'
+        deploy:
+            resources: {limits: {cpus: '0.25', memory: 512M}, reservations: {cpus: '0.25', memory: 512M}}
+        logging:
+            options: {max-size: 10m, max-file: '10'}
+        restart: on-failure
 
-  rabbitmq-service:
-    container_name: rabbitmq-service
-    image: rabbitmq:3.6-management-alpine
-    environment:
-      RABBITMQ_DEFAULT_USER: appuser
-      RABBITMQ_DEFAULT_PASS: appuser
-    networks:
-      - prod-network 
-    ports:
-      - '5672:5672'
-      - '15672:15672'
-    expose:
-      - "5672"
-      - "15672"
-    volumes:
-      - ./../data/rabbitmq-service/:/var/lib/rabbitmq
-    deploy:
-      resources:
-        limits:
-          cpus: '0.25'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 512M
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "10"
-    depends_on:
-      - config-service
-    restart: "on-failure"
+    rabbitmq-service:
+        container_name: rabbitmq-service
+        image: 'rabbitmq:3.6-management-alpine'
+        environment:
+            RABBITMQ_DEFAULT_USER: appuser
+            RABBITMQ_DEFAULT_PASS: appuser
+        networks:
+            - prod-network
+        ports:
+            - '5672:5672'
+            - '15672:15672'
+        expose:
+            - '5672'
+            - '15672'
+        volumes:
+            - './../data/rabbitmq-service/:/var/lib/rabbitmq'
+        deploy:
+            resources: {limits: {cpus: '0.25', memory: 512M}, reservations: {cpus: '0.25', memory: 512M}}
+        logging:
+            options: {max-size: 10m, max-file: '10'}
+        depends_on:
+            - consul-service
+        restart: on-failure
 
-  # https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/docker-mysql-getting-started.html
-  # https://dev.mysql.com/doc/refman/8.0/en/creating-accounts.html
-  # GENERATED ROOT PASSWORD: &@muRaLoB&0RkufjycAP^@Dq@Dq
-  mysql-service:
-    container_name: mysql-service
-    image: mysql:5.7
-    environment:
-      MYSQL_USER: appuser
-      MYSQL_PASSWORD: appuser
-      MYSQL_ROOT_PASSWORD: root
-    networks:
-      - prod-network 
-    ports:
-      - "3308:3306"
-    expose:
-      - "3308"
-    volumes:
-      - ./../data/mysql-service:/var/lib/mysql
-    deploy:
-      resources:
-        limits:
-          cpus: '0.25'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 512M
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "10"
-    depends_on:
-      - config-service
-      - rabbitmq-service
-    restart: "on-failure"
+    mysql-service:
+        container_name: mysql-service
+        image: 'mysql:5.7'
+        environment:
+            MYSQL_USER: appuser
+            MYSQL_PASSWORD: appuser
+            MYSQL_ROOT_PASSWORD: root
+        networks:
+            - prod-network
+        ports:
+            - '3308:3306'
+        expose:
+            - '3308'
+        volumes:
+            - './../data/mysql-service:/var/lib/mysql'
+        deploy:
+            resources: {limits: {cpus: '0.25', memory: 512M}, reservations: {cpus: '0.25', memory: 512M}}
+        logging:
+            options: {max-size: 10m, max-file: '10'}
+        depends_on:
+            - consul-service
+            - rabbitmq-service
+        restart: on-failure

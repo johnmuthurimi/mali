@@ -1,6 +1,30 @@
 spring:
-  application:
-    name: alert-service
-  cloud:
-    config:
-      uri: http://192.168.100.29:5001
+    application:
+        name: alert-service
+    cloud:
+        consul:
+            host: 192.168.100.29
+            port: 8500
+            discovery: {instance-id: '${spring.application.name}:${server.port}:${random.int[1,999999]}'}
+
+logging:
+    level:
+        org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+    pattern:
+        console: '%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n'
+
+server.port: ${PORT:5002}
+
+---
+spring:
+    profiles: zone1
+    cloud:
+        consul:
+            discovery: {instanceZone: zone1}
+
+---
+spring:
+    profiles: zone2
+    cloud:
+        consul:
+            discovery: {instanceZone: zone2}
