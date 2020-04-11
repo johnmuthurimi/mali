@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import slick.mali.coreservice.model.Response;
-import slick.mali.coreservice.model.User;
+import slick.mali.coreservice.model.user.Token;
+import slick.mali.coreservice.model.user.User;
 import slick.mali.coreservice.model.Request;
-import slick.mali.userservice.service.IUserService;
+import slick.mali.userservice.service.token.ITokenService;
+import slick.mali.userservice.service.user.IUserService;
 import slick.mali.coreservice.controller.BaseController;
 
 import javax.validation.Valid;
@@ -32,6 +34,12 @@ public class UserController extends BaseController {
     private IUserService userService;
 
     /**
+     * Inject the token Service
+     */
+    @Autowired
+    private ITokenService tokenService;
+
+    /**
      * This is end point is responsible getting registered user
      * @param  id
      * @return User
@@ -39,9 +47,8 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/user")
     @ResponseBody
     public ResponseEntity<Response<User>> getUser(@RequestParam(value = "id") String id) {
-        User result = new User();
         try {
-            result = userService.getUser(id);
+            User result = userService.findById(id);
             return this.successfulResponse(result);
         } catch (Exception e) {
             return this.errorResponse(e.getMessage());
@@ -55,19 +62,9 @@ public class UserController extends BaseController {
      */
     @PostMapping(path = "/user", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Response<User>> signUp(@Valid @RequestBody Request<User> req) {
-        User result = new User();
         try {
-            boolean userExist = userService.checkUserExists(req.getParam());
-            if (userExist) {
-                return this.errorResponse("User already exists");
-            } else {
-                result = userService.signUp(req.getParam());
-                if (result.getId() != null) {
-                    return this.successfulResponse(null);
-                } else {
-                    return this.errorResponse( "User sign up Failed");
-                }
-            }
+            User result = userService.create(req.getParam());
+            return this.successfulResponse(result);
         } catch (Exception e) {
             return this.errorResponse(e.getMessage());
         }
@@ -80,35 +77,25 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/verify")
     @ResponseBody
-    public ResponseEntity<Response<User>> verifyUser(@RequestParam(value = "token") String token) {
-        User result = new User();
+    public ResponseEntity<Response<Token>> verifyUser(@RequestParam(value = "token") String token) {
         try {
-            result = userService.isTokenValid(token);
-            if (result != null) {
-                return this.successfulResponse(null);
-            } else {
-                return this.errorResponse("User verification failed");
-            }
+            Token result = tokenService.verifyToken(token);
+            return this.successfulResponse(null);
         } catch (Exception e) {
             return this.errorResponse(e.getMessage());
         }
     }
 
     /**
-     * Use this API for the login
-     * @param  token
-     * @return User
+     * This is the endpoint for login
+     * @param req
+     * @return
      */
     @PostMapping(path = "/login", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Response<User>> login(@Valid @RequestBody Request<User> req) {
-        User result;
         try {
-            result = userService.login(req.getParam());
-            if (result != null) {
-                return this.successfulResponse(null);
-            } else {
-                return this.errorResponse("User login failed");
-            }
+            User result = userService.login(req.getParam());
+            return this.successfulResponse(null);
         } catch (Exception e) {
             return this.errorResponse(e.getMessage());
         }

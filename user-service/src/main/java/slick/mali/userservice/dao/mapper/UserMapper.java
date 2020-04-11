@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
-import slick.mali.coreservice.model.User;
+import slick.mali.coreservice.model.user.User;
 
 public class UserMapper implements RowMapper<User> {
 
@@ -13,7 +13,6 @@ public class UserMapper implements RowMapper<User> {
         User user = new User();
         if (rs != null) {
             user.setId(rs.getString("id"));
-            user.setType(rs.getString("type"));
             user.setEmail(rs.getString("email"));
             user.setStatus(rs.getInt("status"));
         }

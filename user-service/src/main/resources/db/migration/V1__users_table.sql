@@ -1,19 +1,27 @@
 USE user_service;
 
-DROP TABLE IF EXISTS user_user;
+DROP TABLE IF EXISTS users;
 
-CREATE TABLE user_user (
+CREATE TABLE users (
     id 		        VARCHAR(36) NOT NULL,
-    type 		    CHAR(8) NOT NULL DEFAULT 'password',
-    salt 		    VARCHAR(50) NOT NULL,
+    first_name 	    VARCHAR(20) NOT NULL,
+    last_name 	    VARCHAR(20) NOT NULL,
     email 	        VARCHAR(50) NOT NULL,
     password	    VARCHAR(512) NOT NULL,
+    salt 		    VARCHAR(50) NOT NULL,
     status 		    INT(1) NOT NULL DEFAULT 0,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by      VARCHAR(36) NOT NULL,
+    updated_at      TIMESTAMP NULL,
+    updated_by      VARCHAR(36) NULL,
     verified        tinyint(1) NOT NULL DEFAULT '0',
     enabled 		tinyint(1) NOT NULL DEFAULT 0,
     deleted		    tinyint(1) NOT NULL DEFAULT 0,
 
     PRIMARY KEY (id),
+    INDEX (id),
+    INDEX (email),
+    INDEX (id, deleted),
     CONSTRAINT unique_user_user_id UNIQUE (id),
     CONSTRAINT unique_user_user_email UNIQUE (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

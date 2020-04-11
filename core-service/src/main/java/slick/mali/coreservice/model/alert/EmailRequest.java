@@ -86,20 +86,6 @@ public class EmailRequest extends BaseModel {
         }
 
         /**
-         * Get createdAt
-         */
-        public Date getCreatedAt() {
-                return createdAt;
-        }
-
-        /**
-         * Set createdAt
-         */
-        public void setCreatedAt(Date createdAt) {
-                this.createdAt = createdAt;
-        }
-
-        /**
          * Get deliveredAt
          */
         public Date getDeliveredAt() {

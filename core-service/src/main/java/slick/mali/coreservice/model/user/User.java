@@ -1,5 +1,7 @@
-package slick.mali.coreservice.model;
+package slick.mali.coreservice.model.user;
 
+
+import slick.mali.coreservice.model.BaseModel;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
@@ -11,24 +13,14 @@ import javax.validation.constraints.Size;
 public class User extends BaseModel {
 
         /**
-         * User String id
+         * First name
          */
-        private String id;
+        private String firstName;
 
         /**
-         * type of the user authentication e.g Password, PIN
+         * First name
          */
-        private String type;
-
-        /**
-         * user token
-         */
-        private String token;
-
-        /**
-         * User salt
-         */
-        private String salt;
+        private String lastName;
 
         /**
          * email of the user
@@ -45,19 +37,14 @@ public class User extends BaseModel {
         private String password;
 
         /**
+         * User salt
+         */
+        private String salt;
+
+        /**
          * User status
          */
         private Integer status;
-
-        /**
-         * User enabled
-         */
-        private Boolean enabled;
-
-        /**
-         * User deleted
-         */
-        private Boolean deleted;
 
         /**
          * User verified
@@ -65,45 +52,31 @@ public class User extends BaseModel {
         private Boolean verified;
 
         /**
-         * Get user id
+         * Get the firstName
          */
-        public String getId() {
-                return id;
+        public String getFirstName() {
+                return firstName;
         }
 
         /**
-         * Set the user id
+         * Set the firstName
          */
-        public void setId(String id) {
-                this.id = id;
+        public void setFirstName(String firstName) {
+                this.firstName = firstName;
         }
 
         /**
-         * Get the type
+         * Get the lastName
          */
-        public String getType() {
-                return type;
+        public String getLastName() {
+                return lastName;
         }
 
         /**
-         * Set the type
+         * Set the lastName
          */
-        public void setType(String type) {
-                this.type = type;
-        }
-
-        /**
-         * Get the token
-         */
-        public String getToken() {
-                return token;
-        }
-
-        /**
-         * Set the token
-         */
-        public void setToken(String token) {
-                this.token = token;
+        public void setLastName(String lastName) {
+                this.lastName = lastName;
         }
 
         /**
@@ -163,34 +136,6 @@ public class User extends BaseModel {
         }
 
         /**
-         * Get the user enabled
-         */
-        public Boolean isEnabled() {
-                return enabled;
-        }
-
-        /**
-         * Set the user enabled
-         */
-        public void setEnabled(Boolean enabled) {
-                this.enabled = enabled;
-        }
-
-        /**
-         * Get the user deleted
-         */
-        public Boolean isDeleted() {
-                return deleted;
-        }
-
-        /**
-         * Set the user deleted
-         */
-        public void setDeleted(Boolean deleted) {
-                this.deleted = deleted;
-        }
-
-        /**
          * Get the user deleted
          */
         public Boolean isVerified() {
@@ -203,5 +148,4 @@ public class User extends BaseModel {
         public void setVerified(Boolean verified) {
                 this.verified = verified;
         }
-
 }

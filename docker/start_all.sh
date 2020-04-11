@@ -58,7 +58,7 @@ echo "Starting your local dockerized full stack with mounted volumes"
 cd ./../docker/
 
 echo "Create Swarm Cluster"
-docker swarm init
+docker swarm init --advertise-addr 192.168.100.29
 
 # update which environment
 echo -n "Build which environment: [dev/prod]  "

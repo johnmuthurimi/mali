@@ -1,21 +1,21 @@
 package slick.mali.userservice.dao.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
-import slick.mali.coreservice.model.User;
+import slick.mali.coreservice.model.user.Token;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class TokenMapper implements RowMapper<User> {
+public class TokenMapper implements RowMapper<Token> {
 
    @Override
-   public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-        User user = new User();
+   public Token mapRow(ResultSet rs, int rowNum) throws SQLException {
+        Token token = new Token();
         if (rs != null) {
-            user.setToken(rs.getString("token"));
-            user.setId(rs.getString("user_id"));
-            user.setVerified(rs.getBoolean("verified"));
+            token.setId(rs.getString("id"));
+            token.setUserId(rs.getString("user_id"));
+            token.setVerified(rs.getBoolean("verified"));
         }
-        return user;
+        return token;
    }
 }
