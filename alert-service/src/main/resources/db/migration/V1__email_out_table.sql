@@ -1,8 +1,8 @@
 USE alert_service;
 
-DROP TABLE IF EXISTS alert_email_out;
+DROP TABLE IF EXISTS email_out;
 
-CREATE TABLE alert_email_out (
+CREATE TABLE email_out (
     id 		        VARCHAR(36) NOT NULL,
     sender 		    VARCHAR(50) NOT NULL,
     recepient 	    VARCHAR(50) NOT NULL,

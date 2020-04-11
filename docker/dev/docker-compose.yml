@@ -16,9 +16,17 @@ services:
         deploy:
             placement:
                 constraints: [node.role == manager]
-            resources: {limits: {cpus: '1', memory: 2048M}, reservations: {cpus: '0.50', memory: 1024M}}
+            resources:
+                limits:
+                    cpus: '1'
+                    memory: 1024M
+                reservations:
+                    cpus: '0.25'
+                    memory: 512M
         logging:
-            options: {max-size: 10m, max-file: '10'}
+            options:
+                max-size: 10m
+                max-file: '10'
             driver: json-file
     rabbitmq-service:
         image: 'rabbitmq:3.6-management-alpine'
@@ -35,9 +43,17 @@ services:
         deploy:
             placement:
                 constraints: [node.role == manager]
-            resources: {limits: {cpus: '1', memory: 2048M}, reservations: {cpus: '0.50', memory: 1024M}}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
         logging:
-            options: {max-size: 10m, max-file: '10'}
+            options:
+                max-size: 10m
+                max-file: '10'
             driver: json-file
         depends_on:
             - consul-service
@@ -56,9 +72,17 @@ services:
         deploy:
             placement:
               constraints: [node.role == manager]
-            resources: {limits: {cpus: '1', memory: 2048M}, reservations: {cpus: '0.50', memory: 1024M}}
+            resources:
+                limits:
+                    cpus: '2'
+                    memory: 2048M
+                reservations:
+                    cpus: '0.25'
+                    memory: 512M
         logging:
-            options: {max-size: 10m, max-file: '10'}
+            options:
+                max-size: 10m
+                max-file: '10'
             driver: json-file
         depends_on:
             - consul-service
@@ -80,9 +104,17 @@ services:
                 parallelism: 1
                 delay: 10s
                 order: stop-first
-            resources: {limits: {cpus: '1', memory: 1024M}, reservations: {cpus: '0.50', memory: 512M}}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
         logging:
-            options: {max-size: 10m, max-file: '10'}
+            options:
+                max-size: 10m
+                max-file: '10'
             driver: json-file
     user-service:
         image: 'mucunga90/user-service:latest'
@@ -100,9 +132,17 @@ services:
                 parallelism: 1
                 delay: 10s
                 order: stop-first
-            resources: {limits: {cpus: '1', memory: 1024M}, reservations: {cpus: '0.50', memory: 512M}}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
         logging:
-            options: {max-size: 10m, max-file: '10'}
+            options:
+                max-size: 10m
+                max-file: '10'
             driver: json-file
         depends_on:
             - gateway-service
@@ -123,9 +163,17 @@ services:
                 parallelism: 1
                 delay: 10s
                 order: stop-first
-            resources: {limits: {cpus: '1', memory: 1024M}, reservations: {cpus: '0.50', memory: 512M}}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
         logging:
-            options: {max-size: 10m, max-file: '10'}
+            options:
+                max-size: 10m
+                max-file: '10'
             driver: json-file
         depends_on:
             - gateway-service
@@ -147,9 +195,17 @@ services:
                 parallelism: 1
                 delay: 10s
                 order: stop-first
-            resources: {limits: {cpus: '1', memory: 1024M}, reservations: {cpus: '0.50', memory: 512M}}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
         logging:
-            options: {max-size: 10m, max-file: '10'}
+            options:
+                max-size: 10m
+                max-file: '10'
             driver: json-file
         depends_on:
             - gateway-service

@@ -1,5 +1,6 @@
 package slick.mali.coreservice.model.alert;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import slick.mali.coreservice.model.BaseModel;
 
@@ -24,19 +25,14 @@ public class EmailRequest extends BaseModel {
         private String message;
 
         /**
-         * createdAt
-         */
-        private Date createdAt;
-
-        /**
          * sentAt
          */
-        private Date sentAt;
+        private Timestamp sentAt;
 
         /**
          * deliveredAt
          */
-        private Date deliveredAt;
+        private Timestamp deliveredAt;
 
         /**
          * User status
@@ -88,28 +84,28 @@ public class EmailRequest extends BaseModel {
         /**
          * Get deliveredAt
          */
-        public Date getDeliveredAt() {
+        public Timestamp getDeliveredAt() {
                 return deliveredAt;
         }
 
         /**
          * Set deliveredAt
          */
-        public void setDeliveredAt(Date deliveredAt) {
+        public void setDeliveredAt(Timestamp deliveredAt) {
                 this.deliveredAt = deliveredAt;
         }
 
         /**
          * Get SentAt
          */
-        public Date getSentAt() {
+        public Timestamp getSentAt() {
                 return sentAt;
         }
 
         /**
          * Set SentAt
          */
-        public void setSentAt(Date sentAt) {
+        public void setSentAt(Timestamp sentAt) {
                 this.sentAt = sentAt;
         }
 

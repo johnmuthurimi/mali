@@ -1,6 +1,6 @@
 package slick.mali.coreservice.model;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 public class BaseModel {
 

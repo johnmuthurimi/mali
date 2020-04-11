@@ -80,10 +80,10 @@ public class EmailService {
             mimeMessageHelper.setFrom(request.getSender());
             mimeMessageHelper.setTo(request.getRecepient());
             mimeMessageHelper.setText(request.getMessage(), true);
-            request.setSentAt(DateUtils.now());
+            request.setSentAt(DateUtils.timestamp());
             mailSender.send(mimeMessageHelper.getMimeMessage());
-            request.setDeliveredAt(DateUtils.now());
-            request.setSentAt(DateUtils.now());
+            request.setDeliveredAt(DateUtils.timestamp());
+            request.setSentAt(DateUtils.timestamp());
             request.setStatus(AlertStatus.DELIVERED);
             LoggerUtil.trace(LOGGER, "EmailScheduler: sending email for recipient: " + request.getRecepient() + " delivered");
         } catch (MessagingException e) {

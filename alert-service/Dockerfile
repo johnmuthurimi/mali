@@ -4,4 +4,5 @@ ENV APP_HOME /app
 EXPOSE 5005
 COPY target/$APP_FILE $APP_HOME/
 WORKDIR $APP_HOME
-ENTRYPOINT ["java","-jar","$APP_FILE"]
+ENTRYPOINT ["sh", "-c"]
+CMD ["exec java -jar $APP_FILE"]

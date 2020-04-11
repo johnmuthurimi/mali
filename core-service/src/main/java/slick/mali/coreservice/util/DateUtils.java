@@ -1,5 +1,6 @@
 package slick.mali.coreservice.util;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,5 +26,14 @@ public class DateUtils {
         } catch (ParseException e) {
             return null;
         }
+    }
+
+    /**
+     * Generate new time stamp
+     * @return
+     */
+    public static Timestamp timestamp() {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        return timestamp;
     }
 }

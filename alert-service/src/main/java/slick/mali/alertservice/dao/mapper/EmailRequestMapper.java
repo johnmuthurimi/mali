@@ -22,9 +22,9 @@ public class EmailRequestMapper implements RowMapper<EmailRequest> {
       obj.setSender(rs.getString("sender"));
       obj.setRecepient(rs.getString("recepient"));
       obj.setMessage(rs.getString("message"));
-      obj.setCreatedAt(rs.getDate("createdAt"));
-      obj.setSentAt(rs.getDate("sentAt"));
-      obj.setDeliveredAt(rs.getDate("deliveredAt"));
+      obj.setCreatedAt(rs.getTimestamp("createdAt"));
+      obj.setSentAt(rs.getTimestamp("sentAt"));
+      obj.setDeliveredAt(rs.getTimestamp("deliveredAt"));
       obj.setStatus(rs.getInt("status"));
       return obj;
    }
