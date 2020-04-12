@@ -1,62 +1,52 @@
 version: '3.7'
+
 networks:
-    backend:
+    public:
         driver: overlay
-    frontend:
+    private:
         driver: overlay
+
 services:
     consul-service:
         image: consul
+        environment:
+            - CONSUL_BOOTSTRAP_EXPECT=1
+            - CONSUL_CLIENT_LAN_ADDRESS=0.0.0.0
+            - CONSUL_DISABLE_KEYRING_FILE=true
         networks:
-            - backend
+            - private
         ports:
             - '8500:8500'
         volumes:
             - './../data/consul-service/:/consul/data'
         deploy:
-            placement:
-                constraints: [node.role == manager]
-            resources:
-                limits:
-                    cpus: '1'
-                    memory: 1024M
-                reservations:
-                    cpus: '0.25'
-                    memory: 512M
+            replicas: 1
+            restart_policy: {condition: on-failure, delay: 5s, max_attempts: 10}
+            update_config: {parallelism: 1, delay: 10s, order: start-first}
         logging:
-            options:
-                max-size: 10m
-                max-file: '10'
+            options: {max-size: 10m, max-file: '10'}
             driver: json-file
+
     rabbitmq-service:
         image: 'rabbitmq:3.6-management-alpine'
         environment:
             RABBITMQ_DEFAULT_USER: appuser
             RABBITMQ_DEFAULT_PASS: appuser
         networks:
-            - backend
+            - private
         ports:
             - '5672:5672'
             - '15672:15672'
         volumes:
             - './../data/rabbitmq-service/:/var/lib/rabbitmq'
         deploy:
-            placement:
-                constraints: [node.role == manager]
-            resources:
-                limits:
-                    cpus: '0.50'
-                    memory: 512M
-                reservations:
-                    cpus: '0.25'
-                    memory: 256M
+            replicas: 1
+            restart_policy: {condition: on-failure, delay: 5s, max_attempts: 10}
+            update_config: {parallelism: 1, delay: 10s, order: start-first}
         logging:
-            options:
-                max-size: 10m
-                max-file: '10'
+            options: {max-size: 10m, max-file: '10'}
             driver: json-file
-        depends_on:
-            - consul-service
+
     mysql-service:
         image: 'mysql:5.7'
         environment:
@@ -64,150 +54,72 @@ services:
             MYSQL_PASSWORD: appuser
             MYSQL_ROOT_PASSWORD: root
         networks:
-            - backend
+            - private
         ports:
             - '3308:3306'
         volumes:
             - './../data/mysql-service:/var/lib/mysql'
         deploy:
-            placement:
-              constraints: [node.role == manager]
-            resources:
-                limits:
-                    cpus: '2'
-                    memory: 2048M
-                reservations:
-                    cpus: '0.25'
-                    memory: 512M
+            replicas: 1
+            restart_policy: {condition: on-failure, delay: 5s, max_attempts: 10}
+            update_config: {parallelism: 1, delay: 10s, order: start-first}
         logging:
-            options:
-                max-size: 10m
-                max-file: '10'
+            options: {max-size: 10m, max-file: '10'}
             driver: json-file
-        depends_on:
-            - consul-service
-            - rabbitmq-service
+
     gateway-service:
-        image: 'mucunga90/gateway-service:latest'
+        image: 'mucunga90/gateway-service:1.0.0'
         networks:
-            - backend
+            - private
         ports:
             - '8080:8080'
         deploy:
-            mode: replicated
             replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            update_config:
-                parallelism: 1
-                delay: 10s
-                order: stop-first
-            resources:
-                limits:
-                    cpus: '0.50'
-                    memory: 512M
-                reservations:
-                    cpus: '0.25'
-                    memory: 256M
+            restart_policy: {condition: on-failure, delay: 30s, max_attempts: 10}
+            update_config: {parallelism: 1, delay: 40s, order: start-first}
         logging:
-            options:
-                max-size: 10m
-                max-file: '10'
+            options: {max-size: 10m, max-file: '10'}
             driver: json-file
+
     user-service:
-        image: 'mucunga90/user-service:latest'
+        image: 'mucunga90/user-service:1.0.0'
         networks:
-            - backend
+            - private
         ports:
             - '5001:5001'
         deploy:
             replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            update_config:
-                parallelism: 1
-                delay: 10s
-                order: stop-first
-            resources:
-                limits:
-                    cpus: '0.50'
-                    memory: 512M
-                reservations:
-                    cpus: '0.25'
-                    memory: 256M
+            restart_policy: {condition: on-failure, delay: 30s, max_attempts: 10}
+            update_config: {parallelism: 1, delay: 40s, order: start-first}
         logging:
-            options:
-                max-size: 10m
-                max-file: '10'
+            options: {max-size: 10m, max-file: '10'}
             driver: json-file
-        depends_on:
-            - gateway-service
+
     alert-service:
-        image: 'mucunga90/alert-service:latest'
+        image: 'mucunga90/alert-service:1.0.0'
         networks:
-            - backend
+            - private
         ports:
             - '5002:5002'
         deploy:
             replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-                window: 120s
-            update_config:
-                parallelism: 1
-                delay: 10s
-                order: stop-first
-            resources:
-                limits:
-                    cpus: '0.50'
-                    memory: 512M
-                reservations:
-                    cpus: '0.25'
-                    memory: 256M
+            restart_policy: {condition: on-failure, delay: 30s, max_attempts: 10}
+            update_config: {parallelism: 1, delay: 40s, order: start-first}
         logging:
-            options:
-                max-size: 10m
-                max-file: '10'
+            options: {max-size: 10m, max-file: '10'}
             driver: json-file
-        depends_on:
-            - gateway-service
+
     web-service:
-        image: 'mucunga90/web-service:latest'
+        image: 'mucunga90/web-service:1.0.0'
         networks:
-            - backend
-            - frontend
+            - private
+            - public
         ports:
             - '80:80'
         deploy:
             replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-                window: 120s
-            update_config:
-                parallelism: 1
-                delay: 10s
-                order: stop-first
-            resources:
-                limits:
-                    cpus: '0.50'
-                    memory: 512M
-                reservations:
-                    cpus: '0.25'
-                    memory: 256M
+            restart_policy: {condition: on-failure, delay: 30s, max_attempts: 10}
+            update_config: {parallelism: 1, delay: 40s, order: start-first}
         logging:
-            options:
-                max-size: 10m
-                max-file: '10'
+            options: {max-size: 10m, max-file: '10'}
             driver: json-file
-        depends_on:
-            - gateway-service
-            - user-service
-            - alert-service

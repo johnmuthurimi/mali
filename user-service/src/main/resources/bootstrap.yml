@@ -5,7 +5,7 @@ spring:
         consul:
             host: 192.168.100.29
             port: 8500
-            discovery: {instance-id: '${spring.application.name}:${server.port}:${random.int[1,999999]}'}
+            discovery: {instance-id: '${spring.application.name}:${server.port}'}
 
 logging:
     level:

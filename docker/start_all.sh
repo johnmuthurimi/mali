@@ -10,7 +10,9 @@ echo "Take down the Swarm cluster"
 docker swarm leave --force
 
 echo "System prune all images, containers and volumes"
-docker system prune -a
+echo "Remove unneccessary images and containers"
+docker rm $(docker ps -a -f status=exited -q)
+docker rmi $(docker images -f "dangling=true" -q)
 
 echo -n "Build new images? y/n  "
 read build_images
@@ -58,14 +60,20 @@ echo "Starting your local dockerized full stack with mounted volumes"
 cd ./../docker/
 
 echo "Create Swarm Cluster"
-docker swarm init --advertise-addr 192.168.100.29
+docker swarm init
 
 # update which environment
 echo -n "Build which environment: [dev/prod]  "
 read build_env
 
 echo "Deploy application services"
-docker stack deploy -c $build_env/docker-compose.yml $build_env
+
+docker service create --replicas 1 --name prometheus-service \
+    --mount type=bind,source=/home/muthurimi/workspace/mali/docker/dev/prometheus.yml,destination=/etc/prometheus/prometheus.yml \
+    --publish published=9090,target=9090,protocol=tcp \
+    prom/prometheus
+
+docker stack deploy --compose-file $build_env/docker-compose.yml $build_env
 
 echo "Check the Status of the Running Services on a Swarm Cluster"
 docker service ls
