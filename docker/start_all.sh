@@ -3,7 +3,6 @@
 # get the absolute path of the executable
 SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P) && SELF_PATH="$SELF_PATH"/$(basename -- "$0")
 
-docker stop $(docker ps -a)
 printf "\nTake down the stack (application)\n===================\n"
 docker stack rm dev
 
@@ -12,6 +11,7 @@ docker swarm leave --force
 
 printf "\nSystem prune all images, containers and volumes\n===================\n"
 docker container rm $(docker ps -f "status=exited" -q)
+docker stop $(docker ps -a)
 docker rmi $(docker image ls -f "dangling=true" -q)
 
 printf "\n\n"
@@ -86,7 +86,7 @@ sleep 10
 printf "\nstart Docker registry mirror\n===================\n"
 # start Docker registry mirror
 docker run -d --restart=always -p 4000:5000 --name v2_mirror \
-  -v $PWD/data/registry:/var/lib/registry \
+  -v $PWD/docker-registry:/var/lib/registry \
   -e REGISTRY_PROXY_REMOTEURL=https://registry-1.docker.io \
   registry:2.5
 
@@ -100,9 +100,14 @@ for i in $(seq "${NUM_WORKERS}"); do
   # run new worker container
   docker run -d --privileged --name worker-${i} --hostname=worker-${i} \
     -p ${i}2375:2375 \
-    -p ${i}5000:5000 \
+    -p ${i}8500:8500 \
+    -p ${i}5672:5672 \
+    -p ${i}15672:15672 \
+    -p ${i}3308:3308 \
+    -p ${i}80:80 \
+    -p ${i}8080:8080 \
     -p ${i}5001:5001 \
-    -p ${i}5601:5601 \
+    -p ${i}5002:5002 \
     docker:1.13-rc-dind --registry-mirror http://${SWARM_MASTER}:4000
   # add worker container to the cluster
   docker --host=localhost:${i}2375 swarm join --token ${SWARM_TOKEN} ${SWARM_MASTER}:2377

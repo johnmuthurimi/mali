@@ -1,28 +1,13 @@
 version: '3.7'
-
-networks:
-    front-tier:
-        driver: overlay
-    back-tier:
-        driver: overlay
-
 services:
     consul-service:
         image: consul
         environment:
             - CONSUL_BOOTSTRAP_EXPECT=1
-            - CONSUL_CLIENT_LAN_ADDRESS=192.168.100.29
+            - CONSUL_CLIENT_LAN_ADDRESS=0.0.0.0
             - CONSUL_DISABLE_KEYRING_FILE=true
-        networks:
-            - back-tier
         ports:
             - '8500:8500'
-        volumes:
-            - './../data/consul-service/:/consul/data'
-        deploy:
-            # placement constraint - in this case on 'manager' nodes only
-            placement:
-                constraints: [node.role == manager]
         logging:
             options: {max-size: 10m, max-file: '10'}
 
@@ -31,17 +16,9 @@ services:
         environment:
             RABBITMQ_DEFAULT_USER: appuser
             RABBITMQ_DEFAULT_PASS: appuser
-        networks:
-            - back-tier
         ports:
             - '5672:5672'
             - '15672:15672'
-        volumes:
-            - './../data/rabbitmq-service/:/var/lib/rabbitmq'
-        deploy:
-            # placement constraint - in this case on 'manager' nodes only
-            placement:
-                constraints: [node.role == manager]
         logging:
             options: {max-size: 10m, max-file: '10'}
 
@@ -51,24 +28,13 @@ services:
             MYSQL_USER: appuser
             MYSQL_PASSWORD: appuser
             MYSQL_ROOT_PASSWORD: root
-        networks:
-            - back-tier
         ports:
             - '3308:3306'
-        volumes:
-            - './../data/mysql-service:/var/lib/mysql'
-        deploy:
-            # placement constraint - in this case on 'manager' nodes only
-            placement:
-                constraints: [node.role == manager]
         logging:
             options: {max-size: 10m, max-file: '10'}
 
     web-service:
         image: 'mucunga90/web-service:1.0.0'
-        networks:
-            - back-tier
-            - front-tier
         ports:
             - '80:80'
         logging:
@@ -77,31 +43,9 @@ services:
             - consul-service
             - mysql-service
             - rabbitmq-service
-        deploy:
-            replicas: 1
-            # service resource management
-            resources:
-                # Hard limit - Docker does not allow to allocate more
-                limits:
-                    cpus: '0.25'
-                    memory: 512M
-                # Soft limit - Docker makes best effort to return to it
-                reservations:
-                    cpus: '0.25'
-                    memory: 256M
-                # service restart policy
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            # placement constraint - in this case on 'worker' nodes only
-            placement:
-                constraints: [node.role == worker]
 
     gateway-service:
         image: 'mucunga90/gateway-service:1.0.0'
-        networks:
-            - back-tier
         ports:
             - '8080:8080'
         logging:
@@ -110,31 +54,9 @@ services:
             - consul-service
             - mysql-service
             - rabbitmq-service
-        deploy:
-            replicas: 1
-            # service resource management
-            resources:
-                # Hard limit - Docker does not allow to allocate more
-                limits:
-                    cpus: '0.25'
-                    memory: 512M
-                # Soft limit - Docker makes best effort to return to it
-                reservations:
-                    cpus: '0.25'
-                    memory: 256M
-            # service restart policy
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            # placement constraint - in this case on 'worker' nodes only
-            placement:
-                constraints: [node.role == worker]
 
     user-service:
         image: 'mucunga90/user-service:1.0.0'
-        networks:
-            - back-tier
         ports:
             - '5001:5001'
         logging:
@@ -143,31 +65,9 @@ services:
             - consul-service
             - mysql-service
             - rabbitmq-service
-        deploy:
-            replicas: 1
-            # service resource management
-            resources:
-                # Hard limit - Docker does not allow to allocate more
-                limits:
-                    cpus: '0.25'
-                    memory: 512M
-                # Soft limit - Docker makes best effort to return to it
-                reservations:
-                    cpus: '0.25'
-                    memory: 256M
-            # service restart policy
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            # placement constraint - in this case on 'worker' nodes only
-            placement:
-                constraints: [node.role == worker]
 
     alert-service:
         image: 'mucunga90/alert-service:1.0.0'
-        networks:
-            - back-tier
         ports:
             - '5002:5002'
         logging:
@@ -176,25 +76,3 @@ services:
             - consul-service
             - mysql-service
             - rabbitmq-service
-        deploy:
-            replicas: 1
-            # service resource management
-            resources:
-                # Hard limit - Docker does not allow to allocate more
-                limits:
-                    cpus: '0.25'
-                    memory: 512M
-                # Soft limit - Docker makes best effort to return to it
-                reservations:
-                    cpus: '0.25'
-                    memory: 256M
-            # service restart policy
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            # placement constraint - in this case on 'worker' nodes only
-            placement:
-                constraints: [node.role == worker]
-
-
