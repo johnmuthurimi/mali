@@ -1,9 +1,9 @@
 version: '3.7'
 
 networks:
-    public:
+    front-tier:
         driver: overlay
-    private:
+    back-tier:
         driver: overlay
 
 services:
@@ -11,21 +11,20 @@ services:
         image: consul
         environment:
             - CONSUL_BOOTSTRAP_EXPECT=1
-            - CONSUL_CLIENT_LAN_ADDRESS=0.0.0.0
+            - CONSUL_CLIENT_LAN_ADDRESS=192.168.100.29
             - CONSUL_DISABLE_KEYRING_FILE=true
         networks:
-            - private
+            - back-tier
         ports:
             - '8500:8500'
         volumes:
             - './../data/consul-service/:/consul/data'
         deploy:
-            replicas: 1
-            restart_policy: {condition: on-failure, delay: 5s, max_attempts: 10}
-            update_config: {parallelism: 1, delay: 10s, order: start-first}
+            # placement constraint - in this case on 'manager' nodes only
+            placement:
+                constraints: [node.role == manager]
         logging:
             options: {max-size: 10m, max-file: '10'}
-            driver: json-file
 
     rabbitmq-service:
         image: 'rabbitmq:3.6-management-alpine'
@@ -33,19 +32,18 @@ services:
             RABBITMQ_DEFAULT_USER: appuser
             RABBITMQ_DEFAULT_PASS: appuser
         networks:
-            - private
+            - back-tier
         ports:
             - '5672:5672'
             - '15672:15672'
         volumes:
             - './../data/rabbitmq-service/:/var/lib/rabbitmq'
         deploy:
-            replicas: 1
-            restart_policy: {condition: on-failure, delay: 5s, max_attempts: 10}
-            update_config: {parallelism: 1, delay: 10s, order: start-first}
+            # placement constraint - in this case on 'manager' nodes only
+            placement:
+                constraints: [node.role == manager]
         logging:
             options: {max-size: 10m, max-file: '10'}
-            driver: json-file
 
     mysql-service:
         image: 'mysql:5.7'
@@ -54,72 +52,149 @@ services:
             MYSQL_PASSWORD: appuser
             MYSQL_ROOT_PASSWORD: root
         networks:
-            - private
+            - back-tier
         ports:
             - '3308:3306'
         volumes:
             - './../data/mysql-service:/var/lib/mysql'
         deploy:
-            replicas: 1
-            restart_policy: {condition: on-failure, delay: 5s, max_attempts: 10}
-            update_config: {parallelism: 1, delay: 10s, order: start-first}
+            # placement constraint - in this case on 'manager' nodes only
+            placement:
+                constraints: [node.role == manager]
         logging:
             options: {max-size: 10m, max-file: '10'}
-            driver: json-file
-
-    gateway-service:
-        image: 'mucunga90/gateway-service:1.0.0'
-        networks:
-            - private
-        ports:
-            - '8080:8080'
-        deploy:
-            replicas: 1
-            restart_policy: {condition: on-failure, delay: 30s, max_attempts: 10}
-            update_config: {parallelism: 1, delay: 40s, order: start-first}
-        logging:
-            options: {max-size: 10m, max-file: '10'}
-            driver: json-file
-
-    user-service:
-        image: 'mucunga90/user-service:1.0.0'
-        networks:
-            - private
-        ports:
-            - '5001:5001'
-        deploy:
-            replicas: 1
-            restart_policy: {condition: on-failure, delay: 30s, max_attempts: 10}
-            update_config: {parallelism: 1, delay: 40s, order: start-first}
-        logging:
-            options: {max-size: 10m, max-file: '10'}
-            driver: json-file
-
-    alert-service:
-        image: 'mucunga90/alert-service:1.0.0'
-        networks:
-            - private
-        ports:
-            - '5002:5002'
-        deploy:
-            replicas: 1
-            restart_policy: {condition: on-failure, delay: 30s, max_attempts: 10}
-            update_config: {parallelism: 1, delay: 40s, order: start-first}
-        logging:
-            options: {max-size: 10m, max-file: '10'}
-            driver: json-file
 
     web-service:
         image: 'mucunga90/web-service:1.0.0'
         networks:
-            - private
-            - public
+            - back-tier
+            - front-tier
         ports:
             - '80:80'
-        deploy:
-            replicas: 1
-            restart_policy: {condition: on-failure, delay: 30s, max_attempts: 10}
-            update_config: {parallelism: 1, delay: 40s, order: start-first}
         logging:
             options: {max-size: 10m, max-file: '10'}
-            driver: json-file
+        depends_on:
+            - consul-service
+            - mysql-service
+            - rabbitmq-service
+        deploy:
+            replicas: 1
+            # service resource management
+            resources:
+                # Hard limit - Docker does not allow to allocate more
+                limits:
+                    cpus: '0.25'
+                    memory: 512M
+                # Soft limit - Docker makes best effort to return to it
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
+                # service restart policy
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            # placement constraint - in this case on 'worker' nodes only
+            placement:
+                constraints: [node.role == worker]
+
+    gateway-service:
+        image: 'mucunga90/gateway-service:1.0.0'
+        networks:
+            - back-tier
+        ports:
+            - '8080:8080'
+        logging:
+            options: {max-size: 10m, max-file: '10'}
+        depends_on:
+            - consul-service
+            - mysql-service
+            - rabbitmq-service
+        deploy:
+            replicas: 1
+            # service resource management
+            resources:
+                # Hard limit - Docker does not allow to allocate more
+                limits:
+                    cpus: '0.25'
+                    memory: 512M
+                # Soft limit - Docker makes best effort to return to it
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
+            # service restart policy
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            # placement constraint - in this case on 'worker' nodes only
+            placement:
+                constraints: [node.role == worker]
+
+    user-service:
+        image: 'mucunga90/user-service:1.0.0'
+        networks:
+            - back-tier
+        ports:
+            - '5001:5001'
+        logging:
+            options: {max-size: 10m, max-file: '10'}
+        depends_on:
+            - consul-service
+            - mysql-service
+            - rabbitmq-service
+        deploy:
+            replicas: 1
+            # service resource management
+            resources:
+                # Hard limit - Docker does not allow to allocate more
+                limits:
+                    cpus: '0.25'
+                    memory: 512M
+                # Soft limit - Docker makes best effort to return to it
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
+            # service restart policy
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            # placement constraint - in this case on 'worker' nodes only
+            placement:
+                constraints: [node.role == worker]
+
+    alert-service:
+        image: 'mucunga90/alert-service:1.0.0'
+        networks:
+            - back-tier
+        ports:
+            - '5002:5002'
+        logging:
+            options: {max-size: 10m, max-file: '10'}
+        depends_on:
+            - consul-service
+            - mysql-service
+            - rabbitmq-service
+        deploy:
+            replicas: 1
+            # service resource management
+            resources:
+                # Hard limit - Docker does not allow to allocate more
+                limits:
+                    cpus: '0.25'
+                    memory: 512M
+                # Soft limit - Docker makes best effort to return to it
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
+            # service restart policy
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            # placement constraint - in this case on 'worker' nodes only
+            placement:
+                constraints: [node.role == worker]
+
+

@@ -3,44 +3,45 @@
 # get the absolute path of the executable
 SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P) && SELF_PATH="$SELF_PATH"/$(basename -- "$0")
 
-echo "Take down the stack (application)"
+docker stop $(docker ps -a)
+printf "\nTake down the stack (application)\n===================\n"
 docker stack rm dev
 
-echo "Take down the Swarm cluster"
+printf "\nTake down the Swarm cluster\n===================\n"
 docker swarm leave --force
 
-echo "System prune all images, containers and volumes"
-echo "Remove unneccessary images and containers"
-docker rm $(docker ps -a -f status=exited -q)
-docker rmi $(docker images -f "dangling=true" -q)
+printf "\nSystem prune all images, containers and volumes\n===================\n"
+docker container rm $(docker ps -f "status=exited" -q)
+docker rmi $(docker image ls -f "dangling=true" -q)
 
+printf "\n\n"
 echo -n "Build new images? y/n  "
 read build_images
 if [ "$build_images" == "y" ]; then
 
 	# Included service here if you want to build the docker image
-	echo "Generating gateway-service image..."
+	printf "\nGenerating gateway-service image...\n======================================\\n"
 	cd ./../gateway-service/
 	sh ./build_image.sh
 
 	# Included service here if you want to build the docker image
-	echo "Generating core-service image..."
+	printf "\nGenerating core-service image...\n======================================\\n"
 	cd ./../core-service/
 	sh ./build_image.sh
 	
 	# Included service here if you want to build the docker image
-	echo "Generating user-service image..."
+	printf "\nGenerating user-service image...\n======================================\\n"
 	cd ./../user-service/
 	sh ./build_image.sh
 
 	# Included service here if you want to build the docker image
-	echo "Generating alert-service image..."
+	printf "\nGenerating alert-service image...\n======================================\\n"
 	cd ./../alert-service/
 	sh ./build_image.sh
 
 
 	# Included service here if you want to build the docker image
-	echo "Generating web-service image..."
+	printf "\nGenerating web-service image...\n======================================\\n"
 	cd ./../web-service/
 	sh ./build_image.sh
 fi
@@ -56,24 +57,70 @@ if [ "$build_images" == "y" ]; then
 	#docker push mucunga90/web-service:latest
 fi
 
-echo "Starting your local dockerized full stack with mounted volumes"
+printf "\nStarting your local dockerized full stack with mounted volumes\n============================================================================\n"
 cd ./../docker/
-
-echo "Create Swarm Cluster"
-docker swarm init
 
 # update which environment
 echo -n "Build which environment: [dev/prod]  "
 read build_env
 
-echo "Deploy application services"
+#https://codefresh.io/docker-tutorial/deploy-docker-compose-v3-swarm-mode-cluster/
+printf "\nCreate Swarm Cluster\n===================\n"
+# vars
+[ -z "$NUM_WORKERS" ] && NUM_WORKERS=3
 
-docker service create --replicas 1 --name prometheus-service \
-    --mount type=bind,source=/home/muthurimi/workspace/mali/docker/dev/prometheus.yml,destination=/etc/prometheus/prometheus.yml \
-    --publish published=9090,target=9090,protocol=tcp \
-    prom/prometheus
+# init swarm (need for service command); if not created
+docker node ls 2> /dev/null | grep "Leader"
+if [ $? -ne 0 ]; then
+  docker swarm init > /dev/null 2>&1
+fi
 
-docker stack deploy --compose-file $build_env/docker-compose.yml $build_env
+# get join token
+SWARM_TOKEN=$(docker swarm join-token -q worker)
 
-echo "Check the Status of the Running Services on a Swarm Cluster"
+# get Swarm master IP (Docker for Mac xhyve VM IP)
+SWARM_MASTER=$(docker info --format "{{.Swarm.NodeAddr}}")
+echo "Swarm master IP: ${SWARM_MASTER}"
+sleep 10
+
+printf "\nstart Docker registry mirror\n===================\n"
+# start Docker registry mirror
+docker run -d --restart=always -p 4000:5000 --name v2_mirror \
+  -v $PWD/data/registry:/var/lib/registry \
+  -e REGISTRY_PROXY_REMOTEURL=https://registry-1.docker.io \
+  registry:2.5
+
+printf "\nrun NUM_WORKERS workers with SWARM_TOKEN\n===================\n"
+# run NUM_WORKERS workers with SWARM_TOKEN
+for i in $(seq "${NUM_WORKERS}"); do
+  # remove node from cluster if exists
+  docker node rm --force $(docker node ls --filter "name=worker-${i}" -q) > /dev/null 2>&1
+  # remove worker contianer with same name if exists
+  docker rm --force $(docker ps -q --filter "name=worker-${i}") > /dev/null 2>&1
+  # run new worker container
+  docker run -d --privileged --name worker-${i} --hostname=worker-${i} \
+    -p ${i}2375:2375 \
+    -p ${i}5000:5000 \
+    -p ${i}5001:5001 \
+    -p ${i}5601:5601 \
+    docker:1.13-rc-dind --registry-mirror http://${SWARM_MASTER}:4000
+  # add worker container to the cluster
+  docker --host=localhost:${i}2375 swarm join --token ${SWARM_TOKEN} ${SWARM_MASTER}:2377
+done
+
+# show swarm cluster
+printf "\nLocal Swarm Cluster\n===================\n"
+docker node ls
+
+printf "\nDeploy application services\n===================\n"
+docker stack deploy -c $build_env/docker-compose.yml $build_env
+
+# echo swarm visualizer
+printf "\nLocal Swarm Visualizer\n===================\n"
+docker run -it -d --name swarm_visualizer \
+  -p 8000:8080 -e HOST=localhost \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  dockersamples/visualizer
+
+printf "\nCheck the Status of the Running Services on a Swarm Cluster\n===================\n"
 docker service ls
