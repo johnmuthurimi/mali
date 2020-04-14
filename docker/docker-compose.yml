@@ -10,6 +10,10 @@ services:
             - '8500:8500'
         logging:
             options: {max-size: 10m, max-file: '10'}
+        volumes:
+            - mali_data:/consul/data
+        networks:
+            - mali_network
         deploy:
             replicas: 1
             update_config:
@@ -19,6 +23,8 @@ services:
                 condition: on-failure
                 delay: 10s
                 max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
 
     rabbitmq-service:
         image: 'rabbitmq:3.6-management-alpine'
@@ -30,6 +36,10 @@ services:
             - '15672:15672'
         logging:
             options: {max-size: 10m, max-file: '10'}
+        volumes:
+            - mali_data:/var/lib/rabbitmq
+        networks:
+            - mali_network
         deploy:
             replicas: 1
             update_config:
@@ -39,6 +49,8 @@ services:
                 condition: on-failure
                 delay: 10s
                 max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
 
     mysql-service:
         image: 'mysql:5.7'
@@ -50,6 +62,10 @@ services:
             - '3308:3306'
         logging:
             options: {max-size: 10m, max-file: '10'}
+        volumes:
+            - mali_data:/var/lib/mysql
+        networks:
+            - mali_network
         deploy:
             replicas: 1
             update_config:
@@ -59,6 +75,8 @@ services:
                 condition: on-failure
                 delay: 10s
                 max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
 
     web-service:
         image: 'mucunga90/web-service:1.0.0'
@@ -66,6 +84,10 @@ services:
             - '80:80'
         logging:
             options: {max-size: 10m, max-file: '10'}
+        volumes:
+            - mali_data:/data
+        networks:
+            - mali_network
         deploy:
             replicas: 1
             update_config:
@@ -75,6 +97,8 @@ services:
                 condition: on-failure
                 delay: 10s
                 max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
         depends_on:
             - consul-service
             - mysql-service
@@ -86,6 +110,10 @@ services:
             - '8080:8080'
         logging:
             options: {max-size: 10m, max-file: '10'}
+        volumes:
+            - mali_data:/data
+        networks:
+            - mali_network
         deploy:
             replicas: 1
             update_config:
@@ -95,6 +123,8 @@ services:
                 condition: on-failure
                 delay: 10s
                 max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
         depends_on:
             - consul-service
             - mysql-service
@@ -106,6 +136,10 @@ services:
             - '5001:5001'
         logging:
             options: {max-size: 10m, max-file: '10'}
+        volumes:
+            - mali_data:/data
+        networks:
+            - mali_network
         deploy:
             replicas: 1
             update_config:
@@ -115,6 +149,8 @@ services:
                 condition: on-failure
                 delay: 10s
                 max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
         depends_on:
             - consul-service
             - mysql-service
@@ -126,6 +162,10 @@ services:
             - '5002:5002'
         logging:
             options: {max-size: 10m, max-file: '10'}
+        volumes:
+            - mali_data:/data
+        networks:
+            - mali_network
         deploy:
             replicas: 1
             update_config:
@@ -135,7 +175,22 @@ services:
                 condition: on-failure
                 delay: 10s
                 max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
         depends_on:
             - consul-service
             - mysql-service
             - rabbitmq-service
+
+networks:
+    mali_network:
+        driver: overlay
+        attachable: true
+
+volumes:
+    mali_data:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: /home/muthurimi/docker/mali_data
