@@ -1,8 +1,11 @@
 package slick.mali.coreservice.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
-public class BaseModel {
+public class BaseModel implements Serializable {
+
+    private static final long serialVersionUID = -8091879091924046844L;
 
     /**
      * String id

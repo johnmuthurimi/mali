@@ -40,15 +40,31 @@ public class UserController extends BaseController {
     private ITokenService tokenService;
 
     /**
-     * This is end point is responsible getting registered user
+     * find user by id
      * @param  id
      * @return User
      */
     @RequestMapping(value = "/user")
     @ResponseBody
-    public ResponseEntity<Response<User>> getUser(@RequestParam(value = "id") String id) {
+    public ResponseEntity<Response<User>> findById(@RequestParam(value = "id") String id) {
         try {
             User result = userService.findById(id);
+            return this.successfulResponse(result);
+        } catch (Exception e) {
+            return this.errorResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * Find user by email
+     * @param  email
+     * @return User
+     */
+    @RequestMapping(value = "/user")
+    @ResponseBody
+    public ResponseEntity<Response<User>> findByEmail(@RequestParam(value = "email") String email) {
+        try {
+            User result = userService.findByEmail(email);
             return this.successfulResponse(result);
         } catch (Exception e) {
             return this.errorResponse(e.getMessage());

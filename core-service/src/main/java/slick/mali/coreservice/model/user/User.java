@@ -6,11 +6,12 @@ import slick.mali.coreservice.model.BaseModel;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 /**
  * Domain class for user
  */
-public class User extends BaseModel {
+public class User extends BaseModel implements Serializable {
 
         /**
          * First name
@@ -50,6 +51,11 @@ public class User extends BaseModel {
          * User verified
          */
         private Boolean verified;
+
+        /**
+         * User token
+         */
+        private String token;
 
         /**
          * Get the firstName
@@ -147,5 +153,19 @@ public class User extends BaseModel {
          */
         public void setVerified(Boolean verified) {
                 this.verified = verified;
+        }
+
+        /**
+         * Get the user token
+         */
+        public String getToken() {
+                return token;
+        }
+
+        /**
+         * Set the user token
+         */
+        public void setToken(String token) {
+                this.token = token;
         }
 }

@@ -26,28 +26,6 @@ public class UserDaoImpl implements UserDao {
     private JdbcTemplate jdbcTemplate;
 
     /**
-     * Find user by email
-     * @param email
-     * @return user
-     */
-    @Override
-    public User findByEmail(String email) {
-        String query = "SELECT id, email, status, enabled, deleted "
-                + "FROM users  "
-                + "WHERE email = ? "
-                + "LIMIT 1 ";
-        RowMapper<User> rowMapper = new UserMapper();
-        List<User> aut = jdbcTemplate.query(query, rowMapper, email);
-        if(aut.isEmpty() ){
-            return null;
-        } else if (aut.size() == 1) {
-            return aut.get(0);
-        }
-
-        return null;
-    }
-
-    /**
      * Find user by ID which is the unique identifier
      * @param id
      * @return
@@ -60,6 +38,28 @@ public class UserDaoImpl implements UserDao {
                 + "LIMIT 1 ";
         RowMapper<User> rowMapper = new UserMapper();
         List<User> aut = jdbcTemplate.query(query, rowMapper, id);
+        if(aut.isEmpty() ){
+            return null;
+        } else if (aut.size() == 1) {
+            return aut.get(0);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get user by username
+     * @param username
+     * @return
+     */
+    @Override
+    public User findByEmail(String username) {
+        String query = "SELECT id, email, salt, password, status, enabled, deleted "
+                + "FROM users  "
+                + "WHERE username = ? "
+                + "LIMIT 1 ";
+        RowMapper<User> rowMapper = new UserMapper();
+        List<User> aut = jdbcTemplate.query(query, rowMapper, username);
         if(aut.isEmpty() ){
             return null;
         } else if (aut.size() == 1) {

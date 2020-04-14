@@ -10,6 +10,15 @@ services:
             - '8500:8500'
         logging:
             options: {max-size: 10m, max-file: '10'}
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
 
     rabbitmq-service:
         image: 'rabbitmq:3.6-management-alpine'
@@ -21,6 +30,15 @@ services:
             - '15672:15672'
         logging:
             options: {max-size: 10m, max-file: '10'}
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
 
     mysql-service:
         image: 'mysql:5.7'
@@ -32,6 +50,15 @@ services:
             - '3308:3306'
         logging:
             options: {max-size: 10m, max-file: '10'}
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
 
     web-service:
         image: 'mucunga90/web-service:1.0.0'
@@ -39,6 +66,15 @@ services:
             - '80:80'
         logging:
             options: {max-size: 10m, max-file: '10'}
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
         depends_on:
             - consul-service
             - mysql-service
@@ -50,6 +86,15 @@ services:
             - '8080:8080'
         logging:
             options: {max-size: 10m, max-file: '10'}
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
         depends_on:
             - consul-service
             - mysql-service
@@ -61,6 +106,15 @@ services:
             - '5001:5001'
         logging:
             options: {max-size: 10m, max-file: '10'}
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
         depends_on:
             - consul-service
             - mysql-service
@@ -72,6 +126,15 @@ services:
             - '5002:5002'
         logging:
             options: {max-size: 10m, max-file: '10'}
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
         depends_on:
             - consul-service
             - mysql-service

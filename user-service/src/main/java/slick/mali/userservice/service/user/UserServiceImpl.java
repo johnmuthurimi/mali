@@ -5,14 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import slick.mali.coreservice.constants.UserStatus;
+import slick.mali.coreservice.model.EventRequest;
 import slick.mali.coreservice.model.user.User;
 import slick.mali.coreservice.util.LoggerUtil;
+import slick.mali.coreservice.util.PasswordUtils;
 import slick.mali.userservice.dao.token.TokenDao;
 import slick.mali.userservice.dao.user.UserDao;
-import slick.mali.coreservice.model.EventRequest;
 import slick.mali.userservice.rabbitmq.EventMessageSender;
 import slick.mali.userservice.rabbitmq.RabbitConfig;
-import slick.mali.coreservice.util.PasswordUtils;
 
 /**
  * Implementation for all user operations
@@ -197,6 +197,17 @@ public class UserServiceImpl implements IUserService {
 
         LoggerUtil.info(LOGGER, "AlertServiceImpl: Completed sign up requested for : " + user.getEmail());
         return user;
+    }
+
+
+    /**
+     * Get user by username
+     * @param username
+     * @return
+     */
+    @Override
+    public User findByEmail(String username) {
+        return userDao.findByEmail(username);
     }
 
 }

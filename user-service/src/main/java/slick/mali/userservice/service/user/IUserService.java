@@ -31,4 +31,11 @@ public interface IUserService extends IBaseService {
      * @return
      */
     User login(User login);
+
+    /**
+     * Get user by username
+     * @param username
+     * @return
+     */
+    User findByEmail(String username);
 }

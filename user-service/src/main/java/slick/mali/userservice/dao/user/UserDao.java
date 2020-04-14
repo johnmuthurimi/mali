@@ -5,20 +5,19 @@ import slick.mali.coreservice.model.user.User;
 
 public interface UserDao extends BaseDao {
 
-
-   /**
-    * Find user by email
-    * @param email
-    * @return user
-    */
-   User findByEmail(String email);
-
    /**
     * Find user by ID which is the unique identifier
     * @param id
     * @return
     */
    User findById(String id);
+
+   /**
+    * Get user by username
+    * @param username
+    * @return
+    */
+   User findByEmail(String username);
 
    /**
     * Create user in the database
