@@ -60,7 +60,7 @@ public class UserController extends BaseController {
      * @param  email
      * @return User
      */
-    @RequestMapping(value = "/user")
+    @RequestMapping(value = "/users")
     @ResponseBody
     public ResponseEntity<Response<User>> findByEmail(@RequestParam(value = "email") String email) {
         try {

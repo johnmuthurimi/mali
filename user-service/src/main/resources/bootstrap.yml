@@ -1,17 +1,28 @@
 spring:
-    application:
-        name: user-service
-    cloud:
-        consul:
-            host: 192.168.100.29
-            port: 8500
-            discovery: {instance-id: '${spring.application.name}:${server.port}'}
+  application:
+    name: user-service
+  cloud:
+    consul:
+      host: 192.168.100.29
+      port: 8500
+      discovery: {instance-id: '${spring.application.name}:${server.port}'}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://uaa:8090/uaa/token_keys
 
 logging:
-    level:
-        org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
-    pattern:
-        console: '%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n'
+  level:
+    root: INFO
+    com.scg.service: TRACE
+    org.springframework.web: INFO
+    org.springframework.web.HttpLogging: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n'
 
 server:
   port: ${PORT:5001}

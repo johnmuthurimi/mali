@@ -1,0 +1,13 @@
+server:
+  port: ${PORT:8801}
+
+spring:
+  profiles:
+      active: native
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+
+

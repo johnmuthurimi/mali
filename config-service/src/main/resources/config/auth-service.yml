@@ -1,0 +1,25 @@
+server:
+  port: ${PORT:8804}
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.security: DEBUG
+    spring-cloud-starter-netflix-eureka-client: DEBUG
+
+eureka:
+  instance:
+    hostname: 192.168.100.29
+    metadataMap:
+      instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}
+    preferIpAddress: true
+    leaseRenewalIntervalInSeconds: 5
+    lease-expiration-duration-in-seconds: 5
+  client:
+    fetchRegistry: true
+    registryFetchIntervalSeconds: 5
+    serviceUrl:
+      defaultZone: http://192.168.100.29:8802/eureka/

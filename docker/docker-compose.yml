@@ -1,5 +1,29 @@
 version: '3.7'
 services:
+    uaa:
+        image: scg-demo-uaa:latest
+        container_name: uaa
+        ports:
+          - "8090:8090"
+        logging:
+            options: {max-size: 100m, max-file: '10'}
+        volumes:
+            - uaa:/etc/nginx
+        networks:
+            - frontend-tier
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+
     consul-service:
         image: consul
         environment:
@@ -9,11 +33,11 @@ services:
         ports:
             - '8500:8500'
         logging:
-            options: {max-size: 10m, max-file: '10'}
+            options: {max-size: 100m, max-file: '10'}
         volumes:
-            - mali_data:/consul/data
+            - consul_service:/consul/data
         networks:
-            - mali_network
+            - backend-tier
         deploy:
             replicas: 1
             update_config:
@@ -35,11 +59,11 @@ services:
             - '5672:5672'
             - '15672:15672'
         logging:
-            options: {max-size: 10m, max-file: '10'}
+            options: {max-size: 100m, max-file: '10'}
         volumes:
-            - mali_data:/var/lib/rabbitmq
+            - rabbitmq_service:/var/lib/rabbitmq
         networks:
-            - mali_network
+            - backend-tier
         deploy:
             replicas: 1
             update_config:
@@ -61,11 +85,11 @@ services:
         ports:
             - '3308:3306'
         logging:
-            options: {max-size: 10m, max-file: '10'}
+            options: {max-size: 100m, max-file: '10'}
         volumes:
-            - mali_data:/var/lib/mysql
+            - mysql_service:/var/lib/mysql
         networks:
-            - mali_network
+            - backend-tier
         deploy:
             replicas: 1
             update_config:
@@ -83,11 +107,12 @@ services:
         ports:
             - '80:80'
         logging:
-            options: {max-size: 10m, max-file: '10'}
+            options: {max-size: 100m, max-file: '10'}
         volumes:
-            - mali_data:/data
+            - web_service:/etc/nginx
         networks:
-            - mali_network
+            - frontend-tier
+            - backend-tier
         deploy:
             replicas: 1
             update_config:
@@ -109,11 +134,11 @@ services:
         ports:
             - '8080:8080'
         logging:
-            options: {max-size: 10m, max-file: '10'}
+            options: {max-size: 100m, max-file: '10'}
         volumes:
-            - mali_data:/data
+            - gateway_service:/var/log
         networks:
-            - mali_network
+            - backend-tier
         deploy:
             replicas: 1
             update_config:
@@ -135,11 +160,11 @@ services:
         ports:
             - '5001:5001'
         logging:
-            options: {max-size: 10m, max-file: '10'}
+            options: {max-size: 100m, max-file: '10'}
         volumes:
-            - mali_data:/data
+            - user_service:/var/log
         networks:
-            - mali_network
+            - backend-tier
         deploy:
             replicas: 1
             update_config:
@@ -161,11 +186,11 @@ services:
         ports:
             - '5002:5002'
         logging:
-            options: {max-size: 10m, max-file: '10'}
+            options: {max-size: 100m, max-file: '10'}
         volumes:
-            - mali_data:/data
+            - alert_service:/var/log
         networks:
-            - mali_network
+            - backend-tier
         deploy:
             replicas: 1
             update_config:
@@ -183,14 +208,59 @@ services:
             - rabbitmq-service
 
 networks:
-    mali_network:
+    frontend-tier:
+        driver: overlay
+        attachable: true
+    backend-tier:
         driver: overlay
         attachable: true
 
 volumes:
-    mali_data:
+    uaa:
         driver: local
         driver_opts:
             type: none
             o: bind
-            device: /home/muthurimi/docker/mali_data
+            device: /home/muthurimi/docker/mali/uaa
+    consul_service:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: /home/muthurimi/docker/mali/consul_service
+    rabbitmq_service:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: /home/muthurimi/docker/mali/rabbitmq_service
+    mysql_service:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: /home/muthurimi/docker/mali/mysql_service
+    web_service:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: /home/muthurimi/docker/mali/web_service
+    gateway_service:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: /home/muthurimi/docker/mali/gateway_service
+    user_service:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: /home/muthurimi/docker/mali/user_service
+    alert_service:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: /home/muthurimi/docker/mali/alert_service
