@@ -2,12 +2,7 @@ package slick.mali.userservice.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 import slick.mali.coreservice.model.Response;
@@ -25,6 +20,7 @@ import javax.validation.Valid;
  * This class handles all the users request for api v1
  */
 @RestController
+@RequestMapping("/user")
 public class UserController extends BaseController {
 
     /**
@@ -40,31 +36,15 @@ public class UserController extends BaseController {
     private ITokenService tokenService;
 
     /**
-     * find user by id
-     * @param  id
-     * @return User
+     * Find by Id
+     * @param id
+     * @return
      */
-    @RequestMapping(value = "/user")
+    @RequestMapping(value = "/user/{id}")
     @ResponseBody
-    public ResponseEntity<Response<User>> findById(@RequestParam(value = "id") String id) {
+    public ResponseEntity<Response<User>> findById(@PathVariable final String id) {
         try {
             User result = userService.findById(id);
-            return this.successfulResponse(result);
-        } catch (Exception e) {
-            return this.errorResponse(e.getMessage());
-        }
-    }
-
-    /**
-     * Find user by email
-     * @param  email
-     * @return User
-     */
-    @RequestMapping(value = "/users")
-    @ResponseBody
-    public ResponseEntity<Response<User>> findByEmail(@RequestParam(value = "email") String email) {
-        try {
-            User result = userService.findByEmail(email);
             return this.successfulResponse(result);
         } catch (Exception e) {
             return this.errorResponse(e.getMessage());
@@ -91,26 +71,11 @@ public class UserController extends BaseController {
      * @param  token
      * @return User
      */
-    @RequestMapping(value = "/verify")
+    @RequestMapping(value = "user/verify")
     @ResponseBody
     public ResponseEntity<Response<Token>> verifyUser(@RequestParam(value = "token") String token) {
         try {
             Token result = tokenService.verifyToken(token);
-            return this.successfulResponse(null);
-        } catch (Exception e) {
-            return this.errorResponse(e.getMessage());
-        }
-    }
-
-    /**
-     * This is the endpoint for login
-     * @param req
-     * @return
-     */
-    @PostMapping(path = "/login", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Response<User>> login(@Valid @RequestBody Request<User> req) {
-        try {
-            User result = userService.login(req.getParam());
             return this.successfulResponse(null);
         } catch (Exception e) {
             return this.errorResponse(e.getMessage());

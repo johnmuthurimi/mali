@@ -1,55 +1,5 @@
 version: '3.7'
 services:
-    uaa:
-        image: scg-demo-uaa:latest
-        container_name: uaa
-        ports:
-          - "8090:8090"
-        logging:
-            options: {max-size: 100m, max-file: '10'}
-        volumes:
-            - uaa:/etc/nginx
-        networks:
-            - frontend-tier
-            - backend-tier
-        deploy:
-            replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
-
-    consul-service:
-        image: consul
-        environment:
-            - CONSUL_BOOTSTRAP_EXPECT=1
-            - CONSUL_CLIENT_LAN_ADDRESS=0.0.0.0
-            - CONSUL_DISABLE_KEYRING_FILE=true
-        ports:
-            - '8500:8500'
-        logging:
-            options: {max-size: 100m, max-file: '10'}
-        volumes:
-            - consul_service:/consul/data
-        networks:
-            - backend-tier
-        deploy:
-            replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
-
     rabbitmq-service:
         image: 'rabbitmq:3.6-management-alpine'
         environment:
@@ -58,8 +8,6 @@ services:
         ports:
             - '5672:5672'
             - '15672:15672'
-        logging:
-            options: {max-size: 100m, max-file: '10'}
         volumes:
             - rabbitmq_service:/var/lib/rabbitmq
         networks:
@@ -84,8 +32,6 @@ services:
             MYSQL_ROOT_PASSWORD: root
         ports:
             - '3308:3306'
-        logging:
-            options: {max-size: 100m, max-file: '10'}
         volumes:
             - mysql_service:/var/lib/mysql
         networks:
@@ -106,8 +52,6 @@ services:
         image: 'mucunga90/web-service:1.0.0'
         ports:
             - '80:80'
-        logging:
-            options: {max-size: 100m, max-file: '10'}
         volumes:
             - web_service:/etc/nginx
         networks:
@@ -125,18 +69,94 @@ services:
             placement:
                 constraints: [node.role == manager]
         depends_on:
-            - consul-service
+            - rabbitmq-service
+            - mysql-service
+            - config-service
+            - discovery-service
+            - auth-service
+            - gateway-service
+            - monitoring-service
+            - alert-service
+            - user-service
+
+    config-service:
+        image: 'mucunga90/config-service:1.0.0'
+        ports:
+            - '8888:8888'
+        volumes:
+            - config_service:/app
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+        depends_on:
             - mysql-service
             - rabbitmq-service
+
+    discovery-service:
+        image: 'mucunga90/discovery-service:1.0.0'
+        ports:
+            - '8761:8761'
+        volumes:
+            - discovery_service:/app
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+        depends_on:
+            - rabbitmq-service
+            - mysql-service
+            - config-service
+
+    auth-service:
+        image: 'mucunga90/auth-service:1.0.0'
+        ports:
+            - '5001:5001'
+        volumes:
+            - auth_service:/app
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+        depends_on:
+            - rabbitmq-service
+            - mysql-service
+            - config-service
+            - discovery-service
 
     gateway-service:
         image: 'mucunga90/gateway-service:1.0.0'
         ports:
             - '8080:8080'
-        logging:
-            options: {max-size: 100m, max-file: '10'}
         volumes:
-            - gateway_service:/var/log
+            - gateway_service:/app
         networks:
             - backend-tier
         deploy:
@@ -151,18 +171,16 @@ services:
             placement:
                 constraints: [node.role == manager]
         depends_on:
-            - consul-service
-            - mysql-service
             - rabbitmq-service
+            - mysql-service
+            - config-service
+            - discovery-service
+            - auth-service
 
-    user-service:
-        image: 'mucunga90/user-service:1.0.0'
+    monitoring-service:
+        image: 'openzipkin/zipkin'
         ports:
-            - '5001:5001'
-        logging:
-            options: {max-size: 100m, max-file: '10'}
-        volumes:
-            - user_service:/var/log
+            - '9411:9411'
         networks:
             - backend-tier
         deploy:
@@ -177,18 +195,87 @@ services:
             placement:
                 constraints: [node.role == manager]
         depends_on:
-            - consul-service
-            - mysql-service
             - rabbitmq-service
+            - mysql-service
+            - config-service
+            - discovery-service
+            - auth-service
+            - gateway-service
+
+    elasticsearch-service:
+        image: 'elasticsearch'
+        ports:
+            - '9200:9200'
+            - '9300:9300'
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+        depends_on:
+            - monitoring-service
+
+    kibana-service:
+        image: 'kibana'
+        ports:
+            - '5601:5601'
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+        links:
+            - elasticsearch-service
+        depends_on:
+            - monitoring-service
+            - elasticsearch-service
+
+    logstash-service:
+        image: 'logstash'
+        ports:
+            - '5000:5000'
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+        links:
+            - elasticsearch-service
+        depends_on:
+            - monitoring-service
+            - elasticsearch-service
+            - kibana-service
 
     alert-service:
         image: 'mucunga90/alert-service:1.0.0'
         ports:
             - '5002:5002'
-        logging:
-            options: {max-size: 100m, max-file: '10'}
         volumes:
-            - alert_service:/var/log
+            - alert_service:/app
         networks:
             - backend-tier
         deploy:
@@ -203,9 +290,41 @@ services:
             placement:
                 constraints: [node.role == manager]
         depends_on:
-            - consul-service
-            - mysql-service
             - rabbitmq-service
+            - mysql-service
+            - config-service
+            - discovery-service
+            - auth-service
+            - gateway-service
+            - monitoring-service
+
+    user-service:
+        image: 'mucunga90/user-service:1.0.0'
+        ports:
+            - '5003:5003'
+        volumes:
+            - user_service:/app
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+        depends_on:
+            - rabbitmq-service
+            - mysql-service
+            - config-service
+            - discovery-service
+            - auth-service
+            - gateway-service
+            - monitoring-service
 
 networks:
     frontend-tier:
@@ -216,18 +335,6 @@ networks:
         attachable: true
 
 volumes:
-    uaa:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: /home/muthurimi/docker/mali/uaa
-    consul_service:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: /home/muthurimi/docker/mali/consul_service
     rabbitmq_service:
         driver: local
         driver_opts:
@@ -246,12 +353,36 @@ volumes:
             type: none
             o: bind
             device: /home/muthurimi/docker/mali/web_service
+    config_service:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: /home/muthurimi/docker/mali/config_service
+    discovery_service:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: /home/muthurimi/docker/mali/discovery_service
+    auth_service:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: /home/muthurimi/docker/mali/auth_service
     gateway_service:
         driver: local
         driver_opts:
             type: none
             o: bind
             device: /home/muthurimi/docker/mali/gateway_service
+    elasticsearch_service:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: /home/muthurimi/docker/mali/elasticsearch_service
     user_service:
         driver: local
         driver_opts:

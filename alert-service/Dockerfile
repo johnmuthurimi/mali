@@ -1,8 +1,4 @@
-FROM openjdk:8-jre-alpine
-ENV APP_FILE alert-service-1.0.jar
-ENV APP_HOME /app
-EXPOSE 5005
-COPY target/$APP_FILE $APP_HOME/
-WORKDIR $APP_HOME
-ENTRYPOINT ["sh", "-c"]
-CMD ["exec java -jar $APP_FILE"]
+FROM adoptopenjdk:8u212-b04-jre-hotspot-bionic
+COPY target/alert-service-1.0.jar /app/app.jar
+CMD ["java", "-jar", "/app/app.jar"]
+EXPOSE 5002

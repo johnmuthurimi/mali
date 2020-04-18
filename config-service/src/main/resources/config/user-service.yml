@@ -1,14 +1,17 @@
 server:
-  port: ${PORT:5001}
+  port: ${PORT:5003}
 
 logging:
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
   level:
     root: INFO
+    com.scg.service: TRACE
     org.springframework.web: INFO
+    org.springframework.web.HttpLogging: DEBUG
     org.springframework.security: DEBUG
-    spring-cloud-starter-netflix-eureka-client: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n'
 
 eureka:
   instance:
@@ -25,10 +28,15 @@ eureka:
       defaultZone: http://192.168.100.29:8802/eureka/
 
 spring:
+  rabbitmq:
+    port: 5672
+    host: 192.168.100.29
+    username: appuser
+    password: appuser
   jpa:
     open-in-view: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     properties:
       hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
   datasource:
@@ -44,3 +52,10 @@ spring:
     max-active: 15
     max-idle: 10
     max-wait: 8000
+
+flyway:
+  enabled: true
+  url: 'jdbc:mysql://192.168.100.29:3308/mysql'
+  schemas: user_service
+  user: root
+  password: root

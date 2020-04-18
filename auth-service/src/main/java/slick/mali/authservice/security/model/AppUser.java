@@ -2,31 +2,33 @@ package slick.mali.authservice.security.model;
 
 
 public class AppUser {
-    private Integer id;
-    private String username, password;
+    private String id;
+    private String email, password;
     private String role;
 
-    public AppUser(Integer id, String username, String password, String role) {
+    public AppUser() {}
+
+    public AppUser(String id, String email, String password, String role) {
         this.id = id;
-        this.username = username;
+        this.email = email;
         this.password = password;
         this.role = role;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {

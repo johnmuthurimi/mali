@@ -1,4 +1,4 @@
 FROM adoptopenjdk:8u212-b04-jre-hotspot-bionic
-COPY user-service-1.0.jar /app/app.jar
+COPY target/user-service-1.0.jar /app/app.jar
 CMD ["java", "-jar", "/app/app.jar"]
-EXPOSE 5001
+EXPOSE 5003
