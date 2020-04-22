@@ -40,7 +40,7 @@ public class UserController extends BaseController {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/user/{id}")
+    @RequestMapping(value = "/{id}")
     @ResponseBody
     public ResponseEntity<Response<User>> findById(@PathVariable final String id) {
         try {
@@ -56,7 +56,7 @@ public class UserController extends BaseController {
      * @param req
      * @return
      */
-    @PostMapping(path = "/user", consumes = "application/json", produces = "application/json")
+    @PostMapping(path = "", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Response<User>> signUp(@Valid @RequestBody Request<User> req) {
         try {
             User result = userService.create(req.getParam());
@@ -71,7 +71,7 @@ public class UserController extends BaseController {
      * @param  token
      * @return User
      */
-    @RequestMapping(value = "user/verify")
+    @RequestMapping(value = "verify")
     @ResponseBody
     public ResponseEntity<Response<Token>> verifyUser(@RequestParam(value = "token") String token) {
         try {

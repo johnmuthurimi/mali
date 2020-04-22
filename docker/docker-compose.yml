@@ -1,6 +1,6 @@
 version: '3.7'
 services:
-    rabbitmq-service:
+    rabbitmq:
         image: 'rabbitmq:3.6-management-alpine'
         environment:
             RABBITMQ_DEFAULT_USER: appuser
@@ -9,7 +9,7 @@ services:
             - '5672:5672'
             - '15672:15672'
         volumes:
-            - rabbitmq_service:/var/lib/rabbitmq
+            - rabbitmq:/var/lib/rabbitmq
         networks:
             - backend-tier
         deploy:
@@ -24,7 +24,7 @@ services:
             placement:
                 constraints: [node.role == manager]
 
-    mysql-service:
+    mysql:
         image: 'mysql:5.7'
         environment:
             MYSQL_USER: appuser
@@ -33,7 +33,7 @@ services:
         ports:
             - '3308:3306'
         volumes:
-            - mysql_service:/var/lib/mysql
+            - mysql:/var/lib/mysql
         networks:
             - backend-tier
         deploy:
@@ -48,12 +48,273 @@ services:
             placement:
                 constraints: [node.role == manager]
 
+    # Monitoring the system
+    influxdb:
+        image: influxdb:1.7.6
+        ports:
+            - 8086:8086
+        volumes:
+            - influxdb:/var/lib/influxdb
+        environment:
+            INFLUXDB_HTTP_AUTH_ENABLED: "true"
+            INFLUXDB_DB: mali
+            INFLUXDB_USER: user
+            INFLUXDB_USER_PASSWORD: pass
+            INFLUXDB_ADMIN_USER: admin
+            INFLUXDB_ADMIN_PASSWORD: secret
+
+    grafana:
+        image: grafana/grafana:6.2.2
+        ports:
+            - 3000:3000
+        volumes:
+            - grafana:/var/lib/influxdb
+        environment:
+            GF_SECURITY_ADMIN_PASSWORD: admin
+
+    prometheus:
+        image: prom/prometheus:v2.17.2
+        ports:
+            - 9090:9090
+
+     # Logging the system
+    elasticsearch:
+        image: 'docker.elastic.co/elasticsearch/elasticsearch:7.2.0'
+        environment:
+            - "discovery.type=single-node"
+        ports:
+            - '9200:9200'
+        volumes:
+            - elasticsearch:/usr/share/elasticsearch/data
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+
+    logstash:
+        image: 'docker.elastic.co/logstash/logstash:7.2.0'
+        ports:
+            - "25826:25826"
+            - "5044:5044"
+        volumes:
+            - $MALI/docker/logstash/pipeline:/usr/share/logstash/pipeline:ro
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+        depends_on:
+            - elasticsearch
+
+    filebeat:
+        image: docker.elastic.co/beats/filebeat:7.2.0
+        volumes:
+            - $MALI/docker/filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.docker.yml:ro   # Configuration file
+            - /var/lib/docker/containers:/var/lib/docker/containers:ro                    # Docker logs
+            - /var/run/docker.sock:/var/run/docker.sock:ro                                # Additional information about containers
+            - ./filebeat/data:/usr/share/filebeat/data:rw                                 # Persistence data
+        user: root                                                                        # Allow access to log files and docker.sock
+        restart: on-failure
+        depends_on:
+            - logstash
+
+    kibana:
+        image: 'docker.elastic.co/kibana/kibana:7.2.0'
+        ports:
+            - '5601:5601'
+        environment:
+            - "xpack.security.enabled=false"
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+        depends_on:
+            - elasticsearch
+            - logstash
+
+    # Mali microservices
+    config-service:
+        image: 'mucunga90/config-service:1.0.1'
+        ports:
+            - '8888:8888'
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+        labels:
+            collect_logs_with_filebeat: "true"
+            decode_log_event_to_json_object: "true"
+
+    discovery-service:
+        image: 'mucunga90/discovery-service:1.0.0'
+        ports:
+            - '8761:8761'
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+        depends_on:
+            - rabbitmq
+            - mysql
+            - config-service
+        labels:
+            collect_logs_with_filebeat: "true"
+            decode_log_event_to_json_object: "true"
+
+    auth-service:
+        image: 'mucunga90/auth-service:1.0.0'
+        ports:
+            - '5001:5001'
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+        depends_on:
+            - rabbitmq
+            - mysql
+            - config-service
+            - discovery-service
+        labels:
+            collect_logs_with_filebeat: "true"
+            decode_log_event_to_json_object: "true"
+
+    gateway-service:
+        image: 'mucunga90/gateway-service:1.0.0'
+        ports:
+            - '8080:8080'
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+        depends_on:
+            - rabbitmq
+            - mysql
+            - config-service
+            - discovery-service
+        labels:
+            collect_logs_with_filebeat: "true"
+            decode_log_event_to_json_object: "true"
+
+    alert-service:
+        image: 'mucunga90/alert-service:1.0.1'
+        ports:
+            - '5002:5002'
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+        depends_on:
+            - rabbitmq
+            - mysql
+            - config-service
+            - discovery-service
+            - gateway-service
+        labels:
+            collect_logs_with_filebeat: "true"
+            decode_log_event_to_json_object: "true"
+
+    user-service:
+        image: 'mucunga90/user-service:1.0.1'
+        ports:
+            - '5003:5003'
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+        depends_on:
+            - rabbitmq
+            - mysql
+            - config-service
+            - discovery-service
+            - gateway-service
+        labels:
+            collect_logs_with_filebeat: "true"
+            decode_log_event_to_json_object: "true"
+
     web-service:
         image: 'mucunga90/web-service:1.0.0'
         ports:
             - '80:80'
-        volumes:
-            - web_service:/etc/nginx
         networks:
             - frontend-tier
             - backend-tier
@@ -69,262 +330,15 @@ services:
             placement:
                 constraints: [node.role == manager]
         depends_on:
-            - rabbitmq-service
-            - mysql-service
+            - rabbitmq
+            - mysql
             - config-service
             - discovery-service
             - auth-service
             - gateway-service
-            - monitoring-service
             - alert-service
             - user-service
 
-    config-service:
-        image: 'mucunga90/config-service:1.0.0'
-        ports:
-            - '8888:8888'
-        volumes:
-            - config_service:/app
-        networks:
-            - backend-tier
-        deploy:
-            replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
-        depends_on:
-            - mysql-service
-            - rabbitmq-service
-
-    discovery-service:
-        image: 'mucunga90/discovery-service:1.0.0'
-        ports:
-            - '8761:8761'
-        volumes:
-            - discovery_service:/app
-        networks:
-            - backend-tier
-        deploy:
-            replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
-        depends_on:
-            - rabbitmq-service
-            - mysql-service
-            - config-service
-
-    auth-service:
-        image: 'mucunga90/auth-service:1.0.0'
-        ports:
-            - '5001:5001'
-        volumes:
-            - auth_service:/app
-        networks:
-            - backend-tier
-        deploy:
-            replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
-        depends_on:
-            - rabbitmq-service
-            - mysql-service
-            - config-service
-            - discovery-service
-
-    gateway-service:
-        image: 'mucunga90/gateway-service:1.0.0'
-        ports:
-            - '8080:8080'
-        volumes:
-            - gateway_service:/app
-        networks:
-            - backend-tier
-        deploy:
-            replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
-        depends_on:
-            - rabbitmq-service
-            - mysql-service
-            - config-service
-            - discovery-service
-            - auth-service
-
-    monitoring-service:
-        image: 'openzipkin/zipkin'
-        ports:
-            - '9411:9411'
-        networks:
-            - backend-tier
-        deploy:
-            replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
-        depends_on:
-            - rabbitmq-service
-            - mysql-service
-            - config-service
-            - discovery-service
-            - auth-service
-            - gateway-service
-
-    elasticsearch-service:
-        image: 'elasticsearch'
-        ports:
-            - '9200:9200'
-            - '9300:9300'
-        networks:
-            - backend-tier
-        deploy:
-            replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
-        depends_on:
-            - monitoring-service
-
-    kibana-service:
-        image: 'kibana'
-        ports:
-            - '5601:5601'
-        networks:
-            - backend-tier
-        deploy:
-            replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
-        links:
-            - elasticsearch-service
-        depends_on:
-            - monitoring-service
-            - elasticsearch-service
-
-    logstash-service:
-        image: 'logstash'
-        ports:
-            - '5000:5000'
-        networks:
-            - backend-tier
-        deploy:
-            replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
-        links:
-            - elasticsearch-service
-        depends_on:
-            - monitoring-service
-            - elasticsearch-service
-            - kibana-service
-
-    alert-service:
-        image: 'mucunga90/alert-service:1.0.0'
-        ports:
-            - '5002:5002'
-        volumes:
-            - alert_service:/app
-        networks:
-            - backend-tier
-        deploy:
-            replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
-        depends_on:
-            - rabbitmq-service
-            - mysql-service
-            - config-service
-            - discovery-service
-            - auth-service
-            - gateway-service
-            - monitoring-service
-
-    user-service:
-        image: 'mucunga90/user-service:1.0.0'
-        ports:
-            - '5003:5003'
-        volumes:
-            - user_service:/app
-        networks:
-            - backend-tier
-        deploy:
-            replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
-        depends_on:
-            - rabbitmq-service
-            - mysql-service
-            - config-service
-            - discovery-service
-            - auth-service
-            - gateway-service
-            - monitoring-service
 
 networks:
     frontend-tier:
@@ -335,63 +349,33 @@ networks:
         attachable: true
 
 volumes:
-    rabbitmq_service:
+    rabbitmq:
         driver: local
         driver_opts:
             type: none
             o: bind
-            device: /home/muthurimi/docker/mali/rabbitmq_service
-    mysql_service:
+            device: /home/muthurimi/docker/mali/rabbitmq
+    mysql:
         driver: local
         driver_opts:
             type: none
             o: bind
-            device: /home/muthurimi/docker/mali/mysql_service
-    web_service:
+            device: /home/muthurimi/docker/mali/mysql
+    elasticsearch:
         driver: local
         driver_opts:
             type: none
             o: bind
-            device: /home/muthurimi/docker/mali/web_service
-    config_service:
+            device: /home/muthurimi/docker/mali/elasticsearch
+    influxdb:
         driver: local
         driver_opts:
             type: none
             o: bind
-            device: /home/muthurimi/docker/mali/config_service
-    discovery_service:
+            device: /home/muthurimi/docker/mali/influxdb
+    grafana:
         driver: local
         driver_opts:
             type: none
             o: bind
-            device: /home/muthurimi/docker/mali/discovery_service
-    auth_service:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: /home/muthurimi/docker/mali/auth_service
-    gateway_service:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: /home/muthurimi/docker/mali/gateway_service
-    elasticsearch_service:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: /home/muthurimi/docker/mali/elasticsearch_service
-    user_service:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: /home/muthurimi/docker/mali/user_service
-    alert_service:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: /home/muthurimi/docker/mali/alert_service
+            device: /home/muthurimi/docker/mali/grafana

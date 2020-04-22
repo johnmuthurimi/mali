@@ -1,20 +1,14 @@
 server:
-  port: ${PORT:5002}
-
+    port: '${PORT:5002}'
 eureka:
-  instance:
-    hostname: 192.168.100.29
-    metadataMap:
-      instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}
-    preferIpAddress: true
-    leaseRenewalIntervalInSeconds: 5
-    lease-expiration-duration-in-seconds: 5
-  client:
-    fetchRegistry: true
-    registryFetchIntervalSeconds: 5
-    serviceUrl:
-      defaultZone: http://192.168.100.29:8802/eureka/
-
+    instance:
+        leaseRenewalIntervalInSeconds: 1
+        leaseExpirationDurationInSeconds: 2
+    server:
+        enableSelfPreservation: false
+    client:
+        serviceUrl:
+            defaultZone: 'http://192.168.100.29:8761/eureka/'
 spring:
     application:
         name: alert-service
@@ -52,13 +46,12 @@ spring:
         properties.mail.smtp.starttls.enable: true
         smtp.debug: true
         batchSize: 10
-        subject: "MALI"
+        subject: MALI
         fixedDelay: 5000
         initialDelay: 5000
         verificationLink: 192.168.100.29/user/verify
     zipkin:
-        base-url: http://192.168.100.29:9411/
-
+        base-url: 'http://192.168.100.29:9411/'
 flyway:
     enabled: true
     url: 'jdbc:mysql://192.168.100.29:3308/mysql'

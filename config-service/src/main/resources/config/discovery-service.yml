@@ -2,15 +2,9 @@ server:
   port: ${PORT:8761}
 
 eureka:
-  instance:
-    hostname: 192.168.100.29
-    preferIpAddress: true
-  server:
-    enableSelfPreservation: true
-    eviction-interval-timer-in-ms: 1000
   client:
     registerWithEureka: false
     fetchRegistry: false
     serviceUrl:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+      defaultZone: http://192.168.100.29:8761/eureka/
 

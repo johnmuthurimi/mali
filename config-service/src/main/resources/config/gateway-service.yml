@@ -1,52 +1,34 @@
-info:
-  component: Gateway Server
-
-endpoints:
-  restart:
-    enabled: true
-  shutdown:
-    enabled: true
-  health:
-    sensitive: false
-
 server:
-  port: ${PORT:8080}
-
+    port: '${PORT:8080}'
 logging:
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
-  level:
-    root: INFO
-    org.springframework.web: INFO
-    org.spring-boot-starter-actuator: DEBUG
-    org.springframework.security: DEBUG
-    org.spring-cloud-starter-sleuth: DEBUG
-    org.spring-cloud-starter-netflix-zuul: DEBUG
-
+    pattern:
+        console: '%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n'
+    level:
+        root: INFO
+        org.springframework.web: INFO
+        org.spring-boot-starter-actuator: DEBUG
+        org.springframework.security: DEBUG
+        org.spring-cloud-starter-sleuth: DEBUG
+        org.spring-cloud-starter-netflix-zuul: DEBUG
 eureka:
-  instance:
-    hostname: 192.168.100.29
-    metadataMap:
-      instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}
-    preferIpAddress: true
-    leaseRenewalIntervalInSeconds: 5
-    lease-expiration-duration-in-seconds: 5
-  client:
-    fetchRegistry: true
-    registryFetchIntervalSeconds: 5
-    serviceUrl:
-      defaultZone: http://192.168.100.29:8802/eureka/
-
+    instance:
+        leaseRenewalIntervalInSeconds: 1
+        leaseExpirationDurationInSeconds: 2
+    server:
+        enableSelfPreservation: false
+    client:
+        serviceUrl:
+            defaultZone: 'http://192.168.100.29:8761/eureka/'
 zuul:
-  routes:
-    auth-service:
-      path: /auth/**
-      service-id: AUTH-SERVICE
-      strip-prefix: false
-      sensitive-headers: Cookie,Set-Cookie
-    user-service:
-      path: /user/**
-      service-id: user-service
-  host:
-    connect-timeout-millis: 10000
-    socket-timeout-millis: 60000
+    routes:
+        auth-service:
+            path: '/auth/**'
+            service-id: AUTH-SERVICE
+            strip-prefix: false
+            sensitive-headers: 'Cookie,Set-Cookie'
+        user-service:
+            path: '/user/**'
+            service-id: user-service
+    host:
+        connect-timeout-millis: 10000
+        socket-timeout-millis: 60000

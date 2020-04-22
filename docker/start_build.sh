@@ -59,6 +59,7 @@ if [ "$build_images" == "y" ]; then
 	# Included service here if you want to publish this to docker hub
 	docker push mucunga90/config-service:1.0.0
 	docker push mucunga90/discovery-service:1.0.0
+	docker push mucunga90/auth-service:1.0.0
 	docker push mucunga90/gateway-service:1.0.0
 	docker push mucunga90/alert-service:1.0.0
 	docker push mucunga90/user-service:1.0.0
