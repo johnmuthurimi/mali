@@ -9,21 +9,14 @@ services:
             - '5672:5672'
             - '15672:15672'
         volumes:
-            - rabbitmq_data:/var/lib/rabbitmq
+            - 'rabbitmq_data:/var/lib/rabbitmq'
         networks:
             - backend-tier
         deploy:
             replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
-
+            update_config: {parallelism: 2, delay: 10s}
+            restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
+            placement: {constraints: ['node.role == manager']}
     mysql:
         image: 'mysql:5.7'
         environment:
@@ -33,78 +26,63 @@ services:
         ports:
             - '3308:3306'
         volumes:
-            - mysql_data:/var/lib/mysql
+            - 'mysql_data:/var/lib/mysql'
         networks:
             - backend-tier
         deploy:
             replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
-
-    # Monitoring the system
+            update_config: {parallelism: 2, delay: 10s}
+            restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
+            placement: {constraints: ['node.role == manager']}
     cadvisor:
-        image: google/cadvisor:v0.29.0
+        image: 'google/cadvisor:v0.29.0'
         ports:
             - '9101:8080'
         volumes:
-            - /var/run/docker.sock:/var/run/docker.sock,readonly
-            - /var/run:/var/run:rw
-            - /:/rootfs:ro
-            - /sys:/sys:ro
-            - /var/lib/docker:/var/lib/docker:ro
-            - /dev/disk/:/dev/disk:ro
+            - '/var/run/docker.sock:/var/run/docker.sock,readonly'
+            - '/var/run:/var/run:rw'
+            - '/:/rootfs:ro'
+            - '/sys:/sys:ro'
+            - '/var/lib/docker:/var/lib/docker:ro'
+            - '/dev/disk/:/dev/disk:ro'
         deploy:
             mode: global
-            restart_policy:
-                condition: on-failure
-
+            restart_policy: {condition: on-failure}
     node-exporter:
         image: prom/node-exporter
         ports:
-             - '9100:9100'
+            - '9100:9100'
         volumes:
-             - '/proc:/host/proc:ro'
-             - '/sys:/host/sys:ro'
-             - '/:/rootfs:ro'
+            - '/proc:/host/proc:ro'
+            - '/sys:/host/sys:ro'
+            - '/:/rootfs:ro'
         command:
-             - '--path.procfs=/host/proc'
-             - '--path.sysfs=/host/sys'
-             - '--collector.filesystem.ignored-mount-points'
-             - ^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)
+            - '--path.procfs=/host/proc'
+            - '--path.sysfs=/host/sys'
+            - '--collector.filesystem.ignored-mount-points'
+            - ^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)
         deploy:
             mode: global
-            restart_policy:
-                condition: on-failure
-
+            restart_policy: {condition: on-failure}
     prometheus:
-        image: prom/prometheus:v2.17.2
+        image: 'prom/prometheus:v2.17.2'
         ports:
-            - 9090:9090
+            - '9090:9090'
         volumes:
-            - $MALI/docker/config/prometheus.yml:/etc/prometheus/prometheus.yml
-            - prometheus_data:/prometheus
+            - '$MALI/docker/config/prometheus.yml:/etc/prometheus/prometheus.yml'
+            - 'prometheus_data:/prometheus'
         depends_on:
             - cadvisor
             - node-exporter
         deploy:
-            placement:
-                constraints: [node.role == manager]
-            restart_policy:
-                condition: on-failure
-
+            placement: {constraints: ['node.role == manager']}
+            restart_policy: {condition: on-failure}
     grafana:
-        image: grafana/grafana:6.2.2
+        image: 'grafana/grafana:6.2.2'
         ports:
-            - 3000:3000
+            - '3000:3000'
         volumes:
-            - grafana_data:/var/lib/grafana
+            - 'grafana_data:/var/lib/grafana'
         environment:
             GF_SECURITY_ADMIN_USER: admin
             GF_SECURITY_ADMIN_PASSWORD: admin1234
@@ -112,8 +90,51 @@ services:
             - cadvisor
             - node-exporter
             - prometheus
-
-    # Mali microservices
+        deploy:
+            placement: {constraints: ['node.role == manager']}
+            restart_policy: {condition: on-failure}
+    elasticsearch:
+        image: 'docker.elastic.co/elasticsearch/elasticsearch:7.2.0'
+        environment:
+            - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+            - "discovery.type=single-node"
+        ports:
+            - '9200:9200'
+        volumes:
+            - 'elasticsearch_data:/usr/share/elasticsearch/data'
+        networks:
+            - backend-tier
+        deploy:
+            placement: {constraints: ['node.role == manager']}
+            restart_policy: {condition: on-failure}
+    kibana:
+        image: 'docker.elastic.co/kibana/kibana:7.2.0'
+        ports:
+            - '5601:5601'
+        environment:
+            - xpack.security.enabled=false
+        networks:
+            - backend-tier
+        depends_on:
+            - elasticsearch
+        deploy:
+            placement: {constraints: ['node.role == manager']}
+            restart_policy: {condition: on-failure}
+    # sudo chown root:root filebeat.yml
+    # sudo chmod 700 filebeat.yml
+    # https://medium.com/@michael_84781/sending-docker-logs-to-elasticsearch-and-kibana-with-filebeat-a0f87d44bfb4
+    filebeat:
+        image: 'docker.elastic.co/beats/filebeat:7.2.0'
+        user: root
+        volumes:
+            - '$MALI/docker/config/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro'
+            - '/var/lib/docker:/var/lib/docker:ro'
+            - '/var/run/docker.sock:/var/run/docker.sock'
+        networks:
+            - backend-tier
+        deploy:
+            placement: {constraints: ['node.role == manager']}
+            restart_policy: {condition: on-failure}
     config-service:
         image: 'mucunga90/config-service:1.0.1'
         ports:
@@ -122,19 +143,12 @@ services:
             - backend-tier
         deploy:
             replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
+            update_config: {parallelism: 2, delay: 10s}
+            restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
+            placement: {constraints: ['node.role == manager']}
         labels:
-            collect_logs_with_filebeat: "true"
-            decode_log_event_to_json_object: "true"
-
+            collect_logs_with_filebeat: 'true'
+            decode_log_event_to_json_object: 'true'
     discovery-service:
         image: 'mucunga90/discovery-service:1.0.0'
         ports:
@@ -143,23 +157,16 @@ services:
             - backend-tier
         deploy:
             replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
+            update_config: {parallelism: 2, delay: 10s}
+            restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
+            placement: {constraints: ['node.role == manager']}
         depends_on:
             - rabbitmq
             - mysql
             - config-service
         labels:
-            collect_logs_with_filebeat: "true"
-            decode_log_event_to_json_object: "true"
-
+            collect_logs_with_filebeat: 'true'
+            decode_log_event_to_json_object: 'true'
     auth-service:
         image: 'mucunga90/auth-service:1.0.0'
         ports:
@@ -168,24 +175,17 @@ services:
             - backend-tier
         deploy:
             replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
+            update_config: {parallelism: 2, delay: 10s}
+            restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
+            placement: {constraints: ['node.role == manager']}
         depends_on:
             - rabbitmq
             - mysql
             - config-service
             - discovery-service
         labels:
-            collect_logs_with_filebeat: "true"
-            decode_log_event_to_json_object: "true"
-
+            collect_logs_with_filebeat: 'true'
+            decode_log_event_to_json_object: 'true'
     gateway-service:
         image: 'mucunga90/gateway-service:1.0.0'
         ports:
@@ -194,24 +194,17 @@ services:
             - backend-tier
         deploy:
             replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
+            update_config: {parallelism: 2, delay: 10s}
+            restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
+            placement: {constraints: ['node.role == manager']}
         depends_on:
             - rabbitmq
             - mysql
             - config-service
             - discovery-service
         labels:
-            collect_logs_with_filebeat: "true"
-            decode_log_event_to_json_object: "true"
-
+            collect_logs_with_filebeat: 'true'
+            decode_log_event_to_json_object: 'true'
     alert-service:
         image: 'mucunga90/alert-service:1.0.1'
         ports:
@@ -220,15 +213,9 @@ services:
             - backend-tier
         deploy:
             replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
+            update_config: {parallelism: 2, delay: 10s}
+            restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
+            placement: {constraints: ['node.role == manager']}
         depends_on:
             - rabbitmq
             - mysql
@@ -236,9 +223,8 @@ services:
             - discovery-service
             - gateway-service
         labels:
-            collect_logs_with_filebeat: "true"
-            decode_log_event_to_json_object: "true"
-
+            collect_logs_with_filebeat: 'true'
+            decode_log_event_to_json_object: 'true'
     user-service:
         image: 'mucunga90/user-service:1.0.1'
         ports:
@@ -247,15 +233,9 @@ services:
             - backend-tier
         deploy:
             replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
+            update_config: {parallelism: 2, delay: 10s}
+            restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
+            placement: {constraints: ['node.role == manager']}
         depends_on:
             - rabbitmq
             - mysql
@@ -263,9 +243,8 @@ services:
             - discovery-service
             - gateway-service
         labels:
-            collect_logs_with_filebeat: "true"
-            decode_log_event_to_json_object: "true"
-
+            collect_logs_with_filebeat: 'true'
+            decode_log_event_to_json_object: 'true'
     web-service:
         image: 'mucunga90/web-service:1.0.0'
         ports:
@@ -275,15 +254,9 @@ services:
             - backend-tier
         deploy:
             replicas: 1
-            update_config:
-                parallelism: 2
-                delay: 10s
-            restart_policy:
-                condition: on-failure
-                delay: 10s
-                max_attempts: 10
-            placement:
-                constraints: [node.role == manager]
+            update_config: {parallelism: 2, delay: 10s}
+            restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
+            placement: {constraints: ['node.role == manager']}
         depends_on:
             - rabbitmq
             - mysql
@@ -293,8 +266,6 @@ services:
             - gateway-service
             - alert-service
             - user-service
-
-
 networks:
     frontend-tier:
         driver: overlay
@@ -302,7 +273,6 @@ networks:
     backend-tier:
         driver: overlay
         attachable: true
-
 volumes:
     rabbitmq_data:
         driver: local
@@ -322,33 +292,21 @@ volumes:
             type: none
             o: bind
             device: $MALI/docker/data/elasticsearch
-    logstash_data:
+    filebeat_data:
         driver: local
         driver_opts:
             type: none
             o: bind
-            device: $MALI/docker/data/logstash
-    influxdb_data:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: $MALI/docker/data/influxdb
+            device: $MALI/docker/data/filebeat
     grafana_data:
         driver: local
         driver_opts:
             type: none
             o: bind
             device: $MALI/docker/data/grafana
-    filebeat_data:
-            driver: local
-            driver_opts:
-                type: none
-                o: bind
-                device: $MALI/docker/data/filebeat
     prometheus_data:
-            driver: local
-            driver_opts:
-                type: none
-                o: bind
-                device: $MALI/docker/data/prometheus
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: $MALI/docker/data/prometheus
