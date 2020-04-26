@@ -1,5 +1,7 @@
 package slick.mali.userservice.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,8 @@ import javax.validation.Valid;
 @RequestMapping("/user")
 public class UserController extends BaseController {
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     /**
      * Inject the user service
      */
@@ -43,6 +47,10 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/{id}")
     @ResponseBody
     public ResponseEntity<Response<User>> findById(@PathVariable final String id) {
+        logger.error("====> This is an error log");
+        logger.info("====> This is an info log");
+        logger.warn("====> This is an warn log");
+
         try {
             User result = userService.findById(id);
             return this.successfulResponse(result);

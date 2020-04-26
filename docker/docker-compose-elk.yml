@@ -49,39 +49,26 @@ services:
                 constraints: [node.role == manager]
 
     # Monitoring the system
-    cadvisor:
-        image: google/cadvisor:v0.29.0
+    grafana:
+        image: grafana/grafana:6.2.2
         ports:
-            - '9101:8080'
+            - 3000:3000
         volumes:
-            - /var/run/docker.sock:/var/run/docker.sock,readonly
-            - /var/run:/var/run:rw
-            - /:/rootfs:ro
-            - /sys:/sys:ro
-            - /var/lib/docker:/var/lib/docker:ro
-            - /dev/disk/:/dev/disk:ro
+            - grafana_data:/var/lib/influxdb
+        environment:
+            GF_SECURITY_ADMIN_USER: admin
+            GF_SECURITY_ADMIN_PASSWORD: admin1234
         deploy:
-            mode: global
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
             restart_policy:
                 condition: on-failure
-
-    node-exporter:
-        image: prom/node-exporter
-        ports:
-             - '9100:9100'
-        volumes:
-             - '/proc:/host/proc:ro'
-             - '/sys:/host/sys:ro'
-             - '/:/rootfs:ro'
-        command:
-             - '--path.procfs=/host/proc'
-             - '--path.sysfs=/host/sys'
-             - '--collector.filesystem.ignored-mount-points'
-             - ^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)
-        deploy:
-            mode: global
-            restart_policy:
-                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
 
     prometheus:
         image: prom/prometheus:v2.17.2
@@ -90,28 +77,122 @@ services:
         volumes:
             - $MALI/docker/config/prometheus.yml:/etc/prometheus/prometheus.yml
             - prometheus_data:/prometheus
-        depends_on:
-            - cadvisor
-            - node-exporter
         deploy:
-            placement:
-                constraints: [node.role == manager]
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
             restart_policy:
                 condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
 
-    grafana:
-        image: grafana/grafana:6.2.2
+    node-exporter:
+        image: prom/node-exporter
         ports:
-            - 3000:3000
+            - '9100:9100'
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+
+    cadvisor:
+        image: google/cadvisor:latest
+        ports:
+            - '9101:8080'
         volumes:
-            - grafana_data:/var/lib/grafana
+            - /:/rootfs:ro
+            - /var/run:/var/run:rw
+            - /sys:/sys:ro
+            - /var/lib/docker/:/var/lib/docker:ro
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+
+     # Logging the system
+    elasticsearch:
+        image: 'docker.elastic.co/elasticsearch/elasticsearch:6.5.4'
         environment:
-            GF_SECURITY_ADMIN_USER: admin
-            GF_SECURITY_ADMIN_PASSWORD: admin1234
+            - "discovery.type=single-node"
+        ports:
+            - '9200:9200'
+        volumes:
+            - elasticsearch_data:/usr/share/elasticsearch/data
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+
+    kibana:
+        image: 'docker.elastic.co/kibana/kibana:6.5.4'
+        ports:
+            - '5601:5601'
+        environment:
+            - "xpack.security.enabled=false"
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
         depends_on:
-            - cadvisor
-            - node-exporter
-            - prometheus
+            - elasticsearch
+
+    logstash:
+        image: 'docker.elastic.co/logstash/logstash:6.5.4'
+        ports:
+            - "5044:5044"
+        volumes:
+            - logstash_data:/logs
+            - $MALI/docker/config/logstash.conf:/conf/logstash.conf
+        networks:
+            - backend-tier
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 10s
+            restart_policy:
+                condition: on-failure
+                delay: 10s
+                max_attempts: 10
+            placement:
+                constraints: [node.role == manager]
+        depends_on:
+            - elasticsearch
 
     # Mali microservices
     config-service:

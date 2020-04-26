@@ -1,8 +1,5 @@
 server:
     port: '${PORT:5003}'
-logging:
-    level:
-        org.influxdb: DEBUG
 eureka:
     instance:
         leaseRenewalIntervalInSeconds: 1
@@ -44,12 +41,5 @@ flyway:
     user: root
     password: root
 management:
-    metrics:
-        export:
-            influx: {db: mali, uri: 'http://192.168.100.29:8086', userName: user, password: pass, step: 15s, autoCreateDb: false}
-    endpoint:
-        prometheus:
-            enabled: true
-    endpoints:
-        web.server:
-            auto-time-requests: true
+    metrics.tags.application: ${spring.application.name}
+    endpoints.web.exposure.include: prometheus
