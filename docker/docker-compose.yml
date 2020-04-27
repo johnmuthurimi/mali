@@ -17,6 +17,13 @@ services:
             update_config: {parallelism: 2, delay: 10s}
             restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
             placement: {constraints: ['node.role == manager']}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
     mysql:
         image: 'mysql:5.7'
         environment:
@@ -34,6 +41,13 @@ services:
             update_config: {parallelism: 2, delay: 10s}
             restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
             placement: {constraints: ['node.role == manager']}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 1024M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
     cadvisor:
         image: 'google/cadvisor:v0.29.0'
         ports:
@@ -46,8 +60,14 @@ services:
             - '/var/lib/docker:/var/lib/docker:ro'
             - '/dev/disk/:/dev/disk:ro'
         deploy:
-            mode: global
             restart_policy: {condition: on-failure}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 1024M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
     node-exporter:
         image: prom/node-exporter
         ports:
@@ -62,8 +82,14 @@ services:
             - '--collector.filesystem.ignored-mount-points'
             - ^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)
         deploy:
-            mode: global
             restart_policy: {condition: on-failure}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
     prometheus:
         image: 'prom/prometheus:v2.17.2'
         ports:
@@ -71,12 +97,19 @@ services:
         volumes:
             - '$MALI/docker/config/prometheus.yml:/etc/prometheus/prometheus.yml'
             - 'prometheus_data:/prometheus'
-        depends_on:
-            - cadvisor
-            - node-exporter
         deploy:
             placement: {constraints: ['node.role == manager']}
             restart_policy: {condition: on-failure}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
+        depends_on:
+            - cadvisor
+            - node-exporter
     grafana:
         image: 'grafana/grafana:6.2.2'
         ports:
@@ -86,18 +119,29 @@ services:
         environment:
             GF_SECURITY_ADMIN_USER: admin
             GF_SECURITY_ADMIN_PASSWORD: admin1234
+        deploy:
+            placement: {constraints: ['node.role == manager']}
+            restart_policy: {condition: on-failure}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
         depends_on:
             - cadvisor
             - node-exporter
             - prometheus
-        deploy:
-            placement: {constraints: ['node.role == manager']}
-            restart_policy: {condition: on-failure}
     elasticsearch:
         image: 'docker.elastic.co/elasticsearch/elasticsearch:7.2.0'
         environment:
-            - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
             - "discovery.type=single-node"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
         ports:
             - '9200:9200'
         volumes:
@@ -107,6 +151,13 @@ services:
         deploy:
             placement: {constraints: ['node.role == manager']}
             restart_policy: {condition: on-failure}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
     kibana:
         image: 'docker.elastic.co/kibana/kibana:7.2.0'
         ports:
@@ -115,11 +166,18 @@ services:
             - xpack.security.enabled=false
         networks:
             - backend-tier
-        depends_on:
-            - elasticsearch
         deploy:
             placement: {constraints: ['node.role == manager']}
             restart_policy: {condition: on-failure}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
+        depends_on:
+            - elasticsearch
     # sudo chown root:root filebeat.yml
     # sudo chmod 700 filebeat.yml
     # https://medium.com/@michael_84781/sending-docker-logs-to-elasticsearch-and-kibana-with-filebeat-a0f87d44bfb4
@@ -135,6 +193,13 @@ services:
         deploy:
             placement: {constraints: ['node.role == manager']}
             restart_policy: {condition: on-failure}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 1024M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
     config-service:
         image: 'mucunga90/config-service:1.0.1'
         ports:
@@ -146,9 +211,13 @@ services:
             update_config: {parallelism: 2, delay: 10s}
             restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
             placement: {constraints: ['node.role == manager']}
-        labels:
-            collect_logs_with_filebeat: 'true'
-            decode_log_event_to_json_object: 'true'
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
     discovery-service:
         image: 'mucunga90/discovery-service:1.0.0'
         ports:
@@ -160,13 +229,17 @@ services:
             update_config: {parallelism: 2, delay: 10s}
             restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
             placement: {constraints: ['node.role == manager']}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
         depends_on:
             - rabbitmq
             - mysql
             - config-service
-        labels:
-            collect_logs_with_filebeat: 'true'
-            decode_log_event_to_json_object: 'true'
     auth-service:
         image: 'mucunga90/auth-service:1.0.0'
         ports:
@@ -178,14 +251,18 @@ services:
             update_config: {parallelism: 2, delay: 10s}
             restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
             placement: {constraints: ['node.role == manager']}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
         depends_on:
             - rabbitmq
             - mysql
             - config-service
             - discovery-service
-        labels:
-            collect_logs_with_filebeat: 'true'
-            decode_log_event_to_json_object: 'true'
     gateway-service:
         image: 'mucunga90/gateway-service:1.0.0'
         ports:
@@ -197,14 +274,18 @@ services:
             update_config: {parallelism: 2, delay: 10s}
             restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
             placement: {constraints: ['node.role == manager']}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
         depends_on:
             - rabbitmq
             - mysql
             - config-service
             - discovery-service
-        labels:
-            collect_logs_with_filebeat: 'true'
-            decode_log_event_to_json_object: 'true'
     alert-service:
         image: 'mucunga90/alert-service:1.0.1'
         ports:
@@ -216,15 +297,19 @@ services:
             update_config: {parallelism: 2, delay: 10s}
             restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
             placement: {constraints: ['node.role == manager']}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
         depends_on:
             - rabbitmq
             - mysql
             - config-service
             - discovery-service
             - gateway-service
-        labels:
-            collect_logs_with_filebeat: 'true'
-            decode_log_event_to_json_object: 'true'
     user-service:
         image: 'mucunga90/user-service:1.0.1'
         ports:
@@ -236,15 +321,19 @@ services:
             update_config: {parallelism: 2, delay: 10s}
             restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
             placement: {constraints: ['node.role == manager']}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
         depends_on:
             - rabbitmq
             - mysql
             - config-service
             - discovery-service
             - gateway-service
-        labels:
-            collect_logs_with_filebeat: 'true'
-            decode_log_event_to_json_object: 'true'
     web-service:
         image: 'mucunga90/web-service:1.0.0'
         ports:
@@ -257,6 +346,13 @@ services:
             update_config: {parallelism: 2, delay: 10s}
             restart_policy: {condition: on-failure, delay: 10s, max_attempts: 10}
             placement: {constraints: ['node.role == manager']}
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
         depends_on:
             - rabbitmq
             - mysql
