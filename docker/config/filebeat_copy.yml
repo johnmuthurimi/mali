@@ -1,7 +1,17 @@
 filebeat.inputs:
 - type: container
-  paths: 
-    - '/var/lib/docker/containers/*/*.log'
+  stream: stdout
+  paths:
+    - "/var/log/containers/*.log"
+  multiline.pattern: '^@.*message\ EventError.*'
+  multiline.negate: true
+  multiline.match: after
+  multiline.max_lines: 14
+  ignore_older: 30m
+  scan_frequency: 5m
+  harvester_limit: 1
+  close_inactive: 10s
+
 
 processors:
 - add_docker_metadata:
@@ -15,9 +25,12 @@ processors:
 output.elasticsearch:
   hosts: ["192.168.100.29:9200"]
   indices:
-    - index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+    - index: "filebeat"
 
 logging.json: true
 logging.metrics.enabled: false
+
+# ILM setup
+# ---------
 setup.ilm.enabled: false
 ilm.enabled: false

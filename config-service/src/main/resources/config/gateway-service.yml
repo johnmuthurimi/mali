@@ -1,15 +1,5 @@
 server:
     port: '${PORT:8080}'
-logging:
-    pattern:
-        console: '%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n'
-    level:
-        root: INFO
-        org.springframework.web: INFO
-        org.spring-boot-starter-actuator: DEBUG
-        org.springframework.security: DEBUG
-        org.spring-cloud-starter-sleuth: DEBUG
-        org.spring-cloud-starter-netflix-zuul: DEBUG
 eureka:
     instance:
         leaseRenewalIntervalInSeconds: 1
@@ -32,3 +22,6 @@ zuul:
     host:
         connect-timeout-millis: 10000
         socket-timeout-millis: 60000
+management:
+    metrics.tags.application: ${spring.application.name}
+    endpoints.web.exposure.include: prometheus

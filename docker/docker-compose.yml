@@ -201,7 +201,7 @@ services:
                     cpus: '0.25'
                     memory: 256M
     config-service:
-        image: 'mucunga90/config-service:1.0.1'
+        image: 'mucunga90/config-service:1.0.2'
         ports:
             - '8888:8888'
         networks:
@@ -219,7 +219,7 @@ services:
                     cpus: '0.25'
                     memory: 256M
     discovery-service:
-        image: 'mucunga90/discovery-service:1.0.0'
+        image: 'mucunga90/discovery-service:1.0.2'
         ports:
             - '8761:8761'
         networks:
@@ -241,7 +241,7 @@ services:
             - mysql
             - config-service
     auth-service:
-        image: 'mucunga90/auth-service:1.0.0'
+        image: 'mucunga90/auth-service:1.0.2'
         ports:
             - '5001:5001'
         networks:
@@ -264,7 +264,7 @@ services:
             - config-service
             - discovery-service
     gateway-service:
-        image: 'mucunga90/gateway-service:1.0.0'
+        image: 'mucunga90/gateway-service:1.0.2'
         ports:
             - '8080:8080'
         networks:
@@ -287,7 +287,7 @@ services:
             - config-service
             - discovery-service
     alert-service:
-        image: 'mucunga90/alert-service:1.0.1'
+        image: 'mucunga90/alert-service:1.0.2'
         ports:
             - '5002:5002'
         networks:
@@ -311,7 +311,7 @@ services:
             - discovery-service
             - gateway-service
     user-service:
-        image: 'mucunga90/user-service:1.0.1'
+        image: 'mucunga90/user-service:1.0.2'
         ports:
             - '5003:5003'
         networks:
@@ -388,12 +388,6 @@ volumes:
             type: none
             o: bind
             device: $MALI/docker/data/elasticsearch
-    filebeat_data:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: $MALI/docker/data/filebeat
     grafana_data:
         driver: local
         driver_opts:

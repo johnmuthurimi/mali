@@ -1,13 +1,5 @@
 server:
     port: '${PORT:5001}'
-logging:
-    pattern:
-        console: '%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n'
-    level:
-        root: INFO
-        org.springframework.web: INFO
-        org.springframework.security: DEBUG
-        spring-cloud-starter-netflix-eureka-client: DEBUG
 eureka:
     instance:
         leaseRenewalIntervalInSeconds: 1
@@ -37,3 +29,6 @@ spring:
         max-active: 15
         max-idle: 10
         max-wait: 8000
+management:
+    metrics.tags.application: ${spring.application.name}
+    endpoints.web.exposure.include: prometheus

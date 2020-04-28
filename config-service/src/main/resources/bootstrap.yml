@@ -1,13 +1,10 @@
 server:
-  port: ${PORT:8888}
-
+    port: '${PORT:8888}'
 spring:
-  profiles:
-      active: native
-
-logging:
-  level:
-    root: INFO
-    org.springframework.web: INFO
-
-
+    application:
+        name: config-service
+    profiles:
+        active: native
+management:
+    metrics.tags.application: ${spring.application.name}
+    endpoints.web.exposure.include: prometheus
