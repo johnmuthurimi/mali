@@ -40,7 +40,7 @@ public class AlertDaoImpl implements AlertDao {
     public String createNewEmailNotification(EmailRequest request) {
         UUID uuid = UUID.randomUUID();
         String randomUUIDString = uuid.toString();
-        String query = "INSERT INTO alert_email_out(id, sender, recepient, message, status) VALUES(?, ?, ?, ?, ?)";
+        String query = "INSERT INTO email_out(id, sender, recepient, message, status) VALUES(?, ?, ?, ?, ?)";
         jdbcTemplate.update(query, randomUUIDString, request.getSender(), request.getRecepient(), request.getMessage(), AlertStatus.NEW);
         request.setId(randomUUIDString);
         return randomUUIDString;
@@ -66,7 +66,7 @@ public class AlertDaoImpl implements AlertDao {
     @Override
     public int[] updateQueuedEmailBatch(List<EmailRequest> list) {
         return jdbcTemplate.batchUpdate(
-                "UPDATE  alert_email_out SET status = ? WHERE id = ?",
+                "UPDATE  email_out SET status = ? WHERE id = ?",
                 new BatchPreparedStatementSetter() {
 
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -87,7 +87,7 @@ public class AlertDaoImpl implements AlertDao {
      */
     public List<EmailRequest> getNewEmailBatch() {
         String query = "SELECT id, sender, recepient, message, createdAt, sentAt, deliveredAt, status "
-                + "FROM alert_email_out  "
+                + "FROM email_out  "
                 + "WHERE status = ? "
                 + "LIMIT ? ";
         int limit = Integer.parseInt(env.getProperty("spring.mail.batchSize"));
@@ -101,7 +101,7 @@ public class AlertDaoImpl implements AlertDao {
      */
     public int[] queueNewBatch(List<EmailRequest> list) {
         return jdbcTemplate.batchUpdate(
-                "UPDATE  alert_email_out SET status = ? WHERE id = ?",
+                "UPDATE  email_out SET status = ? WHERE id = ?",
                 new BatchPreparedStatementSetter() {
 
                     public void setValues(PreparedStatement ps, int i) throws SQLException {

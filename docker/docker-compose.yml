@@ -1,5 +1,6 @@
 version: '3.7'
 services:
+    # Event management and microservice communication
     rabbitmq:
         image: 'rabbitmq:3.6-management-alpine'
         environment:
@@ -24,6 +25,7 @@ services:
                 reservations:
                     cpus: '0.25'
                     memory: 256M
+    # Database instance for microservices
     mysql:
         image: 'mysql:5.7'
         environment:
@@ -48,6 +50,7 @@ services:
                 reservations:
                     cpus: '0.25'
                     memory: 256M
+    # Linux host and docker container monitoring
     cadvisor:
         image: 'google/cadvisor:v0.29.0'
         ports:
@@ -60,7 +63,10 @@ services:
             - '/var/lib/docker:/var/lib/docker:ro'
             - '/dev/disk/:/dev/disk:ro'
         deploy:
+            replicas: 1
+            update_config: {parallelism: 2, delay: 10s}
             restart_policy: {condition: on-failure}
+            placement: {constraints: ['node.role == manager']}
             resources:
                 limits:
                     cpus: '0.50'
@@ -82,7 +88,10 @@ services:
             - '--collector.filesystem.ignored-mount-points'
             - ^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)
         deploy:
+            replicas: 1
+            update_config: {parallelism: 2, delay: 10s}
             restart_policy: {condition: on-failure}
+            placement: {constraints: ['node.role == manager']}
             resources:
                 limits:
                     cpus: '0.50'
@@ -98,8 +107,10 @@ services:
             - '$MALI/docker/config/prometheus.yml:/etc/prometheus/prometheus.yml'
             - 'prometheus_data:/prometheus'
         deploy:
-            placement: {constraints: ['node.role == manager']}
+            replicas: 1
+            update_config: {parallelism: 2, delay: 10s}
             restart_policy: {condition: on-failure}
+            placement: {constraints: ['node.role == manager']}
             resources:
                 limits:
                     cpus: '0.50'
@@ -120,8 +131,10 @@ services:
             GF_SECURITY_ADMIN_USER: admin
             GF_SECURITY_ADMIN_PASSWORD: admin1234
         deploy:
-            placement: {constraints: ['node.role == manager']}
+            replicas: 1
+            update_config: {parallelism: 2, delay: 10s}
             restart_policy: {condition: on-failure}
+            placement: {constraints: ['node.role == manager']}
             resources:
                 limits:
                     cpus: '0.50'
@@ -133,6 +146,7 @@ services:
             - cadvisor
             - node-exporter
             - prometheus
+    # Docker container logging
     elasticsearch:
         image: 'docker.elastic.co/elasticsearch/elasticsearch:7.2.0'
         environment:
@@ -149,8 +163,10 @@ services:
         networks:
             - backend-tier
         deploy:
-            placement: {constraints: ['node.role == manager']}
+            replicas: 1
+            update_config: {parallelism: 2, delay: 10s}
             restart_policy: {condition: on-failure}
+            placement: {constraints: ['node.role == manager']}
             resources:
                 limits:
                     cpus: '0.50'
@@ -167,8 +183,10 @@ services:
         networks:
             - backend-tier
         deploy:
-            placement: {constraints: ['node.role == manager']}
+            replicas: 1
+            update_config: {parallelism: 2, delay: 10s}
             restart_policy: {condition: on-failure}
+            placement: {constraints: ['node.role == manager']}
             resources:
                 limits:
                     cpus: '0.50'
@@ -191,8 +209,10 @@ services:
         networks:
             - backend-tier
         deploy:
-            placement: {constraints: ['node.role == manager']}
+            replicas: 1
+            update_config: {parallelism: 2, delay: 10s}
             restart_policy: {condition: on-failure}
+            placement: {constraints: ['node.role == manager']}
             resources:
                 limits:
                     cpus: '0.50'
@@ -200,6 +220,7 @@ services:
                 reservations:
                     cpus: '0.25'
                     memory: 256M
+    # Mali Application microservices
     config-service:
         image: 'mucunga90/config-service:1.0.2'
         ports:

@@ -32,7 +32,7 @@ public class UserDaoImpl implements UserDao {
      */
     @Override
     public User findById(String id) {
-        String query = "SELECT id, email, status, enabled, deleted "
+        String query = "SELECT id, first_name, last_name, email, status, enabled, deleted "
                 + "FROM users  "
                 + "WHERE id = ? "
                 + "LIMIT 1 ";
@@ -48,18 +48,18 @@ public class UserDaoImpl implements UserDao {
     }
 
     /**
-     * Get user by username
-     * @param username
+     * Get user by email
+     * @param email
      * @return
      */
     @Override
-    public User findByEmail(String username) {
-        String query = "SELECT id, email, salt, password, status, enabled, deleted "
+    public User findByEmail(String email) {
+        String query = "SELECT id, first_name, last_name, email, salt, password, status, enabled, deleted "
                 + "FROM users  "
-                + "WHERE username = ? "
+                + "WHERE email = ? AND deleted = 0 "
                 + "LIMIT 1 ";
         RowMapper<User> rowMapper = new UserMapper();
-        List<User> aut = jdbcTemplate.query(query, rowMapper, username);
+        List<User> aut = jdbcTemplate.query(query, rowMapper, email);
         if(aut.isEmpty() ){
             return null;
         } else if (aut.size() == 1) {
@@ -79,8 +79,8 @@ public class UserDaoImpl implements UserDao {
         UUID uuid = UUID.randomUUID();
         String randomUUIDString = uuid.toString();
         String query = "INSERT INTO users(id, first_name, last_name, email, password, salt, status, created_by, updated_by, enabled, deleted) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(query, randomUUIDString, user.getFirstName(), user.getLastName(), user.getEmail(),  user.getSalt(),
-                    user.getPassword(), user.getStatus(),  randomUUIDString, randomUUIDString, user.isEnabled(), user.isDeleted());
+        jdbcTemplate.update(query, randomUUIDString, user.getFirstName(), user.getLastName(), user.getEmail(),  user.getPassword(),
+                user.getSalt(), user.getStatus(),  randomUUIDString, randomUUIDString, user.isEnabled(), user.isDeleted());
         user.setId(randomUUIDString);
         return randomUUIDString;
     }
@@ -93,7 +93,7 @@ public class UserDaoImpl implements UserDao {
     public void delete(String id) {
         User user = findById(id);
         if (user != null) {
-            String query = "DELETE FROM users WHERE id = ?)";
+            String query = "DELETE FROM users WHERE id = ?";
             jdbcTemplate.update(query, id);
         }
     }

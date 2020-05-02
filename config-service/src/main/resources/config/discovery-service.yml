@@ -1,11 +1,17 @@
 server:
     port: '${PORT:8761}'
 eureka:
+    instance:
+        lease-renewal-interval-in-seconds: 30
+        lease-expiration-duration-in-seconds: 90
+    server:
+        peer-node-read-timeout-ms: 300000
+        enable-self-preservation: false
     client:
         registerWithEureka: false
         fetchRegistry: false
-        serviceUrl:
-            defaultZone: 'http://192.168.100.29:8761/eureka/'
+        instance-info-replication-interval-seconds: 10
+        registry-fetch-interval-seconds: 10
 management:
     metrics.tags.application: ${spring.application.name}
     endpoints.web.exposure.include: prometheus

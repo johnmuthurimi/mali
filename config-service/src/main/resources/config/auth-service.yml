@@ -2,13 +2,19 @@ server:
     port: '${PORT:5001}'
 eureka:
     instance:
-        leaseRenewalIntervalInSeconds: 1
-        leaseExpirationDurationInSeconds: 2
+        lease-renewal-interval-in-seconds: 30
+        lease-expiration-duration-in-seconds: 90
     server:
-        enableSelfPreservation: false
+        peer-node-read-timeout-ms: 300000
+        enable-self-preservation: false
     client:
-        serviceUrl:
-            defaultZone: 'http://192.168.100.29:8761/eureka/'
+        enabled: true
+        healthcheck:
+            enabled: true
+        fetch-registry: true
+        register-with-eureka: true
+        instance-info-replication-interval-seconds: 10
+        registry-fetch-interval-seconds: 10
 spring:
     jpa:
         open-in-view: true

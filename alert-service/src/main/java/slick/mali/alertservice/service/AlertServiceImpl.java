@@ -6,7 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import slick.mali.alertservice.dao.AlertDao;
-import slick.mali.alertservice.service.emailTemplate.EmailVerification;
+import slick.mali.alertservice.utility.EmailTemplate;
+import slick.mali.coreservice.constants.AlertType;
 import slick.mali.coreservice.model.EventResponse;
 import slick.mali.coreservice.model.alert.EmailRequest;
 import slick.mali.coreservice.util.LoggerUtil;
@@ -40,23 +41,23 @@ public class AlertServiceImpl implements IAlertService {
     * @param request
     */
     @Override
-    public String sendEmailVerificationNotification(EventResponse request) {
+    public String createOTPNotification(EventResponse request) {
         String id = null;
         try {
-            LoggerUtil.info(LOGGER, "AlertServiceImpl: creating email notification for recipient: " + request.getEmail());
+            LoggerUtil.info(LOGGER, "creating email OTP for recipient: " + request.getEmail());
             String sender = env.getProperty("spring.mail.username");
 
-            String message = generateEmailVerificationMessage(request);
+            String message = generateMessage(request, AlertType.OTP);
             EmailRequest req = new EmailRequest();
             req.setSender(sender);
             req.setRecepient(request.getEmail());
             req.setMessage(message);
 
             id = alertDao.createNewEmailNotification(req);
-            LoggerUtil.info(LOGGER, "IAlertService: email notification for recipient: " + request.getEmail() + " successfully created");
+            LoggerUtil.info(LOGGER, "Email OTP for recipient: " + request.getEmail() + " successfully created");
 
         } catch (Exception e) {
-            LoggerUtil.info(LOGGER, "IAlertService: email notification for recipient: " + request.getEmail() + " Failed");
+            LoggerUtil.info(LOGGER, "Email OTP for recipient: " + request.getEmail() + " Failed");
             LoggerUtil.error(LOGGER, e.getMessage());
         }
 
@@ -82,18 +83,26 @@ public class AlertServiceImpl implements IAlertService {
     }
 
     /**
-     * Update email message with template
-     * @return String
+     * Generate message type depending on alert type
+     * @param request
+     * @param alertType
+     * @return
      */
-    private String generateEmailVerificationMessage(EventResponse request) {
-        EmailVerification template = new EmailVerification("verify.html");
-        String link = env.getProperty("spring.mail.verificationLink");
-        link = link + "/" + request.getToken();
-
-        Map<String, String> replacements = new HashMap<String, String>();
-        replacements.put("link", link);
-
-        String message = template.getTemplate(replacements);
+    private String generateMessage(EventResponse request, int alertType) {
+        Map<String,String> replacements = new HashMap<String,String>();
+        String message;
+        switch (alertType) {
+            case 0:
+                EmailTemplate template = new EmailTemplate("SendOtp.html");
+                replacements.put("user", request.getFirstName());
+                replacements.put("otp",  request.getOtp());
+                message = template.getTemplate(replacements);
+                LoggerUtil.info(LOGGER, "Email OTP message generated for recipient: " + request.getEmail());
+                break;
+            default:
+                LoggerUtil.error(LOGGER, "Email OTP alert type does not exist");
+                throw new IllegalStateException("Email OTP alert type does not exist: " + alertType);
+        }
         return message;
     }
 

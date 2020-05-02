@@ -14,16 +14,16 @@ public interface AlertDao  extends BaseDao {
     * Insert newly created email notification
     * @param request
     */
-    public String createNewEmailNotification(EmailRequest request);
+    String createNewEmailNotification(EmailRequest request);
 
    /**
     * Returns a List of queue emails for sending
     * @return List<EmailRequest>
     */
-   public List<EmailRequest> getQueuedEmailBatch();  
+   List<EmailRequest> getQueuedEmailBatch();
 
    /**
     * Update the new batch after email service
     */
-   public int[] updateQueuedEmailBatch(List<EmailRequest> list);
+   int[] updateQueuedEmailBatch(List<EmailRequest> list);
 }

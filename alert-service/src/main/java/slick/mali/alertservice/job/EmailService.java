@@ -51,11 +51,10 @@ public class EmailService {
      */
     public void executeQueue() {
         List<EmailRequest> queue = alertService.getQueuedEmailBatch();
-        LoggerUtil.trace(LOGGER, "EmailScheduler: fetched queue emails");
+        LoggerUtil.trace(LOGGER, "Fetching queued emails");
         String subject = env.getProperty("spring.mail.subject");
         for (int i = 0; i < queue.size(); i++) {
             try {
-                LoggerUtil.trace(LOGGER, "EmailScheduler: sending email queue");
                 sendEmail(queue.get(i), subject);
             } catch (Exception e) {
                 queue.get(i).setStatus(AlertStatus.FAILED);
@@ -63,7 +62,7 @@ public class EmailService {
         }
         // Update status of the sent emails
         alertService.updateQueuedEmailBatch(queue);
-        LoggerUtil.trace(LOGGER, "EmailScheduler: updated email queue");
+        LoggerUtil.trace(LOGGER, "Updated emails queued");
     }
 
     /**
@@ -85,12 +84,12 @@ public class EmailService {
             request.setDeliveredAt(DateUtils.timestamp());
             request.setSentAt(DateUtils.timestamp());
             request.setStatus(AlertStatus.DELIVERED);
-            LoggerUtil.trace(LOGGER, "EmailScheduler: sending email for recipient: " + request.getRecepient() + " delivered");
+            LoggerUtil.trace(LOGGER, "Sending email for recipient: " + request.getRecepient() + " delivered");
         } catch (MessagingException e) {
             request.setStatus(AlertStatus.FAILED);
         } catch (Exception e) {
             request.setStatus(AlertStatus.FAILED);
-            LoggerUtil.error(LOGGER, "EmailScheduler: sending email failed for recipient: " + request.getRecepient() + " failed");
+            LoggerUtil.error(LOGGER, "Sending email failed for recipient: " + request.getRecepient() + " failed");
         }
     }
 }

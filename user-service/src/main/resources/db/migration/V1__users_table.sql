@@ -19,9 +19,9 @@ CREATE TABLE users (
     deleted		    tinyint(1) NOT NULL DEFAULT 0,
 
     PRIMARY KEY (id),
-    INDEX (id),
-    INDEX (email),
     INDEX (id, deleted),
+    INDEX (email, deleted),
+    INDEX (email, enabled, deleted),
     CONSTRAINT unique_user_user_id UNIQUE (id),
     CONSTRAINT unique_user_user_email UNIQUE (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

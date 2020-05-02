@@ -13,14 +13,34 @@ public class EventResponse extends BaseModel implements Serializable {
         private static final long serialVersionUID = 1L;
 
         /**
+         * firstName of the user
+         */
+        private String firstName;
+
+        /**
          * email of the user
          */
         private String email;
 
         /**
-         * token of the user
+         * otp of the user
          */
-        private String token;
+        private String otp;
+
+
+        /**
+         * Get the user firstName
+         */
+        public String getFirstName() {
+                return firstName;
+        }
+
+        /**
+         * Set the user firstName
+         */
+        public void setFirstName(String firstName) {
+                this.firstName = firstName;
+        }
 
         /**
          * Get the user email
@@ -37,16 +57,16 @@ public class EventResponse extends BaseModel implements Serializable {
         }
 
         /**
-         * Get the user token
+         * Get the user otp
          */
-        public String getToken() {
-                return token;
+        public String getOtp() {
+                return otp;
         }
 
         /**
          * Set the user token
          */
-        public void setToken(String email) {
-                this.token = token;
+        public void setOtp(String otp) {
+                this.otp = otp;
         }
 }

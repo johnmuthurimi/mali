@@ -21,32 +21,32 @@ import org.springframework.messaging.handler.annotation.support.DefaultMessageHa
 @Configuration
 public class RabbitConfig implements RabbitListenerConfigurer 
 {
-    public static final String QUEUE_EMAIL_VERIFICATION= "email_verification-queue";
-    public static final String EXCHANGE_EMAIL_VERIFICATION= "email_verification-exchange";
-    public static final String QUEUE_DEAD_EMAIL_VERIFICATION = "dead-email_verification-queue";
+    public static final String QUEUE_OTP = "OTP-queue";
+    public static final String EXCHANGE_OTP = "OTP-exchange";
+    public static final String QUEUE_DEAD_OTP = "dead-OTP-queue";
 
     @Bean
     Queue dataQueue() {
-        return QueueBuilder.durable(QUEUE_EMAIL_VERIFICATION)
+        return QueueBuilder.durable(QUEUE_OTP)
                 .withArgument("x-dead-letter-exchange", "")
-                .withArgument("x-dead-letter-routing-key", QUEUE_DEAD_EMAIL_VERIFICATION)
+                .withArgument("x-dead-letter-routing-key", QUEUE_DEAD_OTP)
                 .withArgument("x-message-ttl", 15000)
                 .build();
     }
 
     @Bean
     Queue deadLetterQueue() {
-        return QueueBuilder.durable(QUEUE_DEAD_EMAIL_VERIFICATION).build();
+        return QueueBuilder.durable(QUEUE_DEAD_OTP).build();
     }
  
     @Bean
     Exchange dataExchange() {
-        return ExchangeBuilder.topicExchange(EXCHANGE_EMAIL_VERIFICATION).build();
+        return ExchangeBuilder.topicExchange(EXCHANGE_OTP).build();
     }
  
     @Bean
     Binding binding(Queue dataQueue, TopicExchange dataExchange) {
-        return BindingBuilder.bind(dataQueue).to(dataExchange).with(QUEUE_EMAIL_VERIFICATION);
+        return BindingBuilder.bind(dataQueue).to(dataExchange).with(QUEUE_OTP);
     }
 
     @Bean

@@ -30,12 +30,12 @@ public class EmailScheduler {
 	@Scheduled(fixedDelay = 5000)
 	public void scheduleEmail() {
         try {
-            LoggerUtil.info(LOGGER, "EmailScheduler: started");
+            LoggerUtil.info(LOGGER, "Email scheduler started");
             emailService.executeQueue();
         } catch (Exception e) {
-            LoggerUtil.error(LOGGER, "EmailScheduler: experienced failure");
+            LoggerUtil.error(LOGGER, "Email scheduler  experienced failure");
         } finally {
-            LoggerUtil.info(LOGGER, "EmailScheduler: completed");
+            LoggerUtil.info(LOGGER, "Email scheduler stopped");
         }
 	}
 }

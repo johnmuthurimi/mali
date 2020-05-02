@@ -14,10 +14,10 @@ public interface UserDao extends BaseDao {
 
    /**
     * Get user by username
-    * @param username
+    * @param email
     * @return
     */
-   User findByEmail(String username);
+   User findByEmail(String email);
 
    /**
     * Create user in the database

@@ -1,6 +1,6 @@
 package slick.mali.coreservice.model;
 
-public class Request<T> extends BaseModel {
+public class Request<T> {
 
     /**
      * This is the object param returned

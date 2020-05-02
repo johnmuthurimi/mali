@@ -5,7 +5,7 @@ import slick.mali.coreservice.model.BaseModel;
 /**
  * Domain class for user
  */
-public class Token extends BaseModel {
+public class OTP extends BaseModel {
 
     /**
      * User id
@@ -18,6 +18,11 @@ public class Token extends BaseModel {
     private Boolean verified;
 
     /**
+     * OTP number
+     */
+    private String otp;
+
+    /**
      * Get user id
      */
     public String getUserId() {
@@ -27,10 +32,9 @@ public class Token extends BaseModel {
     /**
      * Set the user id
      */
-    public void setUserId(String id) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
-
 
     /**
      * Get the deleted status
@@ -44,6 +48,20 @@ public class Token extends BaseModel {
      */
     public void setVerified(Boolean verified) {
         this.verified = verified;
+    }
+
+    /**
+     * Get user otp
+     */
+    public String getOtp() {
+        return otp;
+    }
+
+    /**
+     * Set the user otp
+     */
+    public void setOtp(String otp) {
+        this.otp = otp;
     }
 
 }

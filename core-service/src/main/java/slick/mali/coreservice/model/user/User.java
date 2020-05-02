@@ -1,6 +1,7 @@
 package slick.mali.coreservice.model.user;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import slick.mali.coreservice.model.BaseModel;
 
 import javax.validation.constraints.Email;
@@ -11,6 +12,7 @@ import java.io.Serializable;
 /**
  * Domain class for user
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class User extends BaseModel implements Serializable {
 
         /**

@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.*;
 
 
 import slick.mali.coreservice.model.Response;
-import slick.mali.coreservice.model.user.Token;
+import slick.mali.coreservice.model.user.OTP;
 import slick.mali.coreservice.model.user.User;
 import slick.mali.coreservice.model.Request;
-import slick.mali.userservice.service.token.ITokenService;
+import slick.mali.userservice.service.otp.IOtpService;
 import slick.mali.userservice.service.user.IUserService;
 import slick.mali.coreservice.controller.BaseController;
 
@@ -34,25 +34,35 @@ public class UserController extends BaseController {
     private IUserService userService;
 
     /**
-     * Inject the token Service
+     * Inject the OTP Service
      */
     @Autowired
-    private ITokenService tokenService;
+    private IOtpService otpService;
 
     /**
      * Find by Id
      * @param id
      * @return
      */
-    @RequestMapping(value = "/{id}")
-    @ResponseBody
-    public ResponseEntity<Response<User>> findById(@PathVariable final String id) {
-        logger.error("====> This is an error log");
-        logger.info("====> This is an info log");
-        logger.warn("====> This is an warn log");
-
+    @GetMapping("id/{id}")
+    public ResponseEntity<Response<User>> findById(@PathVariable(value = "id") String id) {
         try {
             User result = userService.findById(id);
+            return this.successfulResponse(result);
+        } catch (Exception e) {
+            return this.errorResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * Find by email
+     * @param email
+     * @return
+     */
+    @GetMapping("email/{email}")
+    public ResponseEntity<Response<User>> findByEmail(@PathVariable(value = "email") String email) {
+        try {
+            User result = userService.findByEmail(email);
             return this.successfulResponse(result);
         } catch (Exception e) {
             return this.errorResponse(e.getMessage());
@@ -64,8 +74,8 @@ public class UserController extends BaseController {
      * @param req
      * @return
      */
-    @PostMapping(path = "", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Response<User>> signUp(@Valid @RequestBody Request<User> req) {
+    @PostMapping(path = "/register", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Response<User>> register(@Valid @RequestBody Request<User> req) {
         try {
             User result = userService.create(req.getParam());
             return this.successfulResponse(result);
@@ -76,14 +86,28 @@ public class UserController extends BaseController {
 
     /**
      * This is end point for verification os user email
-     * @param  token
+     * @param  otp
      * @return User
      */
-    @RequestMapping(value = "verify")
-    @ResponseBody
-    public ResponseEntity<Response<Token>> verifyUser(@RequestParam(value = "token") String token) {
+    @GetMapping("/otp/{otp}")
+    public ResponseEntity<Response<OTP>> verifyUser(@PathVariable(value = "otp") String otp) {
         try {
-            Token result = tokenService.verifyToken(token);
+            OTP result = otpService.verifyOTP(otp);
+            return this.successfulResponse(null);
+        } catch (Exception e) {
+            return this.errorResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * Resend user OTP
+     * @param userId
+     * @return
+     */
+    @GetMapping("resend/otp/{id}")
+    public ResponseEntity<Response<OTP>> resendOTP(@PathVariable(value = "id") String userId) {
+        try {
+            String otp = otpService.create(userId);
             return this.successfulResponse(null);
         } catch (Exception e) {
             return this.errorResponse(e.getMessage());

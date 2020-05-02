@@ -46,10 +46,14 @@ public class UserDetailsServiceImpl implements UserDetailsService  {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         AppUser appUser = findByEmail(username);
-        if(appUser.getEmail().equals(username)) {
-            List<GrantedAuthority> grantedAuthorities = AuthorityUtils
-                    .commaSeparatedStringToAuthorityList("ROLE_" + appUser.getRole());
-            return new User(appUser.getEmail(), appUser.getPassword(), grantedAuthorities);
+        if (appUser != null) {
+            if (appUser.getEmail().equals(username)) {
+                List<GrantedAuthority> grantedAuthorities = AuthorityUtils
+                        .commaSeparatedStringToAuthorityList("ROLE_" + appUser.getRole());
+                return new User(appUser.getEmail(), appUser.getPassword(), grantedAuthorities);
+            } else {
+                throw new UsernameNotFoundException("Username or password is incorrect");
+            }
         }
         throw new UsernameNotFoundException("Username: " + username + " not found");
     }
@@ -62,7 +66,7 @@ public class UserDetailsServiceImpl implements UserDetailsService  {
     public AppUser findByEmail(String username) {
         String query = "SELECT id, email, password, status, enabled, deleted "
                 + "FROM users  "
-                + "WHERE username = ? AND enabled = 1 AND deleted = 0 "
+                + "WHERE email = ? AND enabled = 1 AND deleted = 0 "
                 + "LIMIT 1 ";
         RowMapper<AppUser> rowMapper = new AppUserMapper();
         List<AppUser> user = jdbcTemplate.query(query, rowMapper, username);

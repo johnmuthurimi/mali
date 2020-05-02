@@ -14,7 +14,7 @@ public interface IAlertService extends IBaseService {
     * Insert newly created email notification
     * @param request
     */
-    String sendEmailVerificationNotification(EventResponse request);
+    String createOTPNotification(EventResponse request);
 
     /**
     * Returns a List of queue emails for sending

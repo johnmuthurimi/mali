@@ -1,4 +1,4 @@
-package slick.mali.alertservice.service.emailTemplate;
+package slick.mali.alertservice.utility;
 
 import slick.mali.coreservice.constants.StringConstants;
 import slick.mali.coreservice.util.StringUtil;
@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * USe this class for email verify templates
  */
-public class EmailVerification {
+public class EmailTemplate {
 
     private String templateId;
 
@@ -19,7 +19,7 @@ public class EmailVerification {
 
     private Map<String, String> replacementParams;
 
-    public EmailVerification(String templateId) {
+    public EmailTemplate(String templateId) {
         this.templateId = templateId;
         try {
             this.template = loadTemplate(templateId);

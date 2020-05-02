@@ -9,7 +9,7 @@ import slick.mali.coreservice.model.EventRequest;
 import slick.mali.coreservice.model.user.User;
 import slick.mali.coreservice.util.LoggerUtil;
 import slick.mali.coreservice.util.PasswordUtils;
-import slick.mali.userservice.dao.token.TokenDao;
+import slick.mali.userservice.dao.otp.OtpDao;
 import slick.mali.userservice.dao.user.UserDao;
 import slick.mali.userservice.rabbitmq.EventMessageSender;
 import slick.mali.userservice.rabbitmq.RabbitConfig;
@@ -32,17 +32,17 @@ public class UserServiceImpl implements IUserService {
     private UserDao userDao;
 
     /**
-     * Inject the token DAO
+     * Inject the otp DAO
      */
     @Autowired
-    private TokenDao tokenDao;
+    private OtpDao otpDao;
 
 
     /**
      * Send message request via Rabbit MQ
      */
-    public void sendVerificationMessage(final EventRequest event) {
-        eventMessageSender.sendMessage(event, RabbitConfig.QUEUE_EMAIL_VERIFICATION);
+    public void sendOTPRequest(final EventRequest event) {
+        eventMessageSender.sendMessage(event, RabbitConfig.QUEUE_OTP);
     }
 
     /**
@@ -85,7 +85,7 @@ public class UserServiceImpl implements IUserService {
         boolean found = userExists(user);
         if (!found) {
             try {
-                LoggerUtil.info(LOGGER, "AlertServiceImpl: Initiate user sign up for: " + user.getEmail());
+                LoggerUtil.info(LOGGER, " Initiate user register for: " + user.getEmail());
                 // generate salts
                 final String salt = PasswordUtils.getSalt(30);
                 final String hashValue = PasswordUtils.generateSecurePassword(user.getPassword(), salt);
@@ -94,32 +94,33 @@ public class UserServiceImpl implements IUserService {
                 user.setStatus(UserStatus.NEW);
                 user.setEnabled(false);
                 user.setDeleted(false);
-                LoggerUtil.info(LOGGER, "AlertServiceImpl: Generated password for: " + user.getEmail());
+                LoggerUtil.info(LOGGER, "Generated password for: " + user.getEmail());
 
                 // Register users
                 final String id = userDao.create(user);
                 user.setId(id);
-                LoggerUtil.info(LOGGER, "AlertServiceImpl: Insert the user in the database: " + user.getEmail());
+                LoggerUtil.info(LOGGER, "Insert the user in the database: " + user.getEmail());
 
-                LoggerUtil.info(LOGGER, "AlertServiceImpl: Generate user verification token for : " + user.getEmail());
-                final String token = tokenDao.create(user);
+                LoggerUtil.info(LOGGER, "Generate user verification OTP for : " + user.getEmail());
+                final String otp = otpDao.create(user.getId());
                 user.setId(id);
 
+                event.setFirstName(user.getFirstName());
                 event.setId(user.getId());
                 event.setEmail(user.getEmail());
-                event.setToken(token);
+                event.setOtp(otp);
 
                 // send notification to rabbitmq
-                sendVerificationMessage(event);
-                LoggerUtil.info(LOGGER, "AlertServiceImpl: Initiated RabbitMQ OTP request for: " + user.getEmail());
+                sendOTPRequest(event);
+                LoggerUtil.info(LOGGER, "Initiated RabbitMQ OTP request for: " + user.getEmail());
 
                 // Update user to pending
                 userDao.updateStatus(UserStatus.PENDING, user.getId());
-                LoggerUtil.info(LOGGER, "AlertServiceImpl: Pending user email confirmation for: " + user.getEmail());
+                LoggerUtil.info(LOGGER, "Pending user OTP confirmation for: " + user.getEmail());
             } catch (Exception e) {
-                // We need to delete user token from the database if exist
-                if (event.getToken() != null) {
-                    tokenDao.delete(event.getToken());
+                // We need to delete user OTP from the database if exist
+                if (event.getOtp() != null) {
+                    otpDao.delete(event.getOtp(), user.getId());
                 }
 
                 // We need to delete user from the database if exist
@@ -127,87 +128,27 @@ public class UserServiceImpl implements IUserService {
                     userDao.delete(user.getId());
                 }
 
-                LoggerUtil.error(LOGGER, "AlertServiceImpl: There experienced error registering user : " + user.getEmail());
+                LoggerUtil.error(LOGGER, " There experienced error registering user : " + user.getEmail());
                 LoggerUtil.error(LOGGER, e.getMessage());
                 throw e;
             }
 
-            LoggerUtil.info(LOGGER, "AlertServiceImpl: Completed sign up requested for : " + user.getEmail());
+            LoggerUtil.info(LOGGER, "Completed sign up requested for : " + user.getEmail());
             return user;
         } else {
+            LoggerUtil.error(LOGGER, "User already exists! : " + user.getEmail());
             throw new Exception("User already exists!");
         }
     }
 
     /**
-     * Login User in the platform, it involves the following
-     * @param user
-     * @return user
-     */
-    @Override
-    public User login(User user) {
-        final EventRequest event = new EventRequest();
-        try {
-            LoggerUtil.info(LOGGER, "AlertServiceImpl: Initiate user sign up for: " + user.getEmail());
-            // generate salts
-            final String salt = PasswordUtils.getSalt(30);
-            final String hashValue = PasswordUtils.generateSecurePassword(user.getPassword(), salt);
-            user.setSalt(salt);
-            user.setPassword(hashValue);
-            user.setStatus(UserStatus.NEW);
-            user.setEnabled(false);
-            user.setDeleted(false);
-            LoggerUtil.info(LOGGER, "AlertServiceImpl: Generated password for: " + user.getEmail());
-
-            // Register users
-            final String id = userDao.create(user);
-            user.setId(id);
-            LoggerUtil.info(LOGGER, "AlertServiceImpl: Insert the user in the database: " + user.getEmail());
-
-            LoggerUtil.info(LOGGER, "AlertServiceImpl: Generate user verification token for : " + user.getEmail());
-            final String token = tokenDao.create(user);
-            user.setId(id);
-
-            event.setId(user.getId());
-            event.setEmail(user.getEmail());
-            event.setToken(token);
-
-            // send notification to rabbitmq
-            sendVerificationMessage(event);
-            LoggerUtil.info(LOGGER, "AlertServiceImpl: Initiated RabbitMQ OTP request for: " + user.getEmail());
-
-            // Update user to pending
-            userDao.updateStatus(UserStatus.PENDING, user.getId());
-            LoggerUtil.info(LOGGER, "AlertServiceImpl: Pending user email confirmation for: " + user.getEmail());
-        } catch (Exception e) {
-            // We need to delete user token from the database if exist
-            if (event.getToken() != null) {
-                tokenDao.delete(event.getToken());
-            }
-
-            // We need to delete user from the database if exist
-            if (user.getId() != null) {
-                userDao.delete(user.getId());
-            }
-
-            LoggerUtil.error(LOGGER, "AlertServiceImpl: There experienced error registering user : " + user.getEmail());
-            LoggerUtil.error(LOGGER, e.getMessage());
-            throw e;
-        }
-
-        LoggerUtil.info(LOGGER, "AlertServiceImpl: Completed sign up requested for : " + user.getEmail());
-        return user;
-    }
-
-
-    /**
-     * Get user by username
-     * @param username
+     * Get user by email
+     * @param email
      * @return
      */
     @Override
-    public User findByEmail(String username) {
-        return userDao.findByEmail(username);
+    public User findByEmail(String email) {
+        return userDao.findByEmail(email);
     }
 
 }

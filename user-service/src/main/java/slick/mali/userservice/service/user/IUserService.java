@@ -1,5 +1,6 @@
 package slick.mali.userservice.service.user;
 
+import slick.mali.coreservice.model.user.OTP;
 import slick.mali.coreservice.model.user.User;
 import slick.mali.coreservice.service.IBaseService;
 
@@ -26,16 +27,9 @@ public interface IUserService extends IBaseService {
     User create(User user) throws Exception;
 
     /**
-     * Login User to the platform
-     * @param login
-     * @return
-     */
-    User login(User login);
-
-    /**
-     * Get user by username
+     * Get user by email
      * @param username
      * @return
      */
-    User findByEmail(String username);
+    User findByEmail(String email);
 }

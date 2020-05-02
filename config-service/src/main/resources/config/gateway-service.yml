@@ -2,14 +2,49 @@ server:
     port: '${PORT:8080}'
 eureka:
     instance:
-        leaseRenewalIntervalInSeconds: 1
-        leaseExpirationDurationInSeconds: 2
+        lease-renewal-interval-in-seconds: 30
+        lease-expiration-duration-in-seconds: 90
+        status-page-url-path: ${management.endpoints.web.base-path}/info
+        health-check-url-path: ${management.endpoints.web.base-path}/health
     server:
-        enableSelfPreservation: false
+        peer-node-read-timeout-ms: 300000
+        enable-self-preservation: false
     client:
-        serviceUrl:
-            defaultZone: 'http://192.168.100.29:8761/eureka/'
+        enabled: true
+        healthcheck:
+            enabled: true
+        fetch-registry: true
+        register-with-eureka: true
+        instance-info-replication-interval-seconds: 10
+        registry-fetch-interval-seconds: 10
+hystrix:
+    command:
+        default:
+            execution:
+                isolation:
+                    thread:
+                        timeoutInMilliseconds: 20000
+hystrix.command.default.execution.timeout.enabled: false
+ribbon:
+    eureka:
+        enabled: true
+    ReadTimeout: 600000
+    ConnectTimeout: 10000
+    MaxAutoRetries: 3
+    MaxAutoRetriesNextServer: 5
+    OkToRetryOnAllOperations: true
+    restclient:
+        enabled: true
 zuul:
+    host:
+        max-total-connections: 1000
+        max-per-route-connections: 100
+        connect-timeout-millis: 50000
+        socket-timeout-millis: 100000
+        time-to-live: 100000
+    semaphore:
+        max-semaphores: 500
+    retryable: true
     routes:
         auth-service:
             path: '/auth/**'
@@ -18,7 +53,8 @@ zuul:
             sensitive-headers: 'Cookie,Set-Cookie'
         user-service:
             path: '/user/**'
-            service-id: user-service
+            service-id: USER-SERVICE
+            strip-prefix: false
     host:
         connect-timeout-millis: 10000
         socket-timeout-millis: 60000

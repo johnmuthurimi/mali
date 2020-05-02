@@ -1,8 +1,11 @@
 package slick.mali.coreservice.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BaseModel implements Serializable {
 
     private static final long serialVersionUID = -8091879091924046844L;

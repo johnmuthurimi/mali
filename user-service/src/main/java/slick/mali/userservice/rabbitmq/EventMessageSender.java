@@ -39,7 +39,7 @@ public class EventMessageSender {
      * @param queue
      */
     public void sendMessage(EventRequest event, String queue) {
-        LoggerUtil.info(LOGGER, "EventMessageSender: Initiate RabbitMQ for OTP with  " + event.getEmail());
+        LoggerUtil.info(LOGGER, "Initiate RabbitMQ for OTP with  " + event.getEmail());
         this.rabbitTemplate.convertAndSend(queue, event);
         try {
             String jsonData = objectMapper.writeValueAsString(event);
@@ -48,9 +48,9 @@ public class EventMessageSender {
                                 .setContentType(MessageProperties.CONTENT_TYPE_JSON)
                                 .build();
             this.rabbitTemplate.convertAndSend(queue, message);
-            LoggerUtil.info(LOGGER, "EventMessageSender: RabbitMQ for OTP with  " + event.getEmail() + " was successfully sent");
+            LoggerUtil.info(LOGGER, "RabbitMQ for OTP with  " + event.getEmail() + " was successfully sent");
         } catch (JsonProcessingException e) {
-            LoggerUtil.info(LOGGER, "EventMessageSender: Initiate RabbitMQ for OTP with  " + event.getEmail() + " Failed");
+            LoggerUtil.info(LOGGER, "Initiate RabbitMQ for OTP with  " + event.getEmail() + " Failed");
             LoggerUtil.error(LOGGER, e.getMessage());
         }
     }
