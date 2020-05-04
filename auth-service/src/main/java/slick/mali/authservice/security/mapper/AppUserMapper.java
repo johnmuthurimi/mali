@@ -17,6 +17,7 @@ public class AppUserMapper implements RowMapper<AppUser> {
             user.setId(rs.getString("id"));
             user.setEmail(rs.getString("email"));
             user.setPassword(rs.getString("password"));
+            user.setSalt(rs.getString("salt"));
         }
         return user;
    }

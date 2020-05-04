@@ -64,7 +64,7 @@ public class UserDetailsServiceImpl implements UserDetailsService  {
      * @return
      */
     public AppUser findByEmail(String username) {
-        String query = "SELECT id, email, password, status, enabled, deleted "
+        String query = "SELECT id, email, password, salt, status, enabled, deleted "
                 + "FROM users  "
                 + "WHERE email = ? AND enabled = 1 AND deleted = 0 "
                 + "LIMIT 1 ";
